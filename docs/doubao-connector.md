@@ -9,7 +9,7 @@
 第一条安装 CLI。包发布后，填写实际版本及仓库地址：
 
 ```bash
-npm install -g @lark-ka/cli@0.1.0 --registry="https://npm.customer-a.example.invalid/"
+npm install -g @lark-ka/hn-work-cli@0.1.0 --registry="https://npm.customer-a.example.invalid/"
 ```
 
 第二条保存客户的固定配置。下面所有示例地址、App ID 和 Scope 都要替换成客户提供的真实值；在后台输入框内可合并成一行：

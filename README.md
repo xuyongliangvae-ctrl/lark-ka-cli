@@ -25,7 +25,7 @@ npm run compatibility
 
 ```bash
 # 发布后从实际企业 npm 仓库安装；本地也可以安装生成的 tgz。
-npm install -g @lark-ka/cli@0.1.0 --registry="https://npm.customer-a.example.invalid/"
+npm install -g @lark-ka/hn-work-cli@0.1.0 --registry="https://npm.customer-a.example.invalid/"
 
 # 只传客户参数，不需要配置文件。
 lark-ka config init --name customer-a \
@@ -137,18 +137,18 @@ JSON 结果写 stdout，错误写 stderr；支持 `@file` / stdin、分页、dry
 
 ```bash
 # 公开版本发布至 npm 官方后安装，要求 Node.js >=22。
-npm install -g @lark-ka/cli@0.1.0 --registry=https://registry.npmjs.org/
+npm install -g @lark-ka/hn-work-cli@0.1.0 --registry=https://registry.npmjs.org/
 
 # 国内镜像同步到该版本后也可以安装。
-npm install -g @lark-ka/cli@0.1.0 --registry=https://registry.npmmirror.com/
+npm install -g @lark-ka/hn-work-cli@0.1.0 --registry=https://registry.npmmirror.com/
 lark-ka --version
 
 # 本地打包与安装。
 npm pack
-npm install -g /absolute/path/to/lark-ka-cli-0.1.0.tgz
+npm install -g /absolute/path/to/lark-ka-hn-work-cli-0.1.0.tgz
 ```
 
-镜像同步可能有延迟，可通过 `npm view @lark-ka/cli@0.1.0 version --registry=https://registry.npmmirror.com/` 查询。企业后台配置见 [docs/doubao-connector.md](docs/doubao-connector.md)。
+镜像同步可能有延迟，可通过 `npm view @lark-ka/hn-work-cli@0.1.0 version --registry=https://registry.npmmirror.com/` 查询。企业后台配置见 [docs/doubao-connector.md](docs/doubao-connector.md)。
 
 ## 更新命令定义
 

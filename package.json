@@ -1,5 +1,5 @@
 {
-  "name": "@lark-ka/cli",
+  "name": "@lark-ka/hn-work-cli",
   "version": "0.1.0",
   "description": "Native Node.js CLI for Feishu/Lark and private deployments",
   "repository": {

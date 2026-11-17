@@ -427,7 +427,7 @@ async function executeInternal(words, flags = {}, options = {}) {
       ok: true,
       data: {
         current: VERSION,
-        package: "@lark-ka/cli",
+        package: "@lark-ka/hn-work-cli",
         hint: "Update this customer package from its approved npm registry. No official Go binary is used.",
       },
     };
