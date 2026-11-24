@@ -4,7 +4,7 @@
 
 搜索妙记列表，支持关键词、所有者、参与者以及时间范围等多条件过滤。所有者与参与者都支持传入多个 open\_id，也支持传入 `me` 表示当前用户。只读操作，不修改任何妙记数据。
 
-本 skill 对应 shortcut：`lark-cli minutes +search`（调用 `POST /open-apis/minutes/v1/minutes/search`）。
+本 skill 对应 shortcut：`lark-ka minutes +search`（调用 `POST /open-apis/minutes/v1/minutes/search`）。
 
 ## 典型触发表达
 
@@ -21,46 +21,46 @@
 
 ```bash
 # 关键词搜索
-lark-cli minutes +search --query "预算复盘"
+lark-ka minutes +search --query "预算复盘"
 
 # 查询某一天内的妙记（单日查询时，建议将 start 和 end 都填写为同一天）
-lark-cli minutes +search --start 2026-03-10 --end 2026-03-10
+lark-ka minutes +search --start 2026-03-10 --end 2026-03-10
 
 # 按时间范围搜索
-lark-cli minutes +search --start "2026-03-10T00:00+08:00" --end "2026-03-17T00:00+08:00"
-lark-cli minutes +search --start 2026-03-10 --end 2026-03-17
+lark-ka minutes +search --start "2026-03-10T00:00+08:00" --end "2026-03-17T00:00+08:00"
+lark-ka minutes +search --start 2026-03-10 --end 2026-03-17
 
 # 关键词 + 时间范围
-lark-cli minutes +search --query "预算复盘" --start "2026-03-10T00:00+08:00" --end "2026-03-17T00:00+08:00"
-lark-cli minutes +search --query "预算复盘" --start "2026-03-10T00:00+08:00"
-lark-cli minutes +search --query "预算复盘" --end "2026-03-17T00:00+08:00"
+lark-ka minutes +search --query "预算复盘" --start "2026-03-10T00:00+08:00" --end "2026-03-17T00:00+08:00"
+lark-ka minutes +search --query "预算复盘" --start "2026-03-10T00:00+08:00"
+lark-ka minutes +search --query "预算复盘" --end "2026-03-17T00:00+08:00"
 
 # 按参与者过滤（open_id，逗号分隔）
-lark-cli minutes +search --participant-ids "ou_x,ou_y"
+lark-ka minutes +search --participant-ids "ou_x,ou_y"
 
 # 按所有者过滤（open_id，逗号分隔）
-lark-cli minutes +search --owner-ids "ou_owner,ou_owner_2"
+lark-ka minutes +search --owner-ids "ou_owner,ou_owner_2"
 
 # 严格只查我作为参与者的妙记（不含我拥有）
-lark-cli minutes +search --participant-ids "me"
+lark-ka minutes +search --participant-ids "me"
 
 # 查询我拥有的妙记
-lark-cli minutes +search --owner-ids "me"
+lark-ka minutes +search --owner-ids "me"
 
 # 广义查询我参与的妙记（自然语言默认：我拥有 ∪ 我参与）
-lark-cli minutes +search --owner-ids "me" --start 2026-03-10 --end 2026-03-10
-lark-cli minutes +search --participant-ids "me" --start 2026-03-10 --end 2026-03-10
+lark-ka minutes +search --owner-ids "me" --start 2026-03-10 --end 2026-03-10
+lark-ka minutes +search --participant-ids "me" --start 2026-03-10 --end 2026-03-10
 # 然后按 token 去重合并两次结果
 
 # 多条件组合查询
-lark-cli minutes +search --owner-ids "ou_owner" --participant-ids "ou_x" --start "2026-03-10T00:00+08:00"
+lark-ka minutes +search --owner-ids "ou_owner" --participant-ids "ou_x" --start "2026-03-10T00:00+08:00"
 
 # 分页查询
-lark-cli minutes +search --query "预算复盘" --page-size 20
-lark-cli minutes +search --query "预算复盘" --page-size 20 --page-token '<PAGE_TOKEN>'
+lark-ka minutes +search --query "预算复盘" --page-size 20
+lark-ka minutes +search --query "预算复盘" --page-size 20 --page-token '<PAGE_TOKEN>'
 
 # 输出为结构化 JSON
-lark-cli minutes +search --query "预算复盘" --format json
+lark-ka minutes +search --query "预算复盘" --format json
 ```
 
 ## 参数
@@ -84,12 +84,12 @@ lark-cli minutes +search --query "预算复盘" --format json
 
 ### 2. 仅支持 user 身份
 
-该接口仅支持 `user` 身份，使用前需完成 `lark-cli auth login` 并具备 `minutes:minutes.search:read` 权限。
+该接口仅支持 `user` 身份，使用前需完成 `lark-ka auth login` 并具备 `minutes:minutes.search:read` 权限。
 
 ### 3. `me` 表示当前用户
 
 在 `--owner-ids` 和 `--participant-ids` 中可使用 `me`，表示当前登录用户。该值会在本地解析为当前用户的 `open_id`，无需手动先查询自己的用户 ID。
-若当前环境尚未完成用户登录，或 CLI 无法解析出当前用户的 `open_id`，则应先执行 `lark-cli auth login`，再重新执行搜索。
+若当前环境尚未完成用户登录，或 CLI 无法解析出当前用户的 `open_id`，则应先执行 `lark-ka auth login`，再重新执行搜索。
 
 ### 4. 自然语言中的“参与的妙记”默认按并集理解
 
@@ -156,10 +156,10 @@ CLI 会先按输入的本地日历日语义解析，再标准化为 RFC3339 时�
 
 ```bash
 # First page
-lark-cli minutes +search --query "预算复盘" --page-size 20
+lark-ka minutes +search --query "预算复盘" --page-size 20
 
 # Next page
-lark-cli minutes +search --query "预算复盘" --page-size 20 --page-token '<PAGE_TOKEN>'
+lark-ka minutes +search --query "预算复盘" --page-size 20 --page-token '<PAGE_TOKEN>'
 ```
 
 ## 搜索结果中的下一步
@@ -171,10 +171,10 @@ lark-cli minutes +search --query "预算复盘" --page-size 20 --page-token '<PA
 
 ```bash
 # 首先查询妙记元信息（标题、时长、封面） → 用本 skill
-lark-cli minutes minutes get --params '{"minute_token": "obcn***************"}'
+lark-ka minutes minutes get --params '{"minute_token": "obcn***************"}'
 
-# 查妙记关联的纪要产物：逐字稿、总结、待办、章节等 → 用 lark-cli vc +notes
-lark-cli vc +notes --minute-tokens obcn_EXAMPLE_TOKEN
+# 查妙记关联的纪要产物：逐字稿、总结、待办、章节等 → 用 lark-ka vc +notes
+lark-ka vc +notes --minute-tokens obcn_EXAMPLE_TOKEN
 ```
 
 ## 常见错误与排查

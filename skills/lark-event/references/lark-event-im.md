@@ -2,7 +2,7 @@
 
 > **Prerequisite:** Read [`../SKILL.md`](../SKILL.md) first for the `event consume` essentials (commands, subprocess contract, jq usage).
 >
-> **Heads-up for AI agents**: this key's `.content` is **NOT** the raw OAPI payload shape your training data may suggest. `lark-cli` runs a Process hook (`convertlib`) that flattens the V2 envelope and **pre-renders** `.content` to human-readable text for `text` / `post` / `image` / `file` / `audio` / etc. Only `interactive` (cards) keeps the raw JSON string. Don't blindly `fromjson`.
+> **Heads-up for AI agents**: this key's `.content` is **NOT** the raw OAPI payload shape your training data may suggest. `lark-ka` runs a Process hook (`convertlib`) that flattens the V2 envelope and **pre-renders** `.content` to human-readable text for `text` / `post` / `image` / `file` / `audio` / etc. Only `interactive` (cards) keeps the raw JSON string. Don't blindly `fromjson`.
 
 ## Key catalog (11)
 
@@ -37,17 +37,17 @@
 
 ```bash
 # text: .content is plain text — no fromjson needed
-lark-cli event consume im.message.receive_v1 --as bot \
+lark-ka event consume im.message.receive_v1 --as bot \
   --jq 'select(.message_type=="text") | .content'
 
 # interactive: .content is a JSON string — fromjson to parse
-lark-cli event consume im.message.receive_v1 --as bot \
+lark-ka event consume im.message.receive_v1 --as bot \
   --jq 'select(.message_type=="interactive") | .content | fromjson'
 ```
 
 ## On-demand filter recipes
 
-> **Default = no `--jq`.** Run `lark-cli event consume im.message.receive_v1 --as bot` to see every message. The recipes below are only for cases where the user has asked to narrow the stream.
+> **Default = no `--jq`.** Run `lark-ka event consume im.message.receive_v1 --as bot` to see every message. The recipes below are only for cases where the user has asked to narrow the stream.
 
 ### 1. Filter by chat type (p2p vs group)
 
@@ -55,11 +55,11 @@ lark-cli event consume im.message.receive_v1 --as bot \
 
 ```bash
 # p2p only (direct messages)
-lark-cli event consume im.message.receive_v1 --as bot \
+lark-ka event consume im.message.receive_v1 --as bot \
   --jq 'select(.chat_type=="p2p") | {from: .sender_id, msg: .content}'
 
 # group only
-lark-cli event consume im.message.receive_v1 --as bot \
+lark-ka event consume im.message.receive_v1 --as bot \
   --jq 'select(.chat_type=="group") | {chat: .chat_id, from: .sender_id, msg: .content}'
 ```
 
@@ -67,11 +67,11 @@ lark-cli event consume im.message.receive_v1 --as bot \
 
 ```bash
 # text only — content is plain human-readable text
-lark-cli event consume im.message.receive_v1 --as bot \
+lark-ka event consume im.message.receive_v1 --as bot \
   --jq 'select(.message_type=="text") | .content'
 
 # interactive (card) only — parse the card body
-lark-cli event consume im.message.receive_v1 --as bot \
+lark-ka event consume im.message.receive_v1 --as bot \
   --jq 'select(.message_type=="interactive") | .content | fromjson'
 ```
 
@@ -79,8 +79,8 @@ lark-cli event consume im.message.receive_v1 --as bot \
 
 ```bash
 # example: only messages from the given open_id
-lark-cli event consume im.message.receive_v1 --as bot\
+lark-ka event consume im.message.receive_v1 --as bot\
   --jq 'select(.sender_id=="ou_xxxxxxxxxxxxxxxxxxxxxxxxxx") | {msg_id: .message_id, text: .content}'
 ```
 
-Get your own open_id via `lark-cli contact +get-user --as user`; other users' via `lark-cli contact +search-user`.
+Get your own open_id via `lark-ka contact +get-user --as user`; other users' via `lark-ka contact +search-user`.

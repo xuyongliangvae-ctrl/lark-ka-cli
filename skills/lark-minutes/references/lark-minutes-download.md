@@ -5,31 +5,31 @@
 
 下载妙记的音视频媒体文件到本地，或获取有效期 1 天的下载链接。只读操作。
 
-本 skill 对应 shortcut：`lark-cli minutes +download`。
+本 skill 对应 shortcut：`lark-ka minutes +download`。
 
 ## 命令
 
 ```bash
 # 下载妙记（默认布局，落到 ./minutes/{minute_token}/<server-filename>）
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx
 
 # 指定输出文件（单 token，文件路径）
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --output ./meeting.mp4
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --output ./meeting.mp4
 
 # 指定输出目录（单/批量均可，目录路径）
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --output-dir ./downloads
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --output-dir ./downloads
 
 # 仅获取下载链接（有效期 1 天），不下载文件
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --url-only
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --url-only
 
 # 批量下载多个妙记（默认布局，逐个落到 ./minutes/{minute_token}/）
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx,obcnyyyyyyyyyyyyyyyyyyyy
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx,obcnyyyyyyyyyyyyyyyyyyyy
 
 # 批量下载到同一指定目录
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx,obcnyyyyyyyyyyyyyyyyyyyy --output-dir ./downloads
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx,obcnyyyyyyyyyyyyyyyyyyyy --output-dir ./downloads
 
 # 预览 API 调用
-lark-cli minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --dry-run
+lark-ka minutes +download --minute-tokens obcnxxxxxxxxxxxxxxxxxxxx --dry-run
 ```
 
 ## 参数
@@ -108,8 +108,8 @@ API 限流 5 次/秒，批量下载时需注意控制频率。
 | 来源 | 获取方式 |
 |------|---------|
 | 妙记 URL | 从 URL 末尾提取，如 `https://sample.feishu.cn/minutes/obcnxxxxxxxxxxxxxxxxxxxx` → `obcnxxxxxxxxxxxxxxxxxxxx` |
-| 妙记元信息查询 | `lark-cli minutes minutes get --params '{"minute_token": "obcn..."}'` |
-| 会议录制查询 | `lark-cli vc +recording --meeting-ids <id>` 或 `lark-cli vc +recording --calendar-event-ids <event_id>` |
+| 妙记元信息查询 | `lark-ka minutes minutes get --params '{"minute_token": "obcn..."}'` |
+| 会议录制查询 | `lark-ka vc +recording --meeting-ids <id>` 或 `lark-ka vc +recording --calendar-event-ids <event_id>` |
 
 ## 常见错误与排查
 

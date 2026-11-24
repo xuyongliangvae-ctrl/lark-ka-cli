@@ -1,0 +1,4226 @@
+{
+  "name": "base",
+  "description": "Bitable v1 HTTP APIs available in HaiNeng Work",
+  "servicePath": "/open-apis/bitable/v1",
+  "source": "Official @larksuiteoapi/node-sdk 1.76.0 and route-matched Open Platform documentation",
+  "resources": {
+    "app": {
+      "methods": {
+        "copy": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/copy",
+          "description": "复制一个多维表格，可以指定复制到某个有权限的文件夹下。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "name": {
+              "type": "string",
+              "required": false
+            },
+            "folder_token": {
+              "type": "string",
+              "required": false
+            },
+            "without_content": {
+              "type": "boolean",
+              "required": false
+            },
+            "time_zone": {
+              "type": "string",
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.copy",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app/copy",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:app:copy", "bitable:app"],
+          "risk": "write"
+        },
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps",
+          "description": "在指定文件夹中创建一个多维表格，包含一个空白的数据表。",
+          "parameters": {},
+          "requestBody": {
+            "name": {
+              "type": "string",
+              "required": false
+            },
+            "folder_token": {
+              "type": "string",
+              "required": false
+            },
+            "time_zone": {
+              "type": "string",
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:app:create", "bitable:app"],
+          "risk": "write"
+        },
+        "get": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}",
+          "description": "获取指定多维表格的元数据信息，包括多维表格名称、多维表格版本号、多维表格是否开启高级权限等。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.get",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app/get",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:app:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "update": {
+          "httpMethod": "PUT",
+          "path": "/open-apis/bitable/v1/apps/{app_token}",
+          "description": "更新多维表格元数据，包括多维表格的名称、是否开启高级权限。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "name": {
+              "type": "string",
+              "required": false
+            },
+            "is_advanced": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.update",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app/update",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:app:update", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.dashboard": {
+      "methods": {
+        "copy": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/dashboards/{block_id}/copy",
+          "description": "基于现有仪表盘复制出新的仪表盘。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "block_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "name": {
+              "type": "string",
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.dashboard.copy",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-dashboard/copy",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:dashboard:copy", "bitable:app"],
+          "risk": "write"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/dashboards",
+          "description": "获取多维表格中的所有仪表盘。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "with_share_config": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.dashboard.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-dashboard/list",
+          "authTypes": ["bot", "user"],
+          "scopes": [
+            "base:dashboard:read",
+            "bitable:app",
+            "bitable:app:readonly"
+          ],
+          "risk": "read"
+        }
+      }
+    },
+    "app.role": {
+      "methods": {
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles",
+          "description": "新增多维表格高级权限中自定义的角色。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "role_name": {
+              "type": "string",
+              "required": true
+            },
+            "table_roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "table_perm": {
+                    "type": "number",
+                    "required": true
+                  },
+                  "table_name": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "table_id": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "rec_rule": {
+                    "type": "object",
+                    "properties": {
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field_name": {
+                              "type": "string",
+                              "required": true
+                            },
+                            "operator": {
+                              "type": "string",
+                              "enum": [
+                                "is",
+                                "isNot",
+                                "contains",
+                                "doesNotContain",
+                                "isEmpty",
+                                "isNotEmpty"
+                              ],
+                              "required": false
+                            },
+                            "value": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "required": false
+                            }
+                          }
+                        },
+                        "required": true
+                      },
+                      "conjunction": {
+                        "type": "string",
+                        "enum": ["and", "or"],
+                        "required": false
+                      },
+                      "other_perm": {
+                        "type": "number",
+                        "required": false
+                      }
+                    },
+                    "required": false
+                  },
+                  "field_perm": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "required": false
+                  },
+                  "allow_add_record": {
+                    "type": "boolean",
+                    "required": false
+                  },
+                  "allow_delete_record": {
+                    "type": "boolean",
+                    "required": false
+                  }
+                }
+              },
+              "required": true
+            },
+            "block_roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "block_id": {
+                    "type": "string",
+                    "required": true
+                  },
+                  "block_perm": {
+                    "type": "number",
+                    "required": true
+                  }
+                }
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.role.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:role:create", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "delete": {
+          "httpMethod": "DELETE",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}",
+          "description": "删除多维表格高级权限中自定义的角色。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.role.delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role/delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:role:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles",
+          "description": "列出多维表格高级权限中用户自定义的角色。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.role.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role/list",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:role:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "update": {
+          "httpMethod": "PUT",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}",
+          "description": "更新多维表格高级权限中自定义的角色。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "role_name": {
+              "type": "string",
+              "required": true
+            },
+            "table_roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "table_perm": {
+                    "type": "number",
+                    "required": true
+                  },
+                  "table_name": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "table_id": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "rec_rule": {
+                    "type": "object",
+                    "properties": {
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field_name": {
+                              "type": "string",
+                              "required": true
+                            },
+                            "operator": {
+                              "type": "string",
+                              "enum": [
+                                "is",
+                                "isNot",
+                                "contains",
+                                "doesNotContain",
+                                "isEmpty",
+                                "isNotEmpty"
+                              ],
+                              "required": false
+                            },
+                            "value": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "required": false
+                            }
+                          }
+                        },
+                        "required": true
+                      },
+                      "conjunction": {
+                        "type": "string",
+                        "enum": ["and", "or"],
+                        "required": false
+                      },
+                      "other_perm": {
+                        "type": "number",
+                        "required": false
+                      }
+                    },
+                    "required": false
+                  },
+                  "field_perm": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "required": false
+                  },
+                  "allow_add_record": {
+                    "type": "boolean",
+                    "required": false
+                  },
+                  "allow_delete_record": {
+                    "type": "boolean",
+                    "required": false
+                  }
+                }
+              },
+              "required": true
+            },
+            "block_roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "block_id": {
+                    "type": "string",
+                    "required": true
+                  },
+                  "block_perm": {
+                    "type": "number",
+                    "required": true
+                  }
+                }
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.role.update",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role/update",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:role:update", "bitable:app"],
+          "risk": "high-risk-write"
+        }
+      }
+    },
+    "app.role.member": {
+      "methods": {
+        "batch_create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}/members/batch_create",
+          "description": "批量新增多维表格高级权限中自定义角色的协作者。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "member_list": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "open_id",
+                      "union_id",
+                      "user_id",
+                      "chat_id",
+                      "department_id",
+                      "open_department_id"
+                    ],
+                    "required": false
+                  },
+                  "id": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.role.member.batch_create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role-member/batch_create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:collaborator:create", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "batch_delete": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}/members/batch_delete",
+          "description": "删除多维表格高级权限中自定义角色的协作者。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "member_list": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "open_id",
+                      "union_id",
+                      "user_id",
+                      "chat_id",
+                      "department_id",
+                      "open_department_id"
+                    ],
+                    "required": false
+                  },
+                  "id": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.role.member.batch_delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role-member/batch_delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:collaborator:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}/members",
+          "description": "新增多维表格高级权限中自定义角色的协作者。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "member_id_type": {
+              "type": "string",
+              "enum": [
+                "open_id",
+                "union_id",
+                "user_id",
+                "chat_id",
+                "department_id",
+                "open_department_id"
+              ],
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "member_id": {
+              "type": "string",
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.role.member.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role-member/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:collaborator:create", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "delete": {
+          "httpMethod": "DELETE",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}/members/{member_id}",
+          "description": "删除多维表格高级权限中自定义角色的协作者。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "member_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "member_id_type": {
+              "type": "string",
+              "enum": [
+                "open_id",
+                "union_id",
+                "user_id",
+                "chat_id",
+                "department_id",
+                "open_department_id"
+              ],
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.role.member.delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role-member/delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:collaborator:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/roles/{role_id}/members",
+          "description": "列出多维表格高级权限中自定义角色的协作者。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "role_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.role.member.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-role-member/list",
+          "authTypes": ["bot", "user"],
+          "scopes": [
+            "base:collaborator:read",
+            "bitable:app",
+            "bitable:app:readonly"
+          ],
+          "risk": "read"
+        }
+      }
+    },
+    "app.table": {
+      "methods": {
+        "batch_create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/batch_create",
+          "description": "新增多个数据表，仅可指定数据表名称。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "tables": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "default_view_name": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field_name": {
+                          "type": "string",
+                          "required": true
+                        },
+                        "type": {
+                          "type": "number",
+                          "required": true
+                        },
+                        "ui_type": {
+                          "type": "string",
+                          "enum": [
+                            "Text",
+                            "Barcode",
+                            "Number",
+                            "Progress",
+                            "Currency",
+                            "Rating",
+                            "SingleSelect",
+                            "MultiSelect",
+                            "DateTime",
+                            "Checkbox",
+                            "User",
+                            "GroupChat",
+                            "Phone",
+                            "Url",
+                            "Attachment",
+                            "SingleLink",
+                            "Formula",
+                            "DuplexLink",
+                            "Location",
+                            "CreatedTime",
+                            "ModifiedTime",
+                            "CreatedUser",
+                            "ModifiedUser",
+                            "AutoNumber"
+                          ],
+                          "required": false
+                        },
+                        "property": {
+                          "type": "object",
+                          "properties": {
+                            "options": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "required": false
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "required": false
+                                  },
+                                  "color": {
+                                    "type": "number",
+                                    "required": false
+                                  }
+                                }
+                              },
+                              "required": false
+                            },
+                            "formatter": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "date_formatter": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "auto_fill": {
+                              "type": "boolean",
+                              "required": false
+                            },
+                            "multiple": {
+                              "type": "boolean",
+                              "required": false
+                            },
+                            "table_id": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "table_name": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "back_field_name": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "auto_serial": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "enum": ["custom", "auto_increment_number"],
+                                  "required": true
+                                },
+                                "options": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "type": {
+                                        "type": "string",
+                                        "enum": [
+                                          "system_number",
+                                          "fixed_text",
+                                          "created_time"
+                                        ],
+                                        "required": true
+                                      },
+                                      "value": {
+                                        "type": "string",
+                                        "required": true
+                                      }
+                                    }
+                                  },
+                                  "required": false
+                                }
+                              },
+                              "required": false
+                            },
+                            "location": {
+                              "type": "object",
+                              "properties": {
+                                "input_type": {
+                                  "type": "string",
+                                  "enum": ["only_mobile", "not_limit"],
+                                  "required": true
+                                }
+                              },
+                              "required": false
+                            },
+                            "formula_expression": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "allowed_edit_modes": {
+                              "type": "object",
+                              "properties": {
+                                "manual": {
+                                  "type": "boolean",
+                                  "required": false
+                                },
+                                "scan": {
+                                  "type": "boolean",
+                                  "required": false
+                                }
+                              },
+                              "required": false
+                            },
+                            "min": {
+                              "type": "number",
+                              "required": false
+                            },
+                            "max": {
+                              "type": "number",
+                              "required": false
+                            },
+                            "range_customize": {
+                              "type": "boolean",
+                              "required": false
+                            },
+                            "currency_code": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "rating": {
+                              "type": "object",
+                              "properties": {
+                                "symbol": {
+                                  "type": "string",
+                                  "required": false
+                                }
+                              },
+                              "required": false
+                            },
+                            "type": {
+                              "type": "object",
+                              "properties": {
+                                "data_type": {
+                                  "type": "number",
+                                  "required": true
+                                },
+                                "ui_property": {
+                                  "type": "object",
+                                  "properties": {
+                                    "currency_code": {
+                                      "type": "string",
+                                      "required": false
+                                    },
+                                    "formatter": {
+                                      "type": "string",
+                                      "required": false
+                                    },
+                                    "range_customize": {
+                                      "type": "boolean",
+                                      "required": false
+                                    },
+                                    "min": {
+                                      "type": "number",
+                                      "required": false
+                                    },
+                                    "max": {
+                                      "type": "number",
+                                      "required": false
+                                    },
+                                    "date_formatter": {
+                                      "type": "string",
+                                      "required": false
+                                    },
+                                    "rating": {
+                                      "type": "object",
+                                      "properties": {
+                                        "symbol": {
+                                          "type": "string",
+                                          "required": false
+                                        }
+                                      },
+                                      "required": false
+                                    }
+                                  },
+                                  "required": false
+                                },
+                                "ui_type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "Number",
+                                    "Progress",
+                                    "Currency",
+                                    "Rating",
+                                    "DateTime"
+                                  ],
+                                  "required": false
+                                }
+                              },
+                              "required": false
+                            },
+                            "filter_info": {
+                              "type": "object",
+                              "properties": {
+                                "target_table": {
+                                  "type": "string",
+                                  "required": false
+                                },
+                                "filter_info": {
+                                  "type": "object",
+                                  "properties": {
+                                    "conjunction": {
+                                      "type": "string",
+                                      "enum": ["and", "or"],
+                                      "required": true
+                                    },
+                                    "conditions": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "field_id": {
+                                            "type": "string",
+                                            "required": true
+                                          },
+                                          "operator": {
+                                            "type": "string",
+                                            "enum": [
+                                              "is",
+                                              "isNot",
+                                              "contains",
+                                              "doesNotContain",
+                                              "isEmpty",
+                                              "isNotEmpty",
+                                              "isGreater",
+                                              "isGreaterEqual",
+                                              "isLess",
+                                              "isLessEqual"
+                                            ],
+                                            "required": true
+                                          },
+                                          "value": {
+                                            "type": "string",
+                                            "required": false
+                                          },
+                                          "condition_id": {
+                                            "type": "string",
+                                            "required": false
+                                          },
+                                          "field_type": {
+                                            "type": "number",
+                                            "required": false
+                                          }
+                                        }
+                                      },
+                                      "required": true
+                                    }
+                                  },
+                                  "required": false
+                                }
+                              },
+                              "required": false
+                            }
+                          },
+                          "required": false
+                        },
+                        "description": {
+                          "type": "object",
+                          "properties": {
+                            "disable_sync": {
+                              "type": "boolean",
+                              "required": false
+                            },
+                            "text": {
+                              "type": "string",
+                              "required": false
+                            }
+                          },
+                          "required": false
+                        }
+                      }
+                    },
+                    "required": false
+                  }
+                }
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.batch_create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table/batch_create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:table:create", "bitable:app"],
+          "risk": "write"
+        },
+        "batch_delete": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/batch_delete",
+          "description": "通过 app_token 和 table_id 删除多个数据表。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "table_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.batch_delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table/batch_delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:table:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables",
+          "description": "新增一个数据表，支持传入数据表名称、视图名称和字段。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "table": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "required": false
+                },
+                "default_view_name": {
+                  "type": "string",
+                  "required": false
+                },
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field_name": {
+                        "type": "string",
+                        "required": true
+                      },
+                      "type": {
+                        "type": "number",
+                        "required": true
+                      },
+                      "ui_type": {
+                        "type": "string",
+                        "enum": [
+                          "Text",
+                          "Barcode",
+                          "Number",
+                          "Progress",
+                          "Currency",
+                          "Rating",
+                          "SingleSelect",
+                          "MultiSelect",
+                          "DateTime",
+                          "Checkbox",
+                          "User",
+                          "GroupChat",
+                          "Phone",
+                          "Url",
+                          "Attachment",
+                          "SingleLink",
+                          "Formula",
+                          "DuplexLink",
+                          "Location",
+                          "CreatedTime",
+                          "ModifiedTime",
+                          "CreatedUser",
+                          "ModifiedUser",
+                          "AutoNumber"
+                        ],
+                        "required": false
+                      },
+                      "property": {
+                        "type": "object",
+                        "properties": {
+                          "options": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "required": false
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "required": false
+                                },
+                                "color": {
+                                  "type": "number",
+                                  "required": false
+                                }
+                              }
+                            },
+                            "required": false
+                          },
+                          "formatter": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "date_formatter": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "auto_fill": {
+                            "type": "boolean",
+                            "required": false
+                          },
+                          "multiple": {
+                            "type": "boolean",
+                            "required": false
+                          },
+                          "table_id": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "table_name": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "back_field_name": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "auto_serial": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["custom", "auto_increment_number"],
+                                "required": true
+                              },
+                              "options": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "enum": [
+                                        "system_number",
+                                        "fixed_text",
+                                        "created_time"
+                                      ],
+                                      "required": true
+                                    },
+                                    "value": {
+                                      "type": "string",
+                                      "required": true
+                                    }
+                                  }
+                                },
+                                "required": false
+                              }
+                            },
+                            "required": false
+                          },
+                          "location": {
+                            "type": "object",
+                            "properties": {
+                              "input_type": {
+                                "type": "string",
+                                "enum": ["only_mobile", "not_limit"],
+                                "required": true
+                              }
+                            },
+                            "required": false
+                          },
+                          "formula_expression": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "allowed_edit_modes": {
+                            "type": "object",
+                            "properties": {
+                              "manual": {
+                                "type": "boolean",
+                                "required": false
+                              },
+                              "scan": {
+                                "type": "boolean",
+                                "required": false
+                              }
+                            },
+                            "required": false
+                          },
+                          "min": {
+                            "type": "number",
+                            "required": false
+                          },
+                          "max": {
+                            "type": "number",
+                            "required": false
+                          },
+                          "range_customize": {
+                            "type": "boolean",
+                            "required": false
+                          },
+                          "currency_code": {
+                            "type": "string",
+                            "required": false
+                          },
+                          "rating": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "required": false
+                              }
+                            },
+                            "required": false
+                          },
+                          "type": {
+                            "type": "object",
+                            "properties": {
+                              "data_type": {
+                                "type": "number",
+                                "required": true
+                              },
+                              "ui_property": {
+                                "type": "object",
+                                "properties": {
+                                  "currency_code": {
+                                    "type": "string",
+                                    "required": false
+                                  },
+                                  "formatter": {
+                                    "type": "string",
+                                    "required": false
+                                  },
+                                  "range_customize": {
+                                    "type": "boolean",
+                                    "required": false
+                                  },
+                                  "min": {
+                                    "type": "number",
+                                    "required": false
+                                  },
+                                  "max": {
+                                    "type": "number",
+                                    "required": false
+                                  },
+                                  "date_formatter": {
+                                    "type": "string",
+                                    "required": false
+                                  },
+                                  "rating": {
+                                    "type": "object",
+                                    "properties": {
+                                      "symbol": {
+                                        "type": "string",
+                                        "required": false
+                                      }
+                                    },
+                                    "required": false
+                                  }
+                                },
+                                "required": false
+                              },
+                              "ui_type": {
+                                "type": "string",
+                                "enum": [
+                                  "Number",
+                                  "Progress",
+                                  "Currency",
+                                  "Rating",
+                                  "DateTime"
+                                ],
+                                "required": false
+                              }
+                            },
+                            "required": false
+                          },
+                          "filter_info": {
+                            "type": "object",
+                            "properties": {
+                              "target_table": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "filter_info": {
+                                "type": "object",
+                                "properties": {
+                                  "conjunction": {
+                                    "type": "string",
+                                    "enum": ["and", "or"],
+                                    "required": true
+                                  },
+                                  "conditions": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "field_id": {
+                                          "type": "string",
+                                          "required": true
+                                        },
+                                        "operator": {
+                                          "type": "string",
+                                          "enum": [
+                                            "is",
+                                            "isNot",
+                                            "contains",
+                                            "doesNotContain",
+                                            "isEmpty",
+                                            "isNotEmpty",
+                                            "isGreater",
+                                            "isGreaterEqual",
+                                            "isLess",
+                                            "isLessEqual"
+                                          ],
+                                          "required": true
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "required": false
+                                        }
+                                      }
+                                    },
+                                    "required": true
+                                  }
+                                },
+                                "required": false
+                              }
+                            },
+                            "required": false
+                          }
+                        },
+                        "required": false
+                      },
+                      "description": {
+                        "type": "object",
+                        "properties": {
+                          "disable_sync": {
+                            "type": "boolean",
+                            "required": false
+                          },
+                          "text": {
+                            "type": "string",
+                            "required": false
+                          }
+                        },
+                        "required": false
+                      }
+                    }
+                  },
+                  "required": false
+                }
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:table:create", "bitable:app"],
+          "risk": "write"
+        },
+        "delete": {
+          "httpMethod": "DELETE",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}",
+          "description": "通过 app_token 和 table_id 删除指定的多维表格数据表。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table/delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:table:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables",
+          "description": "列出多维表格中的所有数据表，包括其 ID、版本号和名称。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table/list",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:table:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "patch": {
+          "httpMethod": "PATCH",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}",
+          "description": "更新数据表的名称。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "name": {
+              "type": "string",
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.patch",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table/patch",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:table:update", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.table.field": {
+      "methods": {
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/fields",
+          "description": "在多维表格数据表中新增一个字段。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "client_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "field_name": {
+              "type": "string",
+              "required": true
+            },
+            "type": {
+              "type": "number",
+              "required": true
+            },
+            "property": {
+              "type": "object",
+              "properties": {
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "id": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "color": {
+                        "type": "number",
+                        "required": false
+                      }
+                    }
+                  },
+                  "required": false
+                },
+                "formatter": {
+                  "type": "string",
+                  "required": false
+                },
+                "date_formatter": {
+                  "type": "string",
+                  "required": false
+                },
+                "auto_fill": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "multiple": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "table_id": {
+                  "type": "string",
+                  "required": false
+                },
+                "table_name": {
+                  "type": "string",
+                  "required": false
+                },
+                "back_field_name": {
+                  "type": "string",
+                  "required": false
+                },
+                "auto_serial": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["custom", "auto_increment_number"],
+                      "required": true
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "system_number",
+                              "fixed_text",
+                              "created_time"
+                            ],
+                            "required": true
+                          },
+                          "value": {
+                            "type": "string",
+                            "required": true
+                          }
+                        }
+                      },
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "location": {
+                  "type": "object",
+                  "properties": {
+                    "input_type": {
+                      "type": "string",
+                      "enum": ["only_mobile", "not_limit"],
+                      "required": true
+                    }
+                  },
+                  "required": false
+                },
+                "formula_expression": {
+                  "type": "string",
+                  "required": false
+                },
+                "allowed_edit_modes": {
+                  "type": "object",
+                  "properties": {
+                    "manual": {
+                      "type": "boolean",
+                      "required": false
+                    },
+                    "scan": {
+                      "type": "boolean",
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "min": {
+                  "type": "number",
+                  "required": false
+                },
+                "max": {
+                  "type": "number",
+                  "required": false
+                },
+                "range_customize": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "currency_code": {
+                  "type": "string",
+                  "required": false
+                },
+                "rating": {
+                  "type": "object",
+                  "properties": {
+                    "symbol": {
+                      "type": "string",
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "type": {
+                  "type": "object",
+                  "properties": {
+                    "data_type": {
+                      "type": "number",
+                      "required": true
+                    },
+                    "ui_property": {
+                      "type": "object",
+                      "properties": {
+                        "currency_code": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "formatter": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "range_customize": {
+                          "type": "boolean",
+                          "required": false
+                        },
+                        "min": {
+                          "type": "number",
+                          "required": false
+                        },
+                        "max": {
+                          "type": "number",
+                          "required": false
+                        },
+                        "date_formatter": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "rating": {
+                          "type": "object",
+                          "properties": {
+                            "symbol": {
+                              "type": "string",
+                              "required": false
+                            }
+                          },
+                          "required": false
+                        }
+                      },
+                      "required": false
+                    },
+                    "ui_type": {
+                      "type": "string",
+                      "enum": [
+                        "Number",
+                        "Progress",
+                        "Currency",
+                        "Rating",
+                        "DateTime"
+                      ],
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "filter_info": {
+                  "type": "object",
+                  "properties": {
+                    "target_table": {
+                      "type": "string",
+                      "required": false
+                    },
+                    "filter_info": {
+                      "type": "object",
+                      "properties": {
+                        "conjunction": {
+                          "type": "string",
+                          "enum": ["and", "or"],
+                          "required": true
+                        },
+                        "conditions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "field_id": {
+                                "type": "string",
+                                "required": true
+                              },
+                              "operator": {
+                                "type": "string",
+                                "enum": [
+                                  "is",
+                                  "isNot",
+                                  "contains",
+                                  "doesNotContain",
+                                  "isEmpty",
+                                  "isNotEmpty",
+                                  "isGreater",
+                                  "isGreaterEqual",
+                                  "isLess",
+                                  "isLessEqual"
+                                ],
+                                "required": true
+                              },
+                              "value": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          },
+                          "required": true
+                        }
+                      },
+                      "required": false
+                    }
+                  },
+                  "required": false
+                }
+              },
+              "required": false
+            },
+            "description": {
+              "type": "object",
+              "properties": {
+                "disable_sync": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "text": {
+                  "type": "string",
+                  "required": false
+                }
+              },
+              "required": false
+            },
+            "is_primary": {
+              "type": "boolean",
+              "required": false
+            },
+            "field_id": {
+              "type": "string",
+              "required": false
+            },
+            "ui_type": {
+              "type": "string",
+              "enum": [
+                "Text",
+                "Barcode",
+                "Number",
+                "Progress",
+                "Currency",
+                "Rating",
+                "SingleSelect",
+                "MultiSelect",
+                "DateTime",
+                "Checkbox",
+                "User",
+                "GroupChat",
+                "Phone",
+                "Url",
+                "Attachment",
+                "SingleLink",
+                "Formula",
+                "DuplexLink",
+                "Location",
+                "CreatedTime",
+                "ModifiedTime",
+                "CreatedUser",
+                "ModifiedUser",
+                "AutoNumber",
+                "Email",
+                "Signature"
+              ],
+              "required": false
+            },
+            "is_hidden": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.field.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-field/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:field:create", "bitable:app"],
+          "risk": "write"
+        },
+        "delete": {
+          "httpMethod": "DELETE",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/fields/{field_id}",
+          "description": "删除多维表格数据表中的一个字段。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "field_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.field.delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-field/delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:field:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/fields",
+          "description": "获取多维表格数据表中的的所有字段。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "view_id": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "text_field_as_array": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.field.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-field/list",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:field:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "update": {
+          "httpMethod": "PUT",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/fields/{field_id}",
+          "description": "在多维表格数据表中更新一个字段。更新字段时为全量更新，property 等字段会被完全覆盖。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "field_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "client_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "field_name": {
+              "type": "string",
+              "required": true
+            },
+            "type": {
+              "type": "number",
+              "required": true
+            },
+            "property": {
+              "type": "object",
+              "properties": {
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "id": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "color": {
+                        "type": "number",
+                        "required": false
+                      }
+                    }
+                  },
+                  "required": false
+                },
+                "formatter": {
+                  "type": "string",
+                  "required": false
+                },
+                "date_formatter": {
+                  "type": "string",
+                  "required": false
+                },
+                "auto_fill": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "multiple": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "table_id": {
+                  "type": "string",
+                  "required": false
+                },
+                "table_name": {
+                  "type": "string",
+                  "required": false
+                },
+                "back_field_name": {
+                  "type": "string",
+                  "required": false
+                },
+                "auto_serial": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["custom", "auto_increment_number"],
+                      "required": true
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "system_number",
+                              "fixed_text",
+                              "created_time"
+                            ],
+                            "required": true
+                          },
+                          "value": {
+                            "type": "string",
+                            "required": true
+                          }
+                        }
+                      },
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "location": {
+                  "type": "object",
+                  "properties": {
+                    "input_type": {
+                      "type": "string",
+                      "enum": ["only_mobile", "not_limit"],
+                      "required": true
+                    }
+                  },
+                  "required": false
+                },
+                "formula_expression": {
+                  "type": "string",
+                  "required": false
+                },
+                "allowed_edit_modes": {
+                  "type": "object",
+                  "properties": {
+                    "manual": {
+                      "type": "boolean",
+                      "required": false
+                    },
+                    "scan": {
+                      "type": "boolean",
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "min": {
+                  "type": "number",
+                  "required": false
+                },
+                "max": {
+                  "type": "number",
+                  "required": false
+                },
+                "range_customize": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "currency_code": {
+                  "type": "string",
+                  "required": false
+                },
+                "rating": {
+                  "type": "object",
+                  "properties": {
+                    "symbol": {
+                      "type": "string",
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "type": {
+                  "type": "object",
+                  "properties": {
+                    "data_type": {
+                      "type": "number",
+                      "required": true
+                    },
+                    "ui_property": {
+                      "type": "object",
+                      "properties": {
+                        "currency_code": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "formatter": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "range_customize": {
+                          "type": "boolean",
+                          "required": false
+                        },
+                        "min": {
+                          "type": "number",
+                          "required": false
+                        },
+                        "max": {
+                          "type": "number",
+                          "required": false
+                        },
+                        "date_formatter": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "rating": {
+                          "type": "object",
+                          "properties": {
+                            "symbol": {
+                              "type": "string",
+                              "required": false
+                            }
+                          },
+                          "required": false
+                        }
+                      },
+                      "required": false
+                    },
+                    "ui_type": {
+                      "type": "string",
+                      "enum": [
+                        "Number",
+                        "Progress",
+                        "Currency",
+                        "Rating",
+                        "DateTime"
+                      ],
+                      "required": false
+                    }
+                  },
+                  "required": false
+                },
+                "filter_info": {
+                  "type": "object",
+                  "properties": {
+                    "target_table": {
+                      "type": "string",
+                      "required": false
+                    },
+                    "filter_info": {
+                      "type": "object",
+                      "properties": {
+                        "conjunction": {
+                          "type": "string",
+                          "enum": ["and", "or"],
+                          "required": true
+                        },
+                        "conditions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "field_id": {
+                                "type": "string",
+                                "required": true
+                              },
+                              "operator": {
+                                "type": "string",
+                                "enum": [
+                                  "is",
+                                  "isNot",
+                                  "contains",
+                                  "doesNotContain",
+                                  "isEmpty",
+                                  "isNotEmpty",
+                                  "isGreater",
+                                  "isGreaterEqual",
+                                  "isLess",
+                                  "isLessEqual"
+                                ],
+                                "required": true
+                              },
+                              "value": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          },
+                          "required": true
+                        }
+                      },
+                      "required": false
+                    }
+                  },
+                  "required": false
+                }
+              },
+              "required": false
+            },
+            "description": {
+              "type": "object",
+              "properties": {
+                "disable_sync": {
+                  "type": "boolean",
+                  "required": false
+                },
+                "text": {
+                  "type": "string",
+                  "required": false
+                }
+              },
+              "required": false
+            },
+            "is_primary": {
+              "type": "boolean",
+              "required": false
+            },
+            "ui_type": {
+              "type": "string",
+              "enum": [
+                "Text",
+                "Barcode",
+                "Number",
+                "Progress",
+                "Currency",
+                "Rating",
+                "SingleSelect",
+                "MultiSelect",
+                "DateTime",
+                "Checkbox",
+                "User",
+                "GroupChat",
+                "Phone",
+                "Url",
+                "Attachment",
+                "SingleLink",
+                "Formula",
+                "DuplexLink",
+                "Location",
+                "CreatedTime",
+                "ModifiedTime",
+                "CreatedUser",
+                "ModifiedUser",
+                "AutoNumber",
+                "Email",
+                "Signature"
+              ],
+              "required": false
+            },
+            "is_hidden": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.field.update",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-field/update",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:field:update", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.table.form": {
+      "methods": {
+        "get": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/forms/{form_id}",
+          "description": "获取表单的所有元数据，包括表单名称、描述、是否共享等。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "form_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.form.get",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-form/get",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:form:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "patch": {
+          "httpMethod": "PATCH",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/forms/{form_id}",
+          "description": "更新表单视图中的元数据，包括表单名称、描述、是否共享等。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "form_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "name": {
+              "type": "string",
+              "required": false
+            },
+            "description": {
+              "type": "string",
+              "required": false
+            },
+            "shared": {
+              "type": "boolean",
+              "required": false
+            },
+            "shared_limit": {
+              "type": "string",
+              "enum": ["off", "tenant_editable", "anyone_editable"],
+              "required": false
+            },
+            "submit_limit_once": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.form.patch",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-form/patch",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:form:update", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.table.form.field": {
+      "methods": {
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/forms/{form_id}/fields",
+          "description": "列出表单中的所有问题项。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "form_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.form.field.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-form-field/list",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:form:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "patch": {
+          "httpMethod": "PATCH",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/forms/{form_id}/fields/{field_id}",
+          "description": "更新表单中的问题项。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "form_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "field_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "pre_field_id": {
+              "type": "string",
+              "required": false
+            },
+            "title": {
+              "type": "string",
+              "required": false
+            },
+            "description": {
+              "type": "string",
+              "required": false
+            },
+            "required": {
+              "type": "boolean",
+              "required": false
+            },
+            "visible": {
+              "type": "boolean",
+              "required": false
+            },
+            "rich_description": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "segment_type": {
+                    "type": "string",
+                    "enum": ["text", "url"],
+                    "required": true
+                  },
+                  "text": {
+                    "type": "string",
+                    "required": true
+                  },
+                  "link": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.form.field.patch",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-form-field/patch",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:form:update", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.table.record": {
+      "methods": {
+        "batch_create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/batch_create",
+          "description": "在多维表格数据表中新增多条记录，单次调用最多新增 1,000 条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "client_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "ignore_consistency_check": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fields": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "union",
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "link": {
+                              "type": "string",
+                              "required": false
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "location": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "pname": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "cityname": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "adname": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "address": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "name": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "full_address": {
+                              "type": "string",
+                              "required": false
+                            }
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "avatar_url": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "en_name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "email": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "avatar_url": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "file_token": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "type": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "size": {
+                                "type": "number",
+                                "required": false
+                              },
+                              "url": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "tmp_url": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "required": true
+                  },
+                  "created_by": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "en_name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "email": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "avatar_url": {
+                        "type": "string",
+                        "required": false
+                      }
+                    },
+                    "required": false
+                  },
+                  "created_time": {
+                    "type": "number",
+                    "required": false
+                  },
+                  "last_modified_by": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "en_name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "email": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "avatar_url": {
+                        "type": "string",
+                        "required": false
+                      }
+                    },
+                    "required": false
+                  },
+                  "last_modified_time": {
+                    "type": "number",
+                    "required": false
+                  },
+                  "shared_url": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "record_url": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              },
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.record.batch_create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/batch_create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:create", "bitable:app"],
+          "risk": "write"
+        },
+        "batch_delete": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/batch_delete",
+          "description": "删除多维表格数据表中现有的多条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "ignore_consistency_check": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.record.batch_delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/batch_delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "batch_get": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/batch_get",
+          "description": "通过多个记录 ID 查询记录信息。该接口最多支持查询 100 条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "record_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "required": true
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false
+            },
+            "with_shared_url": {
+              "type": "boolean",
+              "required": false
+            },
+            "automatic_fields": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.record.batch_get",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/batch_get",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "batch_update": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/batch_update",
+          "description": "更新数据表中的多条记录，单次调用最多更新 1,000 条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "ignore_consistency_check": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "client_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fields": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "union",
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "link": {
+                              "type": "string",
+                              "required": false
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "location": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "pname": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "cityname": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "adname": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "address": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "name": {
+                              "type": "string",
+                              "required": false
+                            },
+                            "full_address": {
+                              "type": "string",
+                              "required": false
+                            }
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "avatar_url": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "en_name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "email": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "avatar_url": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "file_token": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "name": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "type": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "size": {
+                                "type": "number",
+                                "required": false
+                              },
+                              "url": {
+                                "type": "string",
+                                "required": false
+                              },
+                              "tmp_url": {
+                                "type": "string",
+                                "required": false
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "required": true
+                  },
+                  "record_id": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "created_by": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "en_name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "email": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "avatar_url": {
+                        "type": "string",
+                        "required": false
+                      }
+                    },
+                    "required": false
+                  },
+                  "created_time": {
+                    "type": "number",
+                    "required": false
+                  },
+                  "last_modified_by": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "en_name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "email": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "avatar_url": {
+                        "type": "string",
+                        "required": false
+                      }
+                    },
+                    "required": false
+                  },
+                  "last_modified_time": {
+                    "type": "number",
+                    "required": false
+                  },
+                  "shared_url": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "record_url": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              },
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.record.batch_update",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/batch_update",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:update", "bitable:app"],
+          "risk": "write"
+        },
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records",
+          "description": "在多维表格数据表中新增一条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "client_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "ignore_consistency_check": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "fields": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "union",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "link": {
+                        "type": "string",
+                        "required": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "location": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "pname": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "cityname": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "adname": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "address": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "full_address": {
+                        "type": "string",
+                        "required": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "required": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "en_name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "email": {
+                          "type": "string",
+                          "required": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "file_token": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "type": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "size": {
+                          "type": "number",
+                          "required": false
+                        },
+                        "url": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "tmp_url": {
+                          "type": "string",
+                          "required": false
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "required": true
+            },
+            "record_id": {
+              "type": "string",
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.record.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:create", "bitable:app"],
+          "risk": "write"
+        },
+        "delete": {
+          "httpMethod": "DELETE",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/{record_id}",
+          "description": "删除多维表格数据表中的一条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "record_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "ignore_consistency_check": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.record.delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:delete", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "get": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/{record_id}",
+          "description": "该接口用于根据 record_id 的值检索现有记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "record_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "text_field_as_array": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "display_formula_ref": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "with_shared_url": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "automatic_fields": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.record.get",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/get",
+          "authTypes": ["bot", "user"],
+          "scopes": ["bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records",
+          "description": "该接口用于列出数据表中的现有记录，单次最多列出 500 行记录，支持分页获取。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "view_id": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "filter": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "sort": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "field_names": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "text_field_as_array": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "display_formula_ref": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "automatic_fields": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.record.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/list",
+          "authTypes": ["bot", "user"],
+          "scopes": ["bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "search": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/search",
+          "description": "该接口用于查询数据表中的现有记录，单次最多查询 500 行记录，支持分页获取。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "view_id": {
+              "type": "string",
+              "required": false
+            },
+            "field_names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "required": false
+            },
+            "sort": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field_name": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "desc": {
+                    "type": "boolean",
+                    "required": false
+                  }
+                }
+              },
+              "required": false
+            },
+            "filter": {
+              "type": "object",
+              "properties": {
+                "conjunction": {
+                  "type": "string",
+                  "enum": ["and", "or"],
+                  "required": true
+                },
+                "conditions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field_name": {
+                        "type": "string",
+                        "required": true
+                      },
+                      "operator": {
+                        "type": "string",
+                        "enum": [
+                          "is",
+                          "isNot",
+                          "contains",
+                          "doesNotContain",
+                          "isEmpty",
+                          "isNotEmpty",
+                          "isGreater",
+                          "isGreaterEqual",
+                          "isLess",
+                          "isLessEqual",
+                          "like",
+                          "in"
+                        ],
+                        "required": true
+                      },
+                      "value": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "required": false
+                      }
+                    }
+                  },
+                  "required": false
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "conjunction": {
+                        "type": "string",
+                        "enum": ["and", "or"],
+                        "required": true
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field_name": {
+                              "type": "string",
+                              "required": true
+                            },
+                            "operator": {
+                              "type": "string",
+                              "enum": [
+                                "is",
+                                "isNot",
+                                "contains",
+                                "doesNotContain",
+                                "isEmpty",
+                                "isNotEmpty",
+                                "isGreater",
+                                "isGreaterEqual",
+                                "isLess",
+                                "isLessEqual",
+                                "like",
+                                "in"
+                              ],
+                              "required": true
+                            },
+                            "value": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "required": false
+                            }
+                          }
+                        },
+                        "required": false
+                      }
+                    }
+                  },
+                  "required": false
+                }
+              },
+              "required": false
+            },
+            "automatic_fields": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.record.search",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/search",
+          "authTypes": ["bot", "user"],
+          "scopes": [
+            "base:record:retrieve",
+            "bitable:app",
+            "bitable:app:readonly"
+          ],
+          "risk": "read"
+        },
+        "update": {
+          "httpMethod": "PUT",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records/{record_id}",
+          "description": "更新多维表格数据表中的一条记录。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "record_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            },
+            "ignore_consistency_check": {
+              "type": "boolean",
+              "required": false,
+              "location": "query"
+            },
+            "client_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "fields": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "union",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "link": {
+                        "type": "string",
+                        "required": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "location": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "pname": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "cityname": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "adname": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "address": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "required": false
+                      },
+                      "full_address": {
+                        "type": "string",
+                        "required": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "required": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "en_name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "email": {
+                          "type": "string",
+                          "required": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "file_token": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "name": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "type": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "size": {
+                          "type": "number",
+                          "required": false
+                        },
+                        "url": {
+                          "type": "string",
+                          "required": false
+                        },
+                        "tmp_url": {
+                          "type": "string",
+                          "required": false
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.record.update",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-record/update",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:record:update", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.table.view": {
+      "methods": {
+        "create": {
+          "httpMethod": "POST",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/views",
+          "description": "在多维表格数据表中新增一个视图，可指定视图类型，包括表格视图、看板视图、画册视图、甘特视图和表单视图。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "view_name": {
+              "type": "string",
+              "required": true
+            },
+            "view_type": {
+              "type": "string",
+              "enum": ["grid", "kanban", "gallery", "gantt", "form"],
+              "required": false
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.table.view.create",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-view/create",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:view:write_only", "bitable:app"],
+          "risk": "write"
+        },
+        "delete": {
+          "httpMethod": "DELETE",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/views/{view_id}",
+          "description": "通过 app_token、table_id 和 view_id，删除多维表格数据表中的指定视图。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "view_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.view.delete",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-view/delete",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:view:write_only", "bitable:app"],
+          "risk": "high-risk-write"
+        },
+        "get": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/views/{view_id}",
+          "description": "根据视图 ID 获取现有视图信息，包括视图名称、类型、属性等。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "view_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.view.get",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-view/get",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:view:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/views",
+          "description": "获取多维表格数据表中的所有视图。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "page_size": {
+              "type": "number",
+              "required": false,
+              "location": "query"
+            },
+            "page_token": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            },
+            "user_id_type": {
+              "type": "string",
+              "enum": ["user_id", "union_id", "open_id"],
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.table.view.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-view/list",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:view:read", "bitable:app", "bitable:app:readonly"],
+          "risk": "read"
+        },
+        "patch": {
+          "httpMethod": "PATCH",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/views/{view_id}",
+          "description": "增量更新视图信息，包括视图名称、属性等，可设置视图的筛选条件。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "table_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "view_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "user_id_type": {
+              "type": "string",
+              "required": false,
+              "location": "query"
+            }
+          },
+          "requestBody": {
+            "view_name": {
+              "type": "string",
+              "required": false
+            },
+            "property": {
+              "type": "object",
+              "properties": {
+                "filter_info": {
+                  "type": "object",
+                  "properties": {
+                    "conjunction": {
+                      "type": "string",
+                      "enum": ["and", "or"],
+                      "required": true
+                    },
+                    "conditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field_id": {
+                            "type": "string",
+                            "required": true
+                          },
+                          "operator": {
+                            "type": "string",
+                            "enum": [
+                              "is",
+                              "isNot",
+                              "contains",
+                              "doesNotContain",
+                              "isEmpty",
+                              "isNotEmpty",
+                              "isGreater",
+                              "isGreaterEqual",
+                              "isLess",
+                              "isLessEqual"
+                            ],
+                            "required": true
+                          },
+                          "value": {
+                            "type": "string",
+                            "required": false
+                          }
+                        }
+                      },
+                      "required": true
+                    }
+                  },
+                  "required": false
+                },
+                "hidden_fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "required": false
+                },
+                "hierarchy_config": {
+                  "type": "object",
+                  "properties": {
+                    "field_id": {
+                      "type": "string",
+                      "required": false
+                    }
+                  },
+                  "required": false
+                }
+              },
+              "required": false
+            }
+          },
+          "requestBodyRequired": false,
+          "id": "base.app.table.view.patch",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-table-view/patch",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:view:write_only", "bitable:app"],
+          "risk": "write"
+        }
+      }
+    },
+    "app.workflow": {
+      "methods": {
+        "list": {
+          "httpMethod": "GET",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/workflows",
+          "description": "该接口用于列出多维表格的自动化流程。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {},
+          "requestBodyRequired": false,
+          "id": "base.app.workflow.list",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-workflow/list",
+          "authTypes": ["bot", "user"],
+          "scopes": [
+            "bitable:app:readonly",
+            "bitable:app",
+            "base:workflow:read"
+          ],
+          "risk": "read"
+        },
+        "update": {
+          "httpMethod": "PUT",
+          "path": "/open-apis/bitable/v1/apps/{app_token}/workflows/{workflow_id}",
+          "description": "开启或关闭自动化流程。",
+          "parameters": {
+            "app_token": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            },
+            "workflow_id": {
+              "type": "string",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "requestBody": {
+            "status": {
+              "type": "string",
+              "required": true
+            }
+          },
+          "requestBodyRequired": true,
+          "id": "base.app.workflow.update",
+          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-workflow/update",
+          "authTypes": ["bot", "user"],
+          "scopes": ["base:workflow:write", "bitable:app"],
+          "risk": "high-risk-write"
+        }
+      }
+    }
+  }
+}

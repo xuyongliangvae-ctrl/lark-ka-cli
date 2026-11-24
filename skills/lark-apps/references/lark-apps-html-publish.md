@@ -8,13 +8,13 @@
 
 ```bash
 # 发布整个目录
-lark-cli apps +html-publish --app-id app_xxx --path ./dist/
+lark-ka apps +html-publish --app-id app_xxx --path ./dist/
 
 # 发布单个 HTML 文件
-lark-cli apps +html-publish --app-id app_xxx --path ./index.html
+lark-ka apps +html-publish --app-id app_xxx --path ./index.html
 
 # 预演（打印文件清单 + SHA256 + 目标 endpoint，不发请求）
-lark-cli apps +html-publish --app-id app_xxx --path ./dist --dry-run
+lark-ka apps +html-publish --app-id app_xxx --path ./dist --dry-run
 ```
 
 ## 参数
@@ -47,7 +47,7 @@ lark-cli apps +html-publish --app-id app_xxx --path ./dist --dry-run
     "type": "api",
     "code": 90001,
     "message": "html-publish failed (code=90001): build failed: dependency conflict",
-    "hint": "构建失败：用 `lark-cli apps +html-publish --path <path> --dry-run` 检查打包文件清单"
+    "hint": "构建失败：用 `lark-ka apps +html-publish --path <path> --dry-run` 检查打包文件清单"
   }
 }
 ```
@@ -85,7 +85,7 @@ lark-cli apps +html-publish --app-id app_xxx --path ./dist --dry-run
 ### 场景 1：用户说"把这个目录发布到妙搭"
 
 ```bash
-lark-cli apps +html-publish --app-id app_xxx --path ./dist
+lark-ka apps +html-publish --app-id app_xxx --path ./dist
 ```
 
 成功后：
@@ -99,15 +99,15 @@ lark-cli apps +html-publish --app-id app_xxx --path ./dist
 ### 场景 2：用户没有 app_id
 
 ```bash
-APP=$(lark-cli apps +create --name "..." --app-type HTML -q '.data.app.app_id' | tr -d '"')
-lark-cli apps +html-publish --app-id "$APP" --path ./dist
+APP=$(lark-ka apps +create --name "..." --app-type HTML -q '.data.app.app_id' | tr -d '"')
+lark-ka apps +html-publish --app-id "$APP" --path ./dist
 ```
 
 ### 场景 3：构建失败（code=90001）
 
 转述 hint：
 
-> 构建失败，建议用 `lark-cli apps +html-publish --app-id <your-app-id> --path ./dist --dry-run` 看一下打包文件清单是否完整。
+> 构建失败，建议用 `lark-ka apps +html-publish --app-id <your-app-id> --path ./dist --dry-run` 看一下打包文件清单是否完整。
 
 ### 场景 4：应用不存在（code=90002）
 

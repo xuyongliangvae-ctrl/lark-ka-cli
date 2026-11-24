@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书 OKR：管理目标与关键结果。查看和编辑 OKR 周期、目标（Objective）、关键结果（Key Result）、对齐关系、量化指标和进展记录。当用户需要查看或创建 OKR、管理目标和关键结果、查看对齐关系时使用。"
 metadata:
   requires:
-    bins: [ "lark-cli" ]
-  cliHelp: "lark-cli okr --help"
+    bins: [ "lark-ka" ]
+  cliHelp: "lark-ka okr --help"
 ---
 
 # okr (v2)
@@ -14,7 +14,7 @@ metadata:
 
 ## Shortcuts（推荐优先使用）
 
-Shortcut 是对常用操作的高级封装（`lark-cli okr +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka okr +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut                                                     | 说明                       |
 |--------------------------------------------------------------|--------------------------|
@@ -36,8 +36,8 @@ Shortcut 是对常用操作的高级封装（`lark-cli okr +<verb> [flags]`）�
 ## API Resources
 
 ```bash
-lark-cli schema okr.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli okr <resource> <method> [flags] # 调用 API
+lark-ka schema okr.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka okr <resource> <method> [flags] # 调用 API
 ```
 
 > **重要**：使用原生 API 时，**必须**先运行 `schema` 查看 `--data` / `--params` 参数结构，**不要**猜测字段格式！

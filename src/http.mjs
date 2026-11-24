@@ -6,6 +6,32 @@ const AUTH_ERRORS = new Set([
   "expired_token",
   "access_denied",
 ]);
+const SCOPE_ERROR_CODES = new Set([99991672, 99991679]);
+const SCOPE_VIOLATION_TYPES = new Set([
+  "action_scope_required",
+  "action_privilege_required",
+  "scope",
+]);
+
+function scopeAlternatives(error) {
+  const violations = error?.permission_violations;
+  if (!Array.isArray(violations)) return [];
+  const scopes = new Set();
+  for (const violation of violations) {
+    if (
+      violation?.type !== undefined &&
+      !SCOPE_VIOLATION_TYPES.has(violation.type)
+    )
+      continue;
+    const scope = violation?.subject ?? violation?.scope;
+    if (
+      typeof scope === "string" &&
+      /^(?:offline_access|[a-z][a-z0-9_.-]*(?::[a-z0-9_.-]+)+)$/.test(scope)
+    )
+      scopes.add(scope);
+  }
+  return [...scopes];
+}
 
 function networkError(error) {
   return new CliError(
@@ -174,17 +200,28 @@ export async function fetchJSON(
       (typeof json.error === "string"
         ? json.error
         : json.error?.message || "API request failed");
+    const apiCode = Number(json.code);
+    const scopeFailure = SCOPE_ERROR_CODES.has(apiCode);
+    const scopes = scopeFailure ? scopeAlternatives(json.error) : [];
     const authentication =
-      response.status === 401 ||
-      AUTH_CODES.has(Number(json.code)) ||
-      AUTH_ERRORS.has(json.error);
+      !scopeFailure &&
+      (response.status === 401 ||
+        AUTH_CODES.has(apiCode) ||
+        AUTH_ERRORS.has(json.error));
     const e = new CliError(authentication ? "auth" : "api", `${raw}`, {
       code: authentication ? 3 : 5,
+      ...(scopes.length && {
+        hint:
+          apiCode === 99991672
+            ? "Enable one of the listed scopes for the application, then authorize again if using employee identity."
+            : "Authorize one of the listed scopes for the employee, then retry the request.",
+      }),
       detail: {
         status: response.status,
         apiCode: json.code,
         oauthError: typeof json.error === "string" ? json.error : undefined,
         logId: response.headers.get("x-tt-logid") || undefined,
+        ...(scopes.length && { scopeAlternatives: scopes }),
       },
     });
     e.status = response.status;

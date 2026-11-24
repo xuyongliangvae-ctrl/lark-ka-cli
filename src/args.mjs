@@ -130,8 +130,27 @@ function flagValue(text) {
   return text;
 }
 
+function isJsonInput(value) {
+  return (
+    typeof value === "string" &&
+    (value === "-" || value.startsWith("@") || /^[\[{]/.test(value.trimStart()))
+  );
+}
+
 function numericToken(token) {
   return /^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(token);
+}
+
+const fileVersionCommands = new Set([
+  "+download",
+  "+version-get",
+  "+version-delete",
+  "+version-revert",
+  "+preview",
+  "+cover",
+]);
+function usesFileVersion(words) {
+  return words[0] === "drive" && fileVersionCommands.has(words[1]);
 }
 
 function put(flags, key, value) {
@@ -190,6 +209,39 @@ export function parseArgs(argv) {
     if (token.startsWith("--")) {
       const equal = token.indexOf("=");
       const key = token.slice(2, equal === -1 ? undefined : equal);
+      if (key === "version") {
+        const candidate = equal === -1 ? argv[i + 1] : token.slice(equal + 1);
+        if (usesFileVersion(positionals) || /^[0-9]+$/.test(candidate ?? "")) {
+          if (!/^[0-9]+$/.test(candidate ?? ""))
+            throw new CliError(
+              "validation",
+              "Drive --version requires a numeric file version from +version-history",
+            );
+          put(flags, key, candidate); // Keep the exact ID, including large integers.
+          if (equal === -1) i++;
+          continue;
+        }
+      }
+      if (
+        key === "remove" &&
+        positionals[0] === "task" &&
+        ["+assign", "+followers"].includes(positionals[1])
+      ) {
+        const ids = equal === -1 ? argv[i + 1] : token.slice(equal + 1);
+        if (!ids || ids.startsWith("-"))
+          throw new CliError(
+            "validation",
+            "Task member --remove requires member IDs",
+          );
+        put(flags, key, ids);
+        if (equal === -1) i++;
+        continue;
+      }
+      const isBoolean =
+        BOOLEAN_FLAGS.has(key) ||
+        (key === "blocks" &&
+          positionals[0] === "docs" &&
+          positionals[1] === "+fetch");
       if (key.startsWith("no-") && !BOOLEAN_FLAGS.has(key)) {
         if (equal !== -1)
           throw new CliError(
@@ -200,26 +252,18 @@ export function parseArgs(argv) {
         continue;
       }
       if (equal !== -1) {
-        if (
-          BOOLEAN_FLAGS.has(key) &&
-          !["true", "false"].includes(token.slice(equal + 1))
-        ) {
+        const value = token.slice(equal + 1);
+        const input = key === "json" && isJsonInput(value);
+        if (isBoolean && !input && value !== "true" && value !== "false") {
           throw new CliError(
             "validation",
             `Boolean flag --${key} requires true or false.`,
           );
         }
-        put(
-          flags,
-          key,
-          BOOLEAN_FLAGS.has(key)
-            ? flagValue(token.slice(equal + 1))
-            : token.slice(equal + 1),
-        );
-      } else if (
-        BOOLEAN_FLAGS.has(key) &&
-        !(key === "json" && /^(?:[\[{]|@|-$)/.test(argv[i + 1] || ""))
-      ) {
+        put(flags, key, isBoolean && !input ? flagValue(value) : value);
+      } else if (key === "json" && isJsonInput(argv[i + 1])) {
+        put(flags, key, argv[++i]);
+      } else if (isBoolean) {
         if (argv[i + 1] === "true" || argv[i + 1] === "false")
           put(flags, key, flagValue(argv[++i]));
         else put(flags, key, true);
@@ -240,10 +284,7 @@ export function parseArgs(argv) {
         hint: "Run the command with --help to see supported flags.",
       });
     const tail = token.slice(2).replace(/^=/, "");
-    if (
-      BOOLEAN_FLAGS.has(key) &&
-      !(key === "json" && /^(?:[\[{]|@|-$)/.test(argv[i + 1] || ""))
-    ) {
+    if (BOOLEAN_FLAGS.has(key)) {
       if (tail) {
         if (tail === "true" || tail === "false")
           put(flags, key, flagValue(tail));
@@ -261,5 +302,12 @@ export function parseArgs(argv) {
       put(flags, key, argv[++i]);
     else throw new CliError("validation", `Flag -${short} requires a value.`);
   }
+  if (Array.isArray(flags.version))
+    throw new CliError("validation", "Specify --version only once");
+  if (typeof flags.version === "string" && !usesFileVersion(positionals))
+    throw new CliError(
+      "validation",
+      "A file --version value requires a Drive command that accepts a version",
+    );
   return { positionals, flags };
 }

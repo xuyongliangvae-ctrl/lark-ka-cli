@@ -2,7 +2,7 @@
 
 > **Prerequisite:** Read [`../lark-shared/SKILL.md`](../../lark-shared/SKILL.md) for authentication, global parameters, and security rules.
 
-This skill maps to shortcut: `lark-cli im +flag-cancel`. Underlying API: `POST /open-apis/im/v1/flags/cancel`.
+This skill maps to shortcut: `lark-ka im +flag-cancel`. Underlying API: `POST /open-apis/im/v1/flags/cancel`.
 
 ## Double-Cancel Behavior (Important)
 
@@ -20,16 +20,16 @@ A message can have flags on both layers simultaneously:
 
 ```bash
 # Double-cancel both layers (recommended default)
-lark-cli im +flag-cancel --as user --message-id om_xxx
+lark-ka im +flag-cancel --as user --message-id om_xxx
 
 # Only cancel message layer
-lark-cli im +flag-cancel --as user --message-id om_xxx --flag-type message
+lark-ka im +flag-cancel --as user --message-id om_xxx --flag-type message
 
 # Only cancel feed layer (need to specify item-type)
-lark-cli im +flag-cancel --as user --message-id om_xxx --item-type thread --flag-type feed
+lark-ka im +flag-cancel --as user --message-id om_xxx --item-type thread --flag-type feed
 
 # Preview request
-lark-cli im +flag-cancel --as user --message-id om_xxx --dry-run
+lark-ka im +flag-cancel --as user --message-id om_xxx --dry-run
 ```
 
 ## Parameters
@@ -63,5 +63,5 @@ If you have message content but not the message ID:
 
 ```bash
 # Search by message content to find message_id
-lark-cli im +messages-search --as user --query "message content here" -q '.data.items[0].message_id'
+lark-ka im +messages-search --as user --query "message content here" -q '.data.items[0].message_id'
 ```

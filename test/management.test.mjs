@@ -205,10 +205,186 @@ test("new-app registration performs begin and poll before storing credentials", 
   await assert.rejects(
     executeManagement(
       ["config", "init"],
-      { new: true, brand: "cnooc" },
+      { new: true, brand: "cnooc", name: "empty" },
       { env },
     ),
     /registration endpoint/,
+  );
+});
+
+test("new-app registration uses the selected private profile and persists tenant flags without switching to SaaS", async (t) => {
+  const { env } = await fixture(t);
+  const host = "https://accounts.private.example.invalid";
+  await writeStore(
+    "config.json",
+    {
+      currentApp: "public",
+      apps: [
+        { name: "public", brand: "feishu", appId: "cli_public" },
+        {
+          name: "cnooc",
+          brand: "custom",
+          appId: "cli_old",
+          accountsBaseUrl: host,
+          openBaseUrl: "https://open.private.example.invalid",
+          webBaseUrl: "https://docs.private.example.invalid",
+          strictMode: "user",
+        },
+      ],
+    },
+    env,
+  );
+  const calls = [];
+  const result = await executeManagement(
+    ["config", "init"],
+    {
+      new: true,
+      profile: "cnooc",
+      name: "new-private",
+      "web-base-url": "https://new-docs.private.example.invalid",
+    },
+    {
+      env,
+      delay: async () => {},
+      emit: () => {},
+      fetchJSON: async (url, { body }) => {
+        calls.push(url);
+        return body.get("action") === "begin"
+          ? { device_code: "fixture", user_code: "temp", expires_in: 10 }
+          : {
+              client_id: "cli_new",
+              client_secret: "fixture-secret",
+              user_info: { tenant_brand: "feishu" },
+            };
+      },
+    },
+  );
+  assert.equal(result.data.brand, "custom");
+  assert.deepEqual(calls, Array(2).fill(host + "/oauth/v1/app/registration"));
+  const saved = (await readStore("config.json", {}, env)).apps.find(
+    (app) => app.name === "new-private",
+  );
+  assert.equal(saved.accountsBaseUrl, host);
+  assert.equal(saved.openBaseUrl, "https://open.private.example.invalid");
+  assert.equal(saved.webBaseUrl, "https://new-docs.private.example.invalid");
+  assert.equal(saved.strictMode, "user");
+});
+
+test("registration honors direct Accounts/OpenAPI flags and rejects incompletely specified private origins before any request", async (t) => {
+  const { env } = await fixture(t);
+  const privateBase = "https://accounts.fixture.invalid";
+  const seen = [];
+  const options = {
+    env,
+    delay: async () => {},
+    emit: () => {},
+    fetchJSON: async (url, { body }) => {
+      seen.push(url);
+      return body.get("action") === "begin"
+        ? { device_code: "local", user_code: "one" }
+        : { client_id: "cli_created", client_secret: "secret" };
+    },
+  };
+  for (const flags of [
+    { profile: "cnooc" },
+    { "open-base-url": "https://private.fixture.invalid" },
+  ]) {
+    await assert.rejects(
+      executeManagement(["config", "init"], { new: true, ...flags }, options),
+      /registration endpoint/,
+    );
+  }
+  assert.deepEqual(seen, []);
+  await executeManagement(
+    ["config", "init"],
+    {
+      new: true,
+      "accounts-base-url": privateBase,
+      "open-base-url": "https://api.fixture.invalid",
+      "app-registration-url": privateBase + "/custom",
+    },
+    options,
+  );
+  assert.deepEqual(seen, Array(2).fill(privateBase + "/custom"));
+  const saved = (await readStore("config.json", {}, env)).apps[0];
+  assert.equal(saved.brand, "custom");
+  assert.equal(saved.accountsBaseUrl, privateBase);
+  assert.equal(saved.openBaseUrl, "https://api.fixture.invalid");
+  assert.equal(saved.registrationUrl, privateBase + "/custom");
+});
+
+test("plain first-time SaaS registration retains the public bootstrap and Lark handoff", async (t) => {
+  const { env } = await fixture(t);
+  const calls = [],
+    options = {
+      env,
+      delay: async () => {},
+      emit: () => {},
+      fetchJSON: async (url) => {
+        calls.push(url);
+        return [
+          { device_code: "mock", user_code: "mock" },
+          { client_id: "cli_public", user_info: { tenant_brand: "lark" } },
+          { client_secret: "mock-secret" },
+        ][calls.length - 1];
+      },
+    };
+  const result = await executeManagement(
+    ["config", "init"],
+    { new: true },
+    options,
+  );
+  assert.equal(result.data.brand, "lark");
+  assert.deepEqual(calls, [
+    "https://accounts.feishu.cn/oauth/v1/app/registration",
+    "https://accounts.feishu.cn/oauth/v1/app/registration",
+    "https://accounts.larksuite.com/oauth/v1/app/registration",
+  ]);
+});
+
+test("changing the registration Accounts origin cannot poll or begin at previously saved absolute URLs", async (t) => {
+  const { env } = await fixture(t);
+  await writeStore(
+    "config.json",
+    {
+      currentApp: "cnooc",
+      apps: [
+        {
+          name: "cnooc",
+          brand: "custom",
+          appId: "cli_old",
+          accountsBaseUrl: "https://earlier.fixture.invalid",
+          registrationUrl: "https://earlier.fixture.invalid/register",
+          registrationPollUrl: "https://earlier.fixture.invalid/poll",
+        },
+      ],
+    },
+    env,
+  );
+  const seen = [];
+  const options = {
+    env,
+    emit: () => {},
+    delay: async () => {},
+    fetchJSON: async (url, { body }) => {
+      seen.push(url);
+      return body.get("action") === "begin"
+        ? { device_code: "fixture", user_code: "fixture" }
+        : { client_id: "cli_fixture", client_secret: "fixture" };
+    },
+  };
+  await executeManagement(
+    ["config", "init"],
+    {
+      new: true,
+      profile: "cnooc",
+      "accounts-base-url": "https://fresh.fixture.invalid",
+    },
+    options,
+  );
+  assert.deepEqual(
+    seen,
+    Array(2).fill("https://fresh.fixture.invalid/oauth/v1/app/registration"),
   );
 });
 
@@ -509,10 +685,9 @@ test("completion walks subcommands and flags and emits shell-specific scripts", 
   const response = await executeManagement(["__complete", "auth", "lo"], {});
   assert.match(response.__raw, /login/);
   assert.match(response.__raw, /:4\n$/);
-  for (const shell of ["bash", "zsh", "fish", "powershell"])
-    assert.ok(
-      (await executeManagement(["completion", shell], {})).__raw.includes(
-        "lark-ka",
-      ),
-    );
+  for (const shell of ["bash", "zsh", "fish", "powershell"]) {
+    const script = (await executeManagement(["completion", shell], {})).__raw;
+    assert.ok(script.includes("lark-ka"));
+    assert.ok(!script.includes("lark-cli"));
+  }
 });

@@ -4,7 +4,7 @@ version: 1.0.0
 description: "会议纪要整理工作流：汇总指定时间范围内的会议纪要并生成结构化报告。当用户需要整理会议纪要、生成会议周报、回顾一段时间内的会议内容时使用。"
 metadata:
   requires:
-    bins: ["lark-cli"]
+    bins: ["lark-ka"]
 ---
 
 # 会议纪要汇总工作流
@@ -27,8 +27,8 @@ metadata:
 仅支持 **user 身份**。执行前确保已授权：
 
 ```bash
-lark-cli auth login --domain vc        # 基础（查询+纪要）
-lark-cli auth login --domain vc,drive   # 含读取纪要文档正文、生成文档
+lark-ka auth login --domain vc        # 基础（查询+纪要）
+lark-ka auth login --domain vc,drive   # 含读取纪要文档正文、生成文档
 ```
 
 ## 工作流
@@ -56,7 +56,7 @@ lark-cli auth login --domain vc,drive   # 含读取纪要文档正文、生成�
 
 ```bash
 # page-size 最大为 30
-lark-cli vc +search --start "<YYYY-MM-DD>" --end "<YYYY-MM-DD>" --format json --page-size 30
+lark-ka vc +search --start "<YYYY-MM-DD>" --end "<YYYY-MM-DD>" --format json --page-size 30
 ```
 
 - 时间范围拆分：搜索的时间范围最大为 1 个月。搜索更长时间范围的会议，需要拆分为多次时间范围为一个月查询。
@@ -69,7 +69,7 @@ lark-cli vc +search --start "<YYYY-MM-DD>" --end "<YYYY-MM-DD>" --format json --
 
 1. 查询会议关联的纪要信息
 ```bash
-lark-cli vc +notes --meeting-ids "id1,id2,...,idN"   
+lark-ka vc +notes --meeting-ids "id1,id2,...,idN"
 ```
 - 根据上一步搜集到的 `meeting-id` 查询会议纪要。
 - 单次最多查询 50 个纪要信息，超过 50 个需分批调用。
@@ -80,10 +80,10 @@ lark-cli vc +notes --meeting-ids "id1,id2,...,idN"
 2. 获取纪要文档和逐字稿文档链接
 ```bash
 # 学习命令使用方式
-lark-cli schema drive.metas.batch_query
+lark-ka schema drive.metas.batch_query
 
 # 批量获取纪要文档与逐字稿链接: 一次最多查询 10 个文档
-lark-cli drive metas batch_query --data '{"request_docs": [{"doc_type": "docx", "doc_token": "<doc_token>"}], "with_url": true}'
+lark-ka drive metas batch_query --data '{"request_docs": [{"doc_type": "docx", "doc_token": "<doc_token>"}], "with_url": true}'
 ```
 
 ### Step 4: 整理纪要报告
@@ -98,9 +98,9 @@ lark-cli drive metas batch_query --data '{"request_docs": [{"doc_type": "docx", 
 阅读 [`../lark-doc/SKILL.md`](../lark-doc/SKILL.md) 学习云文档技能。
 
 ```bash
-lark-cli docs +create --api-version v2 --doc-format markdown --content $'<title>会议纪要汇总 (<start> - <end>)</title>\n<内容>'
+lark-ka docs +create --api-version v2 --doc-format markdown --content $'<title>会议纪要汇总 (<start> - <end>)</title>\n<内容>'
 # 或追加到已有文档
-lark-cli docs +update --api-version v2 --doc "<url_or_token>" --command append --doc-format markdown --content $'<内容>'
+lark-ka docs +update --api-version v2 --doc "<url_or_token>" --command append --doc-format markdown --content $'<内容>'
 ```
 
 ## 参考

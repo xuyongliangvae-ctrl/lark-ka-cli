@@ -56,20 +56,20 @@ In practice, this means:
 To actually receive the subscribed events, use the standard event WebSocket receiver:
 
 ```bash
-lark-cli event +subscribe --event-types task.task.update_user_access_v2 --compact --quiet
+lark-ka event +subscribe --event-types task.task.update_user_access_v2 --compact --quiet
 ```
 
 The full flow is:
-1. Register the subscription with `lark-cli task +subscribe-event [--as user|bot]`
-2. Receive those events with `lark-cli event +subscribe --event-types task.task.update_user_access_v2 ...`
+1. Register the subscription with `lark-ka task +subscribe-event [--as user|bot]`
+2. Receive those events with `lark-ka event +subscribe --event-types task.task.update_user_access_v2 ...`
 
 ## Recommended Commands
 
 ```bash
-lark-cli task +subscribe-event
+lark-ka task +subscribe-event
 ```
 # Subscribe with app identity
-lark-cli task +subscribe-event --as bot
+lark-ka task +subscribe-event --as bot
 
 
 ## Parameters
@@ -79,7 +79,7 @@ This shortcut has no additional parameters.
 ## Workflow
 
 1. Confirm whether the user wants to subscribe with `user` identity or `bot` identity.
-2. Execute `lark-cli task +subscribe-event`
+2. Execute `lark-ka task +subscribe-event`
 3. Report whether the subscription succeeded, and clarify which identity the subscription applies to.
 
 > [!CAUTION]

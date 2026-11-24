@@ -5,25 +5,25 @@
 
 通过 9 位会议号加入一场正在进行的视频会议（bot join）。这是一次**写操作**，会实际让当前身份加入会议。
 
-本 skill 对应 shortcut：`lark-cli vc +meeting-join`（调用 `POST /open-apis/vc/v1/bots/join`）。
+本 skill 对应 shortcut：`lark-ka vc +meeting-join`（调用 `POST /open-apis/vc/v1/bots/join`）。
 
 ## 命令
 
 ```bash
 # 仅指定会议号（无密码）
-lark-cli vc +meeting-join --meeting-number 123456789
+lark-ka vc +meeting-join --meeting-number 123456789
 
 # 指定会议号 + 密码
-lark-cli vc +meeting-join --meeting-number 123456789 --password 8888
+lark-ka vc +meeting-join --meeting-number 123456789 --password 8888
 
 # 从邀请事件透传 call_id（参见「如何获取输入参数」）
-lark-cli vc +meeting-join --meeting-number 123456789 --call-id a08e06bf-9a41-44e4-a89c-a7871899e783
+lark-ka vc +meeting-join --meeting-number 123456789 --call-id a08e06bf-9a41-44e4-a89c-a7871899e783
 
 # 输出格式
-lark-cli vc +meeting-join --meeting-number 123456789 --format json
+lark-ka vc +meeting-join --meeting-number 123456789 --format json
 
 # 预览 API 调用（不实际加入会议）
-lark-cli vc +meeting-join --meeting-number 123456789 --dry-run
+lark-ka vc +meeting-join --meeting-number 123456789 --dry-run
 ```
 
 ## 参数
@@ -88,23 +88,23 @@ lark-cli vc +meeting-join --meeting-number 123456789 --dry-run
 
 ```bash
 # 第 1 步：加入会议，记录返回的 meeting.id
-lark-cli vc +meeting-join --meeting-number 123456789
+lark-ka vc +meeting-join --meeting-number 123456789
 
 # 第 2 步：使用返回的 meeting.id 查询会中事件
-lark-cli vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty
+lark-ka vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty
 ```
 
 ### 场景 2：加入会议 → 会后拉取纪要 / 录制
 
 ```bash
 # 第 1 步：加入并参会
-lark-cli vc +meeting-join --meeting-number 123456789
+lark-ka vc +meeting-join --meeting-number 123456789
 
 # 第 2 步：会议结束后，查询录制（拿到 minute_token）
-lark-cli vc +recording --meeting-ids <meeting.id>
+lark-ka vc +recording --meeting-ids <meeting.id>
 
 # 第 3 步：查询会议纪要（总结 / 待办 / 章节 / 逐字稿）
-lark-cli vc +notes --meeting-ids <meeting.id>
+lark-ka vc +notes --meeting-ids <meeting.id>
 ```
 
 ## 常见错误与排查

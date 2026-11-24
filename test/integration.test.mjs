@@ -7,6 +7,9 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 const bin = fileURLToPath(new URL("../bin/lark-ka.mjs", import.meta.url));
+const { version: packageVersion } = JSON.parse(
+  await readFile(new URL("../package.json", import.meta.url), "utf8"),
+);
 async function run(argv, env, input) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [bin, ...argv], {
@@ -53,7 +56,7 @@ test("version/help/schema run without configuration or a Go binary", async () =>
   };
   const version = await run(["--version"], env);
   assert.equal(version.code, 0);
-  assert.match(version.stdout, /Node.js/);
+  assert.equal(version.stdout.trim(), `lark-ka ${packageVersion} (Node.js)`);
   const help = await run(["--help"], env);
   assert.match(help.stdout, /metadata API/);
   const schema = await run(["schema", "calendar.calendars.list"], env);
@@ -177,6 +180,10 @@ test("MCP handshake and curated schemas are pure JSON and do not need auth", asy
   const replies = result.stdout.trim().split("\n").map(JSON.parse);
   assert.equal(replies.length, 3);
   assert.equal(
+    replies.find((x) => x.id === 1).result.serverInfo.version,
+    packageVersion,
+  );
+  assert.equal(
     replies.find((x) => x.id === 1).result.protocolVersion,
     "2025-11-25",
   );
@@ -287,4 +294,151 @@ test("OAuth code login validates state, exchanges code, stores session, status v
   assert.equal(JSON.parse(state.stdout).loggedIn, true);
   assert.equal(JSON.parse(state.stdout).identity, "user");
   assert.ok(!state.stdout.includes("user-token"));
+});
+
+test("Drive file version IDs pass to the RPC without activating global --version", async () => {
+  const env = {
+    LARK_KA_CONFIG_DIR: await mkdtemp(
+      path.join(os.tmpdir(), "lark-file-version-"),
+    ),
+  };
+  const version = "7633658129540910621";
+  for (const action of ["+version-get", "+version-delete", "+version-revert"]) {
+    const result = await run(
+      [
+        "drive",
+        action,
+        "--file-token",
+        "file123",
+        "--version",
+        version,
+        "--as",
+        "user",
+        "--dry-run",
+      ],
+      env,
+    );
+    assert.equal(result.code, 0, result.stderr);
+    const [req] = JSON.parse(result.stdout).data.requests;
+    assert.equal(req.query?.version ?? req.data?.version, version);
+    assert.ok(req.path.includes("file123"));
+  }
+  const missing = await run(
+    [
+      "drive",
+      "+version-get",
+      "--file-token",
+      "file123",
+      "--version",
+      "--dry-run",
+    ],
+    env,
+  );
+  assert.equal(missing.code, 2);
+  assert.match(missing.stderr, /numeric file version/);
+  const gated = await run(
+    ["drive", "+version-delete", "--file-token", "file123", "--version=1"],
+    { ...env, LARKSUITE_CLI_AUTH_PROXY: "fixture" },
+  );
+  assert.notEqual(gated.code, 0);
+  assert.match(gated.stderr, /sidecar/);
+});
+
+test("7.54 CLI accepts the calendar, native Docx and whiteboard flags consumed by its handlers", async () => {
+  const env = {
+    LARK_KA_CONFIG_DIR: await mkdtemp(
+      path.join(os.tmpdir(), "lark-shortcut-flags-"),
+    ),
+  };
+  const init = await run(
+    [
+      "config",
+      "init",
+      "--name",
+      "cnooc",
+      "--brand",
+      "custom",
+      "--app-id",
+      "cli_fixture",
+      "--open-base-url",
+      "https://open.test.invalid",
+      "--docs-backend",
+      "native",
+    ],
+    env,
+  );
+  assert.equal(init.code, 0, init.stderr);
+  const start = "2026-03-19T14:00:00+08:00",
+    end = "2026-03-19T15:00:00+08:00";
+  const checks = [
+    [
+      ["calendar", "+room-find", "--slot", `${start}~${end}`],
+      "/open-apis/calendar/v4/freebusy/room_find",
+    ],
+    [
+      [
+        "calendar",
+        "+suggestion",
+        "--start",
+        start,
+        "--end",
+        end,
+        "--duration-minutes",
+        "40",
+      ],
+      "/open-apis/calendar/v4/freebusy/suggestion",
+    ],
+    [
+      [
+        "docs",
+        "+fetch",
+        "--api-version",
+        "v1",
+        "--doc",
+        "DOCUMENT",
+        "--blocks",
+      ],
+      "/open-apis/docx/v1/documents/DOCUMENT/blocks",
+    ],
+    [
+      [
+        "whiteboard",
+        "+query",
+        "--output_as",
+        "raw",
+        "--whiteboard-token",
+        "BOARD",
+      ],
+      "/open-apis/board/v1/whiteboards/BOARD/nodes",
+    ],
+    [
+      [
+        "whiteboard",
+        "+update",
+        "--whiteboard-token",
+        "BOARD",
+        "--input_format",
+        "mermaid",
+        "--source",
+        "graph LR; A-->B",
+      ],
+      "/open-apis/board/v1/whiteboards/BOARD/nodes/plantuml",
+    ],
+    ...["+assign", "+followers"].map((action) => [
+      ["task", action, "--task-id", "task123", "--remove", "ou_member"],
+      "/open-apis/task/v2/tasks/task123/remove_members",
+    ]),
+    [
+      ["task", "+reminder", "--task-id", "task123", "--remove"],
+      "/open-apis/task/v2/tasks/task123",
+    ],
+  ];
+  for (const [args, expectedPath] of checks) {
+    const r = await run([...args, "--as", "user", "--dry-run"], env);
+    assert.equal(r.code, 0, r.stderr);
+    const req = JSON.parse(r.stdout).data.requests[0];
+    assert.equal(req.path, expectedPath);
+    if (args[1] === "+suggestion") assert.equal(req.data.duration_minutes, 40);
+    if (args[1] === "+update") assert.equal(req.data.syntax_type, 2);
+  }
 });

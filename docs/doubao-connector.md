@@ -9,7 +9,7 @@
 第一条安装 CLI。包发布后，填写实际版本及仓库地址：
 
 ```bash
-npm install -g @lark-ka/hn-work-cli@0.1.0 --registry="https://npm.customer-a.example.invalid/"
+npm install -g @lark-ka/hn-work-cli@7.54.2 --registry="https://npm.customer-a.example.invalid/"
 ```
 
 第二条保存客户的固定配置。下面所有示例地址、App ID 和 Scope 都要替换成客户提供的真实值；在后台输入框内可合并成一行：
@@ -27,7 +27,7 @@ lark-ka config init --name customer-a \
   --auth-flow authorization-code \
   --client-id-param client_id \
   --redirect-uri "http://127.0.0.1:8989/lark/oauth/callback" \
-  --scope "客户已批准的 Scope" \
+  --scope "该应用已批准的全部员工 Scope" \
   --docs-backend native \
   --default-as user \
   --strict-mode user
@@ -60,9 +60,13 @@ lark-ka config init --name customer-a \
 | 取消授权命令 | `lark-ka --profile customer-a auth logout`             |
 | 授权状态命令 | `lark-ka --profile customer-a auth status --connector` |
 | 授权成功正则 | `"loggedIn"\s*:\s*true`                                |
-| 版本检查命令 | `lark-ka --version`                                    |
+| 版本检查命令 | `lark-ka --version --expect-version 7.54.2`            |
 
 所有授权、注销、状态及业务命令中的 `--profile` 必须与初始化时的 `--name` 一致。地址和 Scope 已保存，后续命令不用重复填写。
+
+版本检查中的 `--expect-version` 使用安装命令固定的版本号。旧版 CLI 会在这项检查中退出非零状态。
+
+安装配置中的 `--scope` 填该应用已批准的完整员工权限清单。启用令牌续期时加入 `offline_access`。授权命令省略 `--scope` 时会一次申请 Profile 的整组权限，员工在浏览器中确认即可。
 
 换客户时，将初始化命令改成 `--name customer-b`，替换对应客户的地址、App ID、Scope 和凭据，并将后续命令统一改成 `--profile customer-b`。安装的 CLI 包保持相同。
 

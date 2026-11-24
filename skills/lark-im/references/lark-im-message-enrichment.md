@@ -24,7 +24,7 @@ On per-thread fetch failure the host gets `thread_replies_error: true` (mirrors 
 The default enrichment requires `im:message.reactions:read`, already declared in each shortcut's `UserScopes` / `BotScopes` (or `Scopes` for the user-only search command), so the framework's pre-flight check surfaces a `missing_scope` error before the request is sent. Bots that were registered before this scope was added need an incremental authorization in the Feishu developer console; users can run:
 
 ```bash
-lark-cli auth login --scope "im:message.reactions:read"
+lark-ka auth login --scope "im:message.reactions:read"
 ```
 
 ## Data contract — missing field ≠ fetch failure

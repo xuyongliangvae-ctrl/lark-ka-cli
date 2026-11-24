@@ -105,6 +105,20 @@ export function authURL(c, type) {
     );
   return new URL(route, validURL(c[base], base)).href;
 }
+export function tokenRequest(c, grant, signal) {
+  const fields = { ...grant, client_id: c.appId };
+  if (c.appSecret) fields.client_secret = c.appSecret;
+  return {
+    method: "POST",
+    signal,
+    ...(c.tokenEncoding === "json"
+      ? {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body: fields,
+        }
+      : { body: new URLSearchParams(fields) }),
+  };
+}
 export async function saveSession(c, token, user, { expectedSession } = {}) {
   secretString(token?.access_token, "access_token");
   if (token.refresh_token !== undefined && token.refresh_token !== "")
@@ -185,18 +199,18 @@ export async function getUserToken(c, { signal } = {}) {
         code: 3,
         hint: "Run lark-ka auth login again.",
       });
-    const form = new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: session.refreshToken,
-      client_id: c.appId,
-    });
-    if (c.appSecret) form.set("client_secret", c.appSecret);
     const refreshed = unbox(
-      await fetchJSON(authURL(c, "refresh"), {
-        method: "POST",
-        body: form,
-        signal,
-      }),
+      await fetchJSON(
+        authURL(c, "refresh"),
+        tokenRequest(
+          c,
+          {
+            grant_type: "refresh_token",
+            refresh_token: session.refreshToken,
+          },
+          signal,
+        ),
+      ),
     );
     return (
       await saveSession(c, refreshed, undefined, { expectedSession: session })
@@ -235,6 +249,96 @@ export async function getBotToken(c, { signal } = {}) {
     return token;
   });
 }
+
+export async function getApplicationUserScopes(
+  c,
+  {
+    signal,
+    getBotToken: getToken = getBotToken,
+    fetchJSON: fetcher = fetchJSON,
+  } = {},
+) {
+  const token = await getToken(c, { signal });
+  const data = unbox(
+    await fetcher(
+      new URL(
+        `/open-apis/application/v6/applications/${encodeURIComponent(c.appId)}?lang=zh_cn`,
+        c.openBaseUrl,
+      ),
+      { headers: { Authorization: `Bearer ${token}` }, signal },
+    ),
+  );
+  const scopes = (data.app ?? data).scopes;
+  if (!Array.isArray(scopes)) return [];
+  return [
+    ...new Set(
+      scopes
+        .filter((scope) => {
+          const types = scope?.token_types ?? scope?.tokenTypes;
+          return (
+            scope?.enabled !== false &&
+            Array.isArray(types) &&
+            types.includes("user")
+          );
+        })
+        .map((scope) => scope.scope)
+        .filter(
+          (scope) => typeof scope === "string" && /^[^\s,]+$/.test(scope),
+        ),
+    ),
+  ];
+}
+
+function normalizedScopes(value) {
+  const entries = Array.isArray(value) ? value : [value];
+  if (entries.some((entry) => typeof entry !== "string"))
+    throw new CliError("validation", "OAuth scopes must be strings");
+  const scopes = [
+    ...new Set(
+      entries.flatMap((entry) => entry.split(/[\s,]+/)).filter(Boolean),
+    ),
+  ];
+  if (scopes.length > 200)
+    throw new CliError(
+      "validation",
+      "OAuth login supports at most 200 distinct scopes",
+      {
+        hint: "Choose a smaller set of approved employee permissions with --scope.",
+      },
+    );
+  return scopes.join(" ");
+}
+
+async function loginScopes(c, requested, options) {
+  if (requested !== undefined || c.scope !== undefined) {
+    const scope = normalizedScopes(
+      requested === undefined ? c.scope : requested,
+    );
+    if (!scope)
+      throw new CliError(
+        "validation",
+        "Specify at least one approved employee OAuth scope",
+      );
+    return scope;
+  }
+  const hint =
+    'Save approved employee scopes with lark-ka config init --scope "…" or pass --scope to auth login.';
+  try {
+    const scope = normalizedScopes(await getApplicationUserScopes(c, options));
+    if (!scope)
+      throw new CliError(
+        "permission",
+        "The application reported no approved employee OAuth scopes",
+        { code: 3 },
+      );
+    return scope;
+  } catch (error) {
+    if (error instanceof CliError && !options.signal?.aborted && !error.hint)
+      error.hint = hint;
+    throw error;
+  }
+}
+
 export async function currentUser(c, token) {
   const accessToken =
     token === undefined
@@ -308,32 +412,35 @@ export async function authLogin(
   {
     emit = (data) => process.stderr.write(JSON.stringify(data) + "\n"),
     signal,
+    getBotToken,
+    fetchJSON: scopeFetchJSON,
   } = {},
 ) {
   if (signal?.aborted)
     throw new CliError("auth", "Login cancelled", { code: 3 });
-  let scope = flags.scope || c.scope;
-  if (Array.isArray(scope)) scope = scope.join(" ");
-  scope = String(scope || "")
-    .replaceAll(",", " ")
-    .trim();
-  if (!scope && !(c.authFlow === "device" && flags["device-code"]))
-    throw new CliError(
-      "validation",
-      "Specify --scope or configure deployment.scope for non-interactive login",
-    );
+  if (c.authFlow !== "device") {
+    if (!["authorization-code", "authorization_code"].includes(c.authFlow))
+      throw new CliError(
+        "config",
+        "authFlow must be device or authorization-code",
+      );
+    if (flags["no-wait"] || flags["device-code"])
+      throw new CliError(
+        "validation",
+        "--no-wait and --device-code are only supported with device flow",
+      );
+  }
+  const scope = flags["device-code"]
+    ? undefined
+    : await loginScopes(c, flags.scope, {
+        signal,
+        getBotToken,
+        fetchJSON: scopeFetchJSON,
+      });
+  if (signal?.aborted)
+    throw new CliError("auth", "Login cancelled", { code: 3 });
   if (c.authFlow === "device")
     return deviceLogin(c, { ...flags, scope }, { emit, signal });
-  if (!["authorization-code", "authorization_code"].includes(c.authFlow))
-    throw new CliError(
-      "config",
-      "authFlow must be device or authorization-code",
-    );
-  if (flags["no-wait"] || flags["device-code"])
-    throw new CliError(
-      "validation",
-      "--no-wait and --device-code are only supported with device flow",
-    );
   const state = randomBytes(32).toString("hex");
   const callback = new URL(
     flags["redirect-uri"] ||
@@ -433,27 +540,28 @@ export async function authLogin(
       Number(flags.timeout || 600) * 1000,
     );
     const code = await result;
-    const form = new URLSearchParams({
-      grant_type: "authorization_code",
-      code,
-      client_id: c.appId,
-      redirect_uri: callback.href,
-    });
-    if (c.appSecret) form.set("client_secret", c.appSecret);
     const token = unbox(
-      await fetchJSON(authURL(c, "token"), {
-        method: "POST",
-        body: form,
-        signal,
-      }),
+      await fetchJSON(
+        authURL(c, "token"),
+        tokenRequest(
+          c,
+          {
+            grant_type: "authorization_code",
+            code,
+            redirect_uri: callback.href,
+          },
+          signal,
+        ),
+      ),
     );
     const user = await currentUser(c, token.access_token);
-    await saveSession(c, { ...token, scope: token.scope || scope }, user);
+    const grantedScope = token.scope ?? scope;
+    await saveSession(c, { ...token, scope: grantedScope }, user);
     return {
       loggedIn: true,
       identity: "user",
       user,
-      scope: token.scope || scope,
+      scope: grantedScope,
     };
   } finally {
     clearTimeout(timeout);
@@ -463,7 +571,6 @@ export async function authLogin(
   }
 }
 async function deviceLogin(c, flags, { emit, signal }) {
-  const endpoint = authURL(c, "device");
   let device;
   if (flags["device-code"])
     device = {
@@ -478,7 +585,7 @@ async function deviceLogin(c, flags, { emit, signal }) {
         }
       : {};
     device = unbox(
-      await fetchJSON(endpoint, {
+      await fetchJSON(authURL(c, "device"), {
         method: "POST",
         headers,
         body: new URLSearchParams({ client_id: c.appId, scope: flags.scope }),
@@ -506,20 +613,20 @@ async function deviceLogin(c, flags, { emit, signal }) {
   let interval = Math.max(1, Number(device.interval || 5));
   while (Date.now() < end) {
     await delay(interval * 1000, undefined, { signal });
-    const form = new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:device_code",
-      device_code: device.device_code,
-      client_id: c.appId,
-    });
-    if (c.appSecret) form.set("client_secret", c.appSecret);
     let response;
     try {
       response = unbox(
-        await fetchJSON(authURL(c, "token"), {
-          method: "POST",
-          body: form,
-          signal,
-        }),
+        await fetchJSON(
+          authURL(c, "token"),
+          tokenRequest(
+            c,
+            {
+              grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+              device_code: device.device_code,
+            },
+            signal,
+          ),
+        ),
       );
     } catch (e) {
       if (
@@ -534,8 +641,14 @@ async function deviceLogin(c, flags, { emit, signal }) {
       throw e;
     }
     const user = await currentUser(c, response.access_token);
-    await saveSession(c, response, user);
-    return { loggedIn: true, identity: "user", user };
+    const scope = response.scope ?? flags.scope;
+    await saveSession(c, { ...response, scope }, user);
+    return {
+      loggedIn: true,
+      identity: "user",
+      user,
+      ...(scope !== undefined && { scope }),
+    };
   }
   throw new CliError("auth", "Device authorization timed out", { code: 3 });
 }

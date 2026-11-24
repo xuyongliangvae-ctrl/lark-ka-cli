@@ -3,22 +3,22 @@ name: lark-apps
 description: "把本地 HTML 文件或目录部署到飞书妙搭（Miaoda），生成一个公网可访问的应用及其链接（URL）。当用户要创建 HTML 或要把 HTML、静态网站或 Web demo 发布成公网可访问的链接 / 可分享链接、设置应用共享范围，或提到妙搭 / Miaoda 时使用。凡产出可独立访问的 HTML 产物都属本 skill 的潜在归宿，是否真要部署由 skill 内部协议判断。不用于：上传普通文件到云空间/云盘/云存储（用 lark-drive）、编辑飞书云文档内容（用 lark-doc）、创建飞书原生幻灯片 / 演示文稿（用 lark-slides）。"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli apps --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka apps --help"
 ---
 
 # apps (v1)
 
 ```bash
 # 常用示例
-lark-cli apps +create           --name "客户调研问卷" --app-type HTML
-lark-cli apps +html-publish     --app-id app_xxx --path ./dist
-lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
+lark-ka apps +create           --name "客户调研问卷" --app-type HTML
+lark-ka apps +html-publish     --app-id app_xxx --path ./dist
+lark-ka apps +access-scope-set --app-id app_xxx --scope tenant
 ```
 
 ## 品牌可用性（先做）
 
-跑 `lark-cli apps --help`；若提示暂未支持，告诉用户敬请期待并停止。
+跑 `lark-ka apps --help`；若提示暂未支持，告诉用户敬请期待并停止。
 
 ## 前置条件 — 执行操作前必读
 
@@ -39,13 +39,13 @@ lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
 **首次操作前一次性把本域 scope 全拿到，避免每条命令首次跑都触发新一轮授权**：
 
 ```bash
-lark-cli auth login --domain apps
+lark-ka auth login --domain apps
 ```
 
 命令失败且 `error.subtype == "missing_scope"` 时，统一引导用户跑：
 
 ```bash
-lark-cli auth login --domain apps
+lark-ka auth login --domain apps
 ```
 
 ## 写 HTML 前的硬约束（避免 publish 阶段被拒）
@@ -94,7 +94,7 @@ lark-cli auth login --domain apps
 
 ## Shortcuts（推荐优先使用）
 
-Shortcut 是对常用操作的高级封装（`lark-cli apps +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka apps +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut | 说明 |
 |----------|------|

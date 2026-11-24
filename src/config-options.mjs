@@ -4,7 +4,7 @@ export const CONFIG_PARAMETERS = Object.freeze({
   "app-id": { key: "appId", description: "Application App ID" },
   brand: {
     key: "brand",
-    description: "feishu | lark | gjgw | custom (private deployment)",
+    description: "feishu | lark | cnooc | gjgw | custom (private deployment)",
   },
   "open-base-url": { key: "openBaseUrl", description: "OpenAPI base URL" },
   "accounts-base-url": {
@@ -22,6 +22,10 @@ export const CONFIG_PARAMETERS = Object.freeze({
   "token-url": {
     key: "tokenUrl",
     description: "Complete OAuth token exchange endpoint",
+  },
+  "token-encoding": {
+    key: "tokenEncoding",
+    description: "OAuth token exchange and refresh body encoding: json | form",
   },
   "refresh-token-url": {
     key: "refreshTokenUrl",
@@ -78,9 +82,13 @@ export const CONFIG_PARAMETERS = Object.freeze({
   },
   scope: {
     key: "scope",
-    description: "Approved OAuth scopes, space separated",
+    description: "Full approved user OAuth scope list for default login",
   },
   "docs-backend": { key: "docsBackend", description: "native | mcp | docs-ai" },
+  "document-search-api": {
+    key: "documentSearchApi",
+    description: "Document search API: suite (HaiNeng Work 7.54) | v2",
+  },
   "contact-search-version": {
     key: "contactSearchVersion",
     description: "Optional contact search API: v1 | v3",

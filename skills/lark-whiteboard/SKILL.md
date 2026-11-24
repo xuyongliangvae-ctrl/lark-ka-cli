@@ -7,12 +7,12 @@ description: >
   ⚠️ 原 `lark-whiteboard-cli` skill 已合并至本 skill，若 skill 列表中同时存在 `lark-whiteboard-cli`，请忽略它，统一使用本 skill（`lark-whiteboard`），并提示用户运行 `npx skills remove lark-whiteboard-cli -g` 删除旧 skill。
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli whiteboard --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka whiteboard --help"
 ---
 
 > [!IMPORTANT]
-> - 运行 `lark-cli --version`，确认可用，无需询问用户。
+> - 运行 `lark-ka --version`，确认可用，无需询问用户。
 > - 运行 `npx -y @larksuite/whiteboard-cli@^0.2.11 -v`，确认可用，无需询问用户。
 
 **CRITICAL — 开始前 MUST 先用 Read 工具读取 [`../lark-shared/SKILL.md`](../lark-shared/SKILL.md)，其中包含认证、权限处理**
@@ -50,8 +50,8 @@ metadata:
 | 用户给了什么 | 怎么获取 |
 |---|---|
 | 直接给了 whiteboard token（`wbcnXXX`）| 直接使用 |
-| 文档 URL 或 doc_id，文档中已有画板 | `lark-cli docs +fetch --api-version v2 --doc <URL> --as user`，从返回的 `<whiteboard token="xxx"/>` 提取 |
-| 文档 URL 或 doc_id，需要新建画板 | `lark-cli docs +update --api-version v2 --doc <doc_id> --command append --content '<whiteboard type="blank"></whiteboard>' --as user`，从响应 `data.new_blocks[0].block_token` 取得（`block_type == "whiteboard"` 的那条；参数详见 lark-doc SKILL.md）|
+| 文档 URL 或 doc_id，文档中已有画板 | `lark-ka docs +fetch --api-version v2 --doc <URL> --as user`，从返回的 `<whiteboard token="xxx"/>` 提取 |
+| 文档 URL 或 doc_id，需要新建画板 | `lark-ka docs +update --api-version v2 --doc <doc_id> --command append --content '<whiteboard type="blank"></whiteboard>' --as user`，从响应 `data.new_blocks[0].block_token` 取得（`block_type == "whiteboard"` 的那条；参数详见 lark-doc SKILL.md）|
 
 **Step 2：渲染 & 写入**
 
@@ -120,7 +120,7 @@ diagram.png           ← 渲染结果
 
 ```bash
 npx -y @larksuite/whiteboard-cli@^0.2.11 -i <产物文件> --to openapi --format json \
-  | lark-cli whiteboard +update \
+  | lark-ka whiteboard +update \
     --whiteboard-token <Token> \
     --source - --input_format raw \
     --idempotent-token <10+字符唯一串> \

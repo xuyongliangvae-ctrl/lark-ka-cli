@@ -4,37 +4,37 @@
 
 Search the list of group chats visible to a user or bot, including chats the user or bot belongs to and public chats visible to them. Supports keyword matching on chat names and member names, including pinyin and prefix fuzzy search.
 
-This skill maps to the shortcut: `lark-cli im +chat-search` (internally calls `POST /open-apis/im/v2/chats/search`).
+This skill maps to the shortcut: `lark-ka im +chat-search` (internally calls `POST /open-apis/im/v2/chats/search`).
 
 ## Commands
 
 ```bash
 # Search chats by keyword
-lark-cli im +chat-search --query "project"
+lark-ka im +chat-search --query "project"
 
 # Restrict by search types
-lark-cli im +chat-search --query "project" --search-types "private,public_joined"
+lark-ka im +chat-search --query "project" --search-types "private,public_joined"
 
 # Filter by member open_ids (with keyword)
-lark-cli im +chat-search --query "project" --member-ids "ou_xxx,ou_yyy"
+lark-ka im +chat-search --query "project" --member-ids "ou_xxx,ou_yyy"
 
 # Search by member open_ids only
-lark-cli im +chat-search --member-ids "ou_xxx,ou_yyy"
+lark-ka im +chat-search --member-ids "ou_xxx,ou_yyy"
 
 # Only show chats you created or manage
-lark-cli im +chat-search --query "project" --is-manager
+lark-ka im +chat-search --query "project" --is-manager
 
 # Set page size
-lark-cli im +chat-search --query "project" --page-size 10
+lark-ka im +chat-search --query "project" --page-size 10
 
 # Pagination
-lark-cli im +chat-search --query "project" --page-token "xxx"
+lark-ka im +chat-search --query "project" --page-token "xxx"
 
 # JSON output
-lark-cli im +chat-search --query "project" --format json
+lark-ka im +chat-search --query "project" --format json
 
 # Preview the request without executing it
-lark-cli im +chat-search --query "project" --dry-run
+lark-ka im +chat-search --query "project" --dry-run
 ```
 
 ## Parameters
@@ -92,21 +92,21 @@ Note: only confirmed-muted chats count toward `filtered_count`; non-member publi
 ### Scenario 1: Search chats that contain a keyword
 
 ```bash
-lark-cli im +chat-search --query "design review"
+lark-ka im +chat-search --query "design review"
 ```
 
 ### Scenario 2: Search a chat and list recent messages
 
 ```bash
-CHAT_ID=$(lark-cli im +chat-search --query "project" --format json | jq -r '.data.chats[0].chat_id')
-lark-cli im +chat-messages-list --chat-id "$CHAT_ID"
+CHAT_ID=$(lark-ka im +chat-search --query "project" --format json | jq -r '.data.chats[0].chat_id')
+lark-ka im +chat-messages-list --chat-id "$CHAT_ID"
 ```
 
 ### Scenario 3: Search a chat and send a message
 
 ```bash
-CHAT_ID=$(lark-cli im +chat-search --query "daily report" --format json | jq -r '.data.chats[0].chat_id')
-lark-cli im +messages-send --chat-id "$CHAT_ID" --text "Today's progress update"
+CHAT_ID=$(lark-ka im +chat-search --query "daily report" --format json | jq -r '.data.chats[0].chat_id')
+lark-ka im +messages-send --chat-id "$CHAT_ID" --text "Today's progress update"
 ```
 
 ## Common Errors and Troubleshooting
@@ -117,7 +117,7 @@ lark-cli im +messages-send --chat-id "$CHAT_ID" --text "Today's progress update"
 | Empty results | No visible chats matched the keyword or filters | Relax the keyword or filters and try again |
 | `--page-size must be an integer between 1 and 100` | page-size is out of range or not an integer | Use an integer between 1 and 100 |
 | Permission denied (99991672) | The bot app does not have `im:chat:read` TAT permission enabled | Enable the permission for the app in the Open Platform console |
-| Permission denied (99991679) with `--as user` | UAT is not authorized for `im:chat:read` | Run `lark-cli auth login --scope "im:chat:read"` |
+| Permission denied (99991679) with `--as user` | UAT is not authorized for `im:chat:read` | Run `lark-ka auth login --scope "im:chat:read"` |
 | `Bot ability is not activated` (232025) | The app does not have bot capability enabled | Enable bot capability in the Open Platform console |
 
 ## AI Usage Guidance

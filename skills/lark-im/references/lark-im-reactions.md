@@ -39,16 +39,16 @@ It focuses on:
 ## Inspect Schema
 
 ```bash
-lark-cli schema im.reactions
-lark-cli schema im.reactions.create --format pretty
-lark-cli schema im.reactions.list --format pretty
-lark-cli schema im.reactions.delete --format pretty
+lark-ka schema im.reactions
+lark-ka schema im.reactions.create --format pretty
+lark-ka schema im.reactions.list --format pretty
+lark-ka schema im.reactions.delete --format pretty
 ```
 
 If your local build has already exposed the batch API in `schema`, also check:
 
 ```bash
-lark-cli schema im.reactions.batch_query --format pretty
+lark-ka schema im.reactions.batch_query --format pretty
 ```
 
 ## create
@@ -56,7 +56,7 @@ lark-cli schema im.reactions.batch_query --format pretty
 Add a reaction to one message.
 
 ```bash
-lark-cli im reactions create \
+lark-ka im reactions create \
   --params '{"message_id":"om_xxx"}' \
   --data '{"reaction_type":{"emoji_type":"SMILE"}}'
 ```
@@ -87,11 +87,11 @@ lark-cli im reactions create \
 List reaction records on one message.
 
 ```bash
-lark-cli im reactions list --params '{"message_id":"om_xxx"}'
-lark-cli im reactions list --params '{"message_id":"om_xxx","reaction_type":"SMILE"}'
-lark-cli im reactions list --params '{"message_id":"om_xxx","page_size":50}'
-lark-cli im reactions list --params '{"message_id":"om_xxx","page_token":"<PAGE_TOKEN>"}'
-lark-cli im reactions list --params '{"message_id":"om_xxx","user_id_type":"open_id"}'
+lark-ka im reactions list --params '{"message_id":"om_xxx"}'
+lark-ka im reactions list --params '{"message_id":"om_xxx","reaction_type":"SMILE"}'
+lark-ka im reactions list --params '{"message_id":"om_xxx","page_size":50}'
+lark-ka im reactions list --params '{"message_id":"om_xxx","page_token":"<PAGE_TOKEN>"}'
+lark-ka im reactions list --params '{"message_id":"om_xxx","user_id_type":"open_id"}'
 ```
 
 ### Request Parameters (`--params`)
@@ -155,7 +155,7 @@ lark-cli im reactions list --params '{"message_id":"om_xxx","user_id_type":"open
 Delete one specific reaction record from one message.
 
 ```bash
-lark-cli im reactions delete \
+lark-ka im reactions delete \
   --params '{"message_id":"om_xxx","reaction_id":"ZCaCIjUBVVWSrm5L-3ZTw_xxx"}'
 ```
 
@@ -178,7 +178,7 @@ The response shape is similar to `create`, and usually echoes:
 Query reactions for multiple messages in one request.
 
 ```bash
-lark-cli im reactions batch_query \
+lark-ka im reactions batch_query \
   --params '{"user_id_type":"open_id"}' \
   --data '{
     "queries":[

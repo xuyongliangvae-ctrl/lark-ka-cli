@@ -1,0 +1,1387 @@
+[
+  {
+    "service": "base",
+    "command": "+advperm-disable",
+    "description": "Disable advanced permissions for a Base",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_advperm_disable.go"
+  },
+  {
+    "service": "base",
+    "command": "+advperm-enable",
+    "description": "Enable advanced permissions for a Base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_advperm_enable.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-block-create",
+    "description": "Create a block",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "type",
+        "description": "resource type",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "block name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "parent-id",
+        "description": "folder block id; when omitted, create at root",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_block_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-block-delete",
+    "description": "Delete a block",
+    "risk": "high-risk-write",
+    "flags": [],
+    "source": "shortcuts/base/base_block_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-block-list",
+    "description": "List blocks in a base",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "type",
+        "description": "filter by resource type",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "parent-id",
+        "description": "folder block id; when omitted, list all blocks",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_block_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-block-move",
+    "description": "Move a block",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "parent-id",
+        "description": "target folder block id; when omitted, move to root",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "before-id",
+        "description": "sibling block id; move the block before this sibling in the target folder/root order",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "after-id",
+        "description": "sibling block id; move the block after this sibling in the target folder/root order",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_block_move.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-block-rename",
+    "description": "Rename a block",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "new unique block name; must not duplicate another block name in this base",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_block_rename.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-arrange",
+    "description": "Auto-arrange dashboard blocks layout (server-side smart layout)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "user-id-type",
+        "description": "user ID type: open_id / union_id / user_id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_arrange.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-block-create",
+    "description": "Create a block in a dashboard",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "block name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "type",
+        "description": "block type: column(柱状图)|bar(条形图)|line(折线图)|pie(饼图)|ring(环形图)|area(面积图)|combo(组合图)|scatter(散点图)|funnel(漏斗图)|wordCloud(词云)|radar(雷达图)|statistics(指标卡)|text(文本). Read dashboard-block-data-config.md before creating.",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "data-config",
+        "description": "data_config JSON object; read dashboard-block-data-config.md for the SSOT",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "user-id-type",
+        "description": "user ID type for user fields in filters: open_id / union_id / user_id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "no-validate",
+        "description": "skip local data_config validation",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_block_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-block-delete",
+    "description": "Delete a dashboard block",
+    "risk": "high-risk-write",
+    "flags": [],
+    "source": "shortcuts/base/dashboard_block_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-block-get",
+    "description": "Get a dashboard block by ID",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "user-id-type",
+        "description": "user ID type: open_id / union_id / user_id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_block_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-block-get-data",
+    "description": "Get computed data for a dashboard chart block",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/dashboard_block_get_data.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-block-list",
+    "description": "List blocks in a dashboard",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "page-size",
+        "description": "page size, default 20, max 100",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "page-token",
+        "description": "pagination token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_block_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-block-update",
+    "description": "Update a dashboard block",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "new block name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "data-config",
+        "description": "data_config JSON object; read dashboard-block-data-config.md for the SSOT",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "user-id-type",
+        "description": "user ID type for user fields in filters: open_id / union_id / user_id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "no-validate",
+        "description": "skip local data_config validation",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_block_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-create",
+    "description": "Create a dashboard in a base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "dashboard name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "theme-style",
+        "description": "theme style, defaults to platform default when omitted",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-delete",
+    "description": "Delete a dashboard",
+    "risk": "high-risk-write",
+    "flags": [],
+    "source": "shortcuts/base/dashboard_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-get",
+    "description": "Get a dashboard by ID",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/dashboard_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-update",
+    "description": "Update a dashboard",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "new dashboard name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "theme-style",
+        "description": "theme style, leave empty to keep current theme",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+data-query",
+    "description": "Query and analyze Base data with JSON DSL (aggregation, filter, sort)",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "dsl",
+        "description": "query JSON DSL; read lark-base-data-query-guide.md first, then lark-base-data-query.md for the full DSL SSOT",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_data_query.go"
+  },
+  {
+    "service": "base",
+    "command": "+field-create",
+    "description": "Create a field",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "field property JSON object",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "i-have-read-guide",
+        "description": "set only after you have read the formula/lookup guide for those field types",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/field_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+field-delete",
+    "description": "Delete a field by ID or name",
+    "risk": "high-risk-write",
+    "flags": [],
+    "source": "shortcuts/base/field_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+field-search-options",
+    "description": "Search select options of a field",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "keyword",
+        "description": "keyword for option query",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "offset",
+        "description": "pagination offset",
+        "type": "int",
+        "default": "0",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "limit",
+        "description": "pagination size, default 30",
+        "type": "int",
+        "default": "30",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/field_search_options.go"
+  },
+  {
+    "service": "base",
+    "command": "+field-update",
+    "description": "Update a field by ID or name",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "complete field definition JSON object; update uses full PUT semantics, not a patch",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "i-have-read-guide",
+        "description": "acknowledge reading formula/lookup guide before creating or updating those field types",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/field_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-create",
+    "description": "Create a form in a Base table",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "Base token (base_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "form name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "description",
+        "description": "form description (plain text or markdown link like [text](https://example.com))",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-delete",
+    "description": "Delete a form in a Base table",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-detail",
+    "description": "Get form detail by share token",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "share-token",
+        "description": "Form share token (share_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_detail.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-list",
+    "description": "List all forms in a Base table (auto-paginated)",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "Base token (base_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "page-size",
+        "description": "page size per request, max 100",
+        "type": "int",
+        "default": "100",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-questions-create",
+    "description": "Create questions for a form in a Base table",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "Base token (base_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "questions",
+        "description": "questions JSON array, max 10 items. Each item requires \"title\"(field title) and \"type\"(text/number/select/datetime/user/attachment/location). Optional fields: \"description\"(plain text or markdown link like [text](https://example.com)),\"required\",\"option_display_mode\"(0=dropdown/1=vertical/2=horizontal,select only),\"multiple\"(bool,select/user),\"options\"([{\"name\":\"opt\",\"hue\":\"Blue\"}],select only),\"style\"({\"type\":\"plain/phone/url/email/barcode/rating\",\"precision\":2,\"format\":\"yyyy/MM/dd\",\"icon\":\"star\",\"min\":1,\"max\":5}). E.g. '[{\"type\":\"text\",\"title\":\"Your name\",\"required\":true}]'",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_questions_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-questions-delete",
+    "description": "Delete questions from a form in a Base table",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "Base token (base_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "question-ids",
+        "description": "JSON array of question IDs to delete, max 10 items, e.g. '[\"q_001\",\"q_002\"]'",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_questions_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-questions-list",
+    "description": "List questions of a form in a Base table",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_questions_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-questions-update",
+    "description": "Update questions of a form in a Base table",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "Base token (base_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "questions",
+        "description": "questions JSON array, max 10 items, each item must include \"id\". Supported fields: \"id\"(required),\"title\",\"description\"(plain text or markdown link like [text](https://example.com)),\"required\",\"option_display_mode\"(0=dropdown,1=vertical,2=horizontal,select only). E.g. '[{\"id\":\"q_001\",\"title\":\"Updated?\",\"required\":true}]'",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_questions_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-submit",
+    "description": "Submit a form (fill and submit form data)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "share-token",
+        "description": "Form share token (required), extracted from the form share link",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "base-token",
+        "description": "Base token (required when --json contains attachments, used for uploading attachments to Base Drive Media)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "JSON object containing \"fields\" (field values) and \"attachments\" (attachment file paths). Example: '{\"fields\":{\"Rating\":5,\"Review\":\"Good\"},\"attachments\":{\"Attachment\":[\"./a.pdf\",\"./b.png\"]}}'",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_submit.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-update",
+    "description": "Update a form in a Base table",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "Base token (base_token)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "new form name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "description",
+        "description": "new form description (plain text or markdown link like [text](https://example.com))",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-download-attachment",
+    "description": "Download Base record attachments by record-id, optionally filtering by file-token",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "file-token",
+        "description": "attachment file_token returned by Base; repeat to download selected files; omit to download all attachments in the record",
+        "type": "string_array",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "output",
+        "description": "local save path; with exactly one file token this may be a file path; with multiple or omitted file tokens this must be an existing directory",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "overwrite",
+        "description": "overwrite existing output file",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_upload_attachment.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-history-list",
+    "description": "List record change history",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "max-version",
+        "description": "max version for next page",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "page-size",
+        "description": "pagination size, max 50",
+        "type": "int",
+        "default": "30",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_history_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-remove-attachment",
+    "description": "Remove one or more file_token values from a Base record attachment cell",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "file-token",
+        "description": "attachment file_token to remove from the target cell; repeat to remove multiple attachments; max 50 tokens",
+        "type": "string_array",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_upload_attachment.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-share-link-create",
+    "description": "Generate share links for one or more records (max 100 per request)",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "record-ids",
+        "description": "record IDs to generate share links for (comma-separated or repeatable, max 100)",
+        "type": "string_slice",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_share_link_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-upload-attachment",
+    "description": "Upload one or more local files and append the returned file_token values to a Base attachment cell",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "file",
+        "description": "local file path; repeat to append multiple attachments in one cell; max 50 files, max 2GB each; files > 20MB use multipart upload automatically",
+        "type": "string_array",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "deprecated; attachment names are derived from local file basenames",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_upload_attachment.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-upsert",
+    "description": "Create or update a record",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "record field map JSON object, e.g. {\"Name\":\"Alice\",\"Status\":\"Todo\"}; do not wrap in fields",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_upsert.go"
+  },
+  {
+    "service": "base",
+    "command": "+role-create",
+    "description": "Create a custom role in a Base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "role config JSON; read lark-base-role-guide.md and role-config.md before constructing permissions",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_role_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+role-delete",
+    "description": "Delete a custom role (system roles cannot be deleted)",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "role-id",
+        "description": "role ID (e.g. rolxxxxxx4)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_role_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+role-get",
+    "description": "Get full config of a role",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "role-id",
+        "description": "role ID (e.g. rolxxxxxx4)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_role_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+role-list",
+    "description": "List all roles in a Base",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_role_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+role-update",
+    "description": "Update a role config (delta merge, only changed fields needed)",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "role-id",
+        "description": "role ID (e.g. rolxxxxxx4)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "delta role config JSON; read lark-base-role-guide.md and role-config.md before changing permissions",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_role_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+table-delete",
+    "description": "Delete a table by ID or name",
+    "risk": "high-risk-write",
+    "flags": [],
+    "source": "shortcuts/base/table_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+table-update",
+    "description": "Rename a table by ID or name",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "new table name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/table_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-create",
+    "description": "Create one or more views",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "view JSON object/array; type defaults to grid; type range: grid, kanban, gallery, calendar, gantt",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-delete",
+    "description": "Delete a view by ID or name",
+    "risk": "high-risk-write",
+    "flags": [],
+    "source": "shortcuts/base/view_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get-card",
+    "description": "Get view card configuration",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get_card.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get-filter",
+    "description": "Get view filter configuration",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get_filter.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get-group",
+    "description": "Get view group configuration",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get_group.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get-sort",
+    "description": "Get view sort configuration",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get_sort.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get-timebar",
+    "description": "Get view timebar configuration",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get_timebar.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get-visible-fields",
+    "description": "Get view visible fields configuration",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get_visible_fields.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-rename",
+    "description": "Rename a view by ID or name",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "new view name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_rename.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-set-card",
+    "description": "Set view card configuration",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "card JSON object, e.g. {\"cover_field\":\"Cover\"} or {\"cover_field\":null} to clear",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_set_card.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-set-filter",
+    "description": "Set view filter configuration",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "filter JSON object, e.g. {\"logic\":\"and\",\"conditions\":[[\"Status\",\"==\",\"Todo\"]]}",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_set_filter.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-set-group",
+    "description": "Set view group configuration",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "group JSON object with group_config array, e.g. {\"group_config\":[{\"field\":\"Status\",\"desc\":false}]}; use {\"group_config\":[]} to clear",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_set_group.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-set-sort",
+    "description": "Set view sort configuration",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "sort_config JSON object, e.g. {\"sort_config\":[{\"field\":\"Priority\",\"desc\":true}]}; use {\"sort_config\":[]} to clear; max 10 items",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_set_sort.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-set-timebar",
+    "description": "Set view timebar configuration",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "timebar JSON object with start_time, end_time, title, e.g. {\"start_time\":\"Start Date\",\"end_time\":\"End Date\",\"title\":\"Name\"}",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_set_timebar.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-set-visible-fields",
+    "description": "Set view visible fields",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "visible fields JSON object, e.g. {\"visible_fields\":[\"Name\",\"Status\"]}",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_set_visible_fields.go"
+  },
+  {
+    "service": "base",
+    "command": "+workflow-create",
+    "description": "Create a new workflow in a base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "workflow body JSON; read lark-base-workflow-guide.md and lark-base-workflow-schema.md before constructing steps",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/workflow_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+workflow-disable",
+    "description": "Disable a workflow in a base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "workflow-id",
+        "description": "workflow ID (wkf... prefix)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/workflow_disable.go"
+  },
+  {
+    "service": "base",
+    "command": "+workflow-enable",
+    "description": "Enable a workflow in a base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "workflow-id",
+        "description": "workflow ID (wkf... prefix)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/workflow_enable.go"
+  },
+  {
+    "service": "base",
+    "command": "+workflow-get",
+    "description": "Get a single workflow definition (including steps) from a base",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "workflow-id",
+        "description": "workflow ID (wkf... prefix)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "user-id-type",
+        "description": "user ID type for creator/updater fields, default open_id",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "open_id",
+          "union_id",
+          "user_id"
+        ]
+      }
+    ],
+    "source": "shortcuts/base/workflow_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+workflow-list",
+    "description": "List all workflows in a base (auto-paginated)",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "status",
+        "description": "filter by status",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "enabled",
+          "disabled"
+        ]
+      },
+      {
+        "name": "page-size",
+        "description": "page size per request, max 100",
+        "type": "int",
+        "default": "100",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/workflow_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+workflow-update",
+    "description": "Replace a workflow's full definition (title and/or steps) in a base",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "base-token",
+        "description": "base token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "workflow-id",
+        "description": "workflow ID (wkf... prefix)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "workflow body JSON; read lark-base-workflow-guide.md and lark-base-workflow-schema.md before replacing steps",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/workflow_update.go"
+  }
+]

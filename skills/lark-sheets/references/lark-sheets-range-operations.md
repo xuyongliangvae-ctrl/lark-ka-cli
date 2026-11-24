@@ -204,18 +204,18 @@ _排序条件列表（仅 sort 操作）_
 
 ```bash
 # dry-run 先看
-lark-cli sheets +cells-clear --url "..." --sheet-id "$SID" --range "A2:Z1000" --scope all --dry-run
+lark-ka sheets +cells-clear --url "..." --sheet-id "$SID" --range "A2:Z1000" --scope all --dry-run
 # 执行
-lark-cli sheets +cells-clear --url "..." --sheet-id "$SID" --range "A2:Z1000" --scope all --yes
+lark-ka sheets +cells-clear --url "..." --sheet-id "$SID" --range "A2:Z1000" --scope all --yes
 ```
 
 ### `+cells-merge` / `+cells-unmerge`
 
 ```bash
 # 合并 A1:C1（可选 --merge-type all/rows/columns）
-lark-cli sheets +cells-merge   --url "..." --sheet-id "$SID" --range "A1:C1"
+lark-ka sheets +cells-merge   --url "..." --sheet-id "$SID" --range "A1:C1"
 # 取消合并：传大 range 一次性取消其中所有合并区域
-lark-cli sheets +cells-unmerge --url "..." --sheet-id "$SID" --range "A1:C100"
+lark-ka sheets +cells-unmerge --url "..." --sheet-id "$SID" --range "A1:C100"
 ```
 
 ### `+rows-resize` / `+cols-resize`
@@ -224,16 +224,16 @@ lark-cli sheets +cells-unmerge --url "..." --sheet-id "$SID" --range "A1:C100"
 
 ```bash
 # 把第 2-10 行设为固定 30 px
-lark-cli sheets +rows-resize --url "..." --sheet-id "$SID" --range "2:10" --type pixel --size 30
+lark-ka sheets +rows-resize --url "..." --sheet-id "$SID" --range "2:10" --type pixel --size 30
 
 # 把 A-C 列设为固定 120 px
-lark-cli sheets +cols-resize --url "..." --sheet-id "$SID" --range "A:C" --type pixel --size 120
+lark-ka sheets +cols-resize --url "..." --sheet-id "$SID" --range "A:C" --type pixel --size 120
 
 # 第 1 行行高自动适应内容（列宽不支持 auto）
-lark-cli sheets +rows-resize --url "..." --sheet-id "$SID" --range "1" --type auto
+lark-ka sheets +rows-resize --url "..." --sheet-id "$SID" --range "1" --type auto
 
 # 重置 A-E 列为默认列宽
-lark-cli sheets +cols-resize --url "..." --sheet-id "$SID" --range "A:E" --type standard
+lark-ka sheets +cols-resize --url "..." --sheet-id "$SID" --range "A:E" --type standard
 ```
 
 > 同时出现在 `lark-sheets-sheet-structure.md` —— 行高 / 列宽调整也算行列结构层动作。
@@ -246,14 +246,14 @@ lark-cli sheets +cols-resize --url "..." --sheet-id "$SID" --range "A:E" --type 
 
 ```bash
 # 用 A1:A2 的序列规律向下填充到 A3:A100（target 区域不能与 source 重叠，否则后端报 source overlaps destination）
-lark-cli sheets +range-fill --url "..." --sheet-id "$SID" --source-range "A1:A2" --target-range "A3:A100" --series-type auto
+lark-ka sheets +range-fill --url "..." --sheet-id "$SID" --source-range "A1:A2" --target-range "A3:A100" --series-type auto
 ```
 
 ### `+range-sort`
 
 ```bash
 # 按 C 列降序排 A1:E100（首行为表头不参与）
-lark-cli sheets +range-sort --url "..." --sheet-id "$SID" --range "A1:E100" --has-header --sort-keys '[{"column":"C","ascending":false}]'
+lark-ka sheets +range-sort --url "..." --sheet-id "$SID" --range "A1:E100" --has-header --sort-keys '[{"column":"C","ascending":false}]'
 ```
 
 ### Validate / DryRun / Execute 约束

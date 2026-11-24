@@ -7,10 +7,10 @@
 ## 推荐命令
 
 ```bash
-lark-cli base +record-batch-update --base-token <base_token> --table-id <table_id> \
+lark-ka base +record-batch-update --base-token <base_token> --table-id <table_id> \
   --json '{"record_id_list":["<record_id>"],"patch":{"状态":"完成"}}'
 
-lark-cli base +record-batch-update --base-token <base_token> --table-id <table_id> --json @batch-update.json
+lark-ka base +record-batch-update --base-token <base_token> --table-id <table_id> --json @batch-update.json
 ```
 
 ## 参数

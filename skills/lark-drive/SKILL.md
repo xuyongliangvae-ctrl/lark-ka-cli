@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书云空间（云盘/云存储）：管理云空间（云盘/云存储）中的文件和文件夹。上传和下载文件、创建文件夹、复制/移动/删除文件、查看文件元数据、管理文档评论、管理文档权限、订阅用户评论变更事件、修改文件标题（docx、sheet、bitable、file、folder、wiki）；也负责把本地 Word/Markdown/Excel/CSV/PPTX 以及 Base 快照（.base）导入为飞书在线云文档（docx、sheet、bitable、slides）。当用户需要上传或下载文件、整理云空间（云盘/云存储）目录、查看文件详情、管理评论、管理文档权限、修改文件标题、订阅用户评论变更事件，或要把本地文件导入成新版文档、电子表格、多维表格/Base/幻灯片 时使用。\"云空间\"、\"云盘\"和\"云存储\"是同一概念，用户说\"云盘\"、\"云存储\"、\"网盘\"、\"我的空间\"时均路由到本 skill。当用户给出 doubao.com 的云空间资源 URL/token，或明确提到豆包里的 file/folder/docx/sheet/bitable/wiki 资源时，也应直接使用本 skill，不要因为域名不是飞书而回退到 WebFetch；路由依据是资源类型、URL 路径模式和 token，而不是域名。"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli drive --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka drive --help"
 ---
 
 # drive (v1)
@@ -14,23 +14,23 @@ metadata:
 
 > **术语说明：** 飞书云空间也常被称为"云盘"或"云存储"，三者指的是同一个产品，是飞书官方的云端文件存储与管理中心。
 
-> **导入分流规则：** 如果用户要把本地 Excel / CSV / `.base` 快照导入成 Base / 多维表格 / bitable，必须优先使用 `lark-cli drive +import --type bitable`。不要先切到 `lark-base`；`lark-base` 只负责导入完成后的表内操作。
+> **导入分流规则：** 如果用户要把本地 Excel / CSV / `.base` 快照导入成 Base / 多维表格 / bitable，必须优先使用 `lark-ka drive +import --type bitable`。不要先切到 `lark-base`；`lark-base` 只负责导入完成后的表内操作。
 
 ## 快速决策
 
 - 用户要**整理云盘 / 文件夹 / 文档库 / 知识库 / 个人文档库**，或要“盘点目录结构、找出未归档/临时/重复/空目录、生成整理方案”，必须先阅读 [`references/lark-drive-workflow-knowledge-organize.md`](references/lark-drive-workflow-knowledge-organize.md)。默认只生成方案；创建目录、移动资源、申请权限都必须单独确认。
-- 用户要**搜文档 / Wiki / 电子表格 / 多维表格 / 云空间（云盘/云存储）对象**，优先使用 `lark-cli drive +search`。自然语言里"最近我编辑过的"、"我创建的"（→ `--mine`，实为 owner 语义）、"最近一周我打开过的 xxx"、"某人 owner 的 docx" 等直接映射到扁平 flag，避免手写嵌套 JSON。
-- 用户要把本地 `.xlsx` / `.csv` / `.base` 导入成 Base / 多维表格 / bitable，第一步必须使用 `lark-cli drive +import --type bitable`。
-- 用户要把本地 `.md` / `.docx` / `.doc` / `.txt` / `.html` 导入成在线文档，使用 `lark-cli drive +import --type docx`。
-- 用户要把本地 `.pptx` 导入成飞书幻灯片，使用 `lark-cli drive +import --type slides`；当前 PPTX 导入上限是 500MB。
+- 搜索云文档时，海能 Work 7.54 使用 `lark-ka --profile cnooc drive +search --as user --query '周报'`，从 `data.docs_entities` 读取结果。关键词必填；支持归属人、聊天及文档类型筛选。公有环境默认 Search v2，可按其服务端能力使用时间、目录及 Wiki 筛选。见[搜索参数与分页](references/lark-drive-search.md)。
+- 用户要把本地 `.xlsx` / `.csv` / `.base` 导入成 Base / 多维表格 / bitable，第一步必须使用 `lark-ka drive +import --type bitable`。
+- 用户要把本地 `.md` / `.docx` / `.doc` / `.txt` / `.html` 导入成在线文档，使用 `lark-ka drive +import --type docx`。
+- 用户要把本地 `.pptx` 导入成飞书幻灯片，使用 `lark-ka drive +import --type slides`；当前 PPTX 导入上限是 500MB。
 - 用户要在 Drive 里上传、创建、读取、局部 patch 或覆盖更新**原生 `.md` 文件**（不是导入成 docx），切到 [`lark-markdown`](../lark-markdown/SKILL.md)。
-- 用户要比较原生 `.md` 文件的**历史版本差异**，或比较远端 Markdown 与本地草稿，切到 [`lark-markdown`](../lark-markdown/SKILL.md) 的 `lark-cli markdown +diff`；需要版本号时先用 `drive +version-history`。
+- 用户要比较原生 `.md` 文件的**历史版本差异**，或比较远端 Markdown 与本地草稿，切到 [`lark-markdown`](../lark-markdown/SKILL.md) 的 `lark-ka markdown +diff`；需要版本号时先用 `drive +version-history`。
 - 用户要查看、下载、回滚或删除文件的**历史版本**，使用 `drive +version-history`、`drive +version-get`、`drive +version-revert`、`drive +version-delete`；这组命令同时支持 `--as user` 和 `--as bot`，自动化场景优先 `--as bot`。
-- 用户要把本地 `.xlsx` / `.xls` / `.csv` 导入成电子表格，使用 `lark-cli drive +import --type sheet`。
-- 用户要在云空间（云盘/云存储）里新建文件夹，优先使用 `lark-cli drive +create-folder`。
-- 用户要查看某个文件有哪些可下载预览格式，或想下载 PDF / HTML / 文本 / 图片等预览产物，使用 `lark-cli drive +preview`。
-- 用户要获取某个文件的封面图，优先使用 `lark-cli drive +cover`；先 `--list-only` 看规格，再选 `--spec` 下载。
-- 用户要把本地文件上传到知识库 / 文档库里的某个 wiki 节点下时，仍然使用 `lark-cli drive +upload --wiki-token <wiki_token>`；不要误切到 `wiki` 域命令。
+- 用户要把本地 `.xlsx` / `.xls` / `.csv` 导入成电子表格，使用 `lark-ka drive +import --type sheet`。
+- 用户要在云空间（云盘/云存储）里新建文件夹，优先使用 `lark-ka drive +create-folder`。
+- 用户要查看某个文件有哪些可下载预览格式，或想下载 PDF / HTML / 文本 / 图片等预览产物，使用 `lark-ka drive +preview`。
+- 用户要获取某个文件的封面图，优先使用 `lark-ka drive +cover`；先 `--list-only` 看规格，再选 `--spec` 下载。
+- 用户要把本地文件上传到知识库 / 文档库里的某个 wiki 节点下时，仍然使用 `lark-ka drive +upload --wiki-token <wiki_token>`；不要误切到 `wiki` 域命令。
 - `lark-base` 只负责导入完成后的 Base 内部操作（表、字段、记录、视图），不要在“本地文件 -> Base”这一步提前切到 `lark-base`。
 
 ## 修改标题
@@ -61,7 +61,7 @@ metadata:
 **推荐方式：使用 `drive +inspect` 自动解包**
 
 ```bash
-lark-cli drive +inspect --url 'https://xxx.feishu.cn/wiki/wikcnXXX'
+lark-ka drive +inspect --url 'https://xxx.feishu.cn/wiki/wikcnXXX'
 ```
 
 返回结果包含 `type`（底层文档类型）、`token`（真实 file_token）、`title`、`url` 等字段，直接用于后续操作。
@@ -70,7 +70,7 @@ lark-cli drive +inspect --url 'https://xxx.feishu.cn/wiki/wikcnXXX'
 
 1. **使用 `wiki.spaces.get_node` 查询节点信息**
    ```bash
-   lark-cli wiki spaces get_node --params '{"token":"wiki_token"}'
+   lark-ka wiki spaces get_node --params '{"token":"wiki_token"}'
    ```
 
 2. **从返回结果中提取关键信息**
@@ -94,7 +94,7 @@ lark-cli drive +inspect --url 'https://xxx.feishu.cn/wiki/wikcnXXX'
 
 ```bash
 # 查询 wiki 节点
-lark-cli wiki spaces get_node --params '{"token":"wiki_token"}'
+lark-ka wiki spaces get_node --params '{"token":"wiki_token"}'
 ```
 
 返回结果示例：
@@ -155,7 +155,7 @@ Drive Folder (云空间/云盘/云存储文件夹)
 - 评论写入内容（添加评论、回复评论、编辑回复）里的文本不能直接出现 `<`、`>`；提交前必须先转义：`<` -> `&lt;`，`>` -> `&gt;`。
 - 使用 `drive +add-comment` 时，shortcut 会对 `type=text` 的文本元素自动做上述转义兜底；如果直接调用 `drive file.comments create_v2`、`drive file.comment.replys create`、`drive file.comment.replys update`，则需要在请求里自行传入已转义的内容。
 - 如果 wiki 解析后不是 `doc`/`docx`/`file`/`sheet`/`slides`，不要用 `+add-comment`。
-- 如果需要更底层地直接调用评论 V2 协议，再走原生 API：先执行 `lark-cli schema drive.file.comments.create_v2`，再执行 `lark-cli drive file.comments create_v2 ...`。全文评论省略 `anchor`，局部评论传 `anchor.block_id`。
+- 如果需要更底层地直接调用评论 V2 协议，再走原生 API：先执行 `lark-ka schema drive.file.comments.create_v2`，再执行 `lark-ka drive file.comments create_v2 ...`。全文评论省略 `anchor`，局部评论传 `anchor.block_id`。
 
 ### 评论查询与统计口径（关键！）
 
@@ -165,20 +165,20 @@ Drive Folder (云空间/云盘/云存储文件夹)
 
 ```bash
 # 默认查询：仅未解决评论（推荐）
-lark-cli drive file.comments list --params '{"file_token": "xxx", "file_type": "docx", "is_solved": false}'
+lark-ka drive file.comments list --params '{"file_token": "xxx", "file_type": "docx", "is_solved": false}'
 
 # 查询所有评论（用户未明确要求包含已解决评论）
-lark-cli drive file.comments list --params '{"file_token": "xxx", "file_type": "docx", "is_solved": false}'
+lark-ka drive file.comments list --params '{"file_token": "xxx", "file_type": "docx", "is_solved": false}'
 
 # 包含已解决评论（需用户明确要求）
-lark-cli drive file.comments list --params '{"file_token": "xxx", "file_type": "docx"}'
+lark-ka drive file.comments list --params '{"file_token": "xxx", "file_type": "docx"}'
 ```
 
 **错误示例：**
 
 ```bash
 # 不推荐：用户未明确要求但查询所有评论
-lark-cli drive file.comments list --params '{"file_token": "xxx", "file_type": "docx"}'
+lark-ka drive file.comments list --params '{"file_token": "xxx", "file_type": "docx"}'
 ```
 
 - 查询文档评论时，使用 `drive file.comments list`。
@@ -228,7 +228,7 @@ lark-cli drive file.comments list --params '{"file_token": "xxx", "file_type": "
 
 #### `permission.public.patch` 错误码引导
 
-调用 `lark-cli drive permission.public patch` 更新文档公开权限失败时，如果返回以下错误码，按表格给用户明确下一步。不要把这些错误简单归类为缺少 scope；它们通常表示租户、对外分享或文档密级策略拦截。
+调用 `lark-ka drive permission.public patch` 更新文档公开权限失败时，如果返回以下错误码，按表格给用户明确下一步。不要把这些错误简单归类为缺少 scope；它们通常表示租户、对外分享或文档密级策略拦截。
 
 | 错误码 | 含义                     | 给用户的引导 |
 |--------|------------------------|--------------|
@@ -245,11 +245,11 @@ lark-cli drive file.comments list --params '{"file_token": "xxx", "file_type": "
 
 ```bash
 # 1. 获取当前应用的 open_id
-lark-cli api GET /open-apis/bot/v3/info --as bot
+lark-ka api GET /open-apis/bot/v3/info --as bot
 # 从返回值中取 bot.open_id
 
 # 2. 授权当前应用访问文档
-lark-cli drive permission.members create \
+lark-ka drive permission.members create \
   --params '{"token":"<doc_token>","type":"<resource_type>"}' \
   --data '{"member_type":"openid","member_id":"<bot_open_id>","perm":"view","type":"user"}'
 ```
@@ -260,7 +260,7 @@ lark-cli drive permission.members create \
 
 ## Shortcuts（推荐优先使用）
 
-Shortcut 是对常用操作的高级封装（`lark-cli drive +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka drive +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut | 说明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 |----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -294,8 +294,8 @@ Shortcut 是对常用操作的高级封装（`lark-cli drive +<verb> [flags]`）
 ## API Resources
 
 ```bash
-lark-cli schema drive.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli drive <resource> <method> [flags] # 调用 API
+lark-ka schema drive.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka drive <resource> <method> [flags] # 调用 API
 ```
 
 > **重要**：使用原生 API 时，必须先运行 `schema` 查看 `--data` / `--params` 参数结构，不要猜测字段格式。

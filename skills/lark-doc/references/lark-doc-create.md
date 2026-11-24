@@ -16,16 +16,16 @@
 
 ```bash
 # 创建 XML 文档（默认格式，推荐）
-lark-cli docs +create --api-version v2 --content '<title>项目计划</title><h1>目标</h1><ul><li>目标 1</li><li>目标 2</li></ul>'
+lark-ka docs +create --api-version v2 --content '<title>项目计划</title><h1>目标</h1><ul><li>目标 1</li><li>目标 2</li></ul>'
 
 # 创建到指定文件夹（XML）
-lark-cli docs +create --api-version v2 --parent-token fldcnXXXX --content '<title>标题</title><p>首段内容</p>'
+lark-ka docs +create --api-version v2 --parent-token fldcnXXXX --content '<title>标题</title><p>首段内容</p>'
 
 # 创建到个人知识库（XML）
-lark-cli docs +create --api-version v2 --parent-position my_library --content '<title>标题</title><p>内容</p>'
+lark-ka docs +create --api-version v2 --parent-position my_library --content '<title>标题</title><p>内容</p>'
 
 # 仅当用户明确要求时才使用 Markdown
-lark-cli docs +create --api-version v2 --doc-format markdown --content $'# 项目计划\n\n## 目标\n\n- 目标 1\n- 目标 2'
+lark-ka docs +create --api-version v2 --doc-format markdown --content $'# 项目计划\n\n## 目标\n\n- 目标 1\n- 目标 2'
 ```
 
 ## 返回值
@@ -50,11 +50,11 @@ lark-cli docs +create --api-version v2 --doc-format markdown --content $'# 项�
 - **`document.new_blocks`**：本次操作新增的 block 列表（如画板）。`block_id` 可用于 `docs +update` 的 `--block-id` 做精确编辑；`block_token` 是资源块（如画板）的 token，可交给 `lark-whiteboard` 等 skill 继续操作
 
 > \[!IMPORTANT]
-> 如果文档是**以应用身份（bot）创建**的，如 `lark-cli docs +create --as bot` 在文档创建成功后，CLI 会**尝试为当前 CLI 用户自动授予该文档的 `full_access`（可管理权限）**。
+> 如果文档是**以应用身份（bot）创建**的，如 `lark-ka docs +create --as bot` 在文档创建成功后，CLI 会**尝试为当前 CLI 用户自动授予该文档的 `full_access`（可管理权限）**。
 >
 > 以应用身份创建时，结果里会额外返回 `permission_grant` 字段，明确说明授权结果：
 > - `status = granted`：当前 CLI 用户已获得该文档的可管理权限
-> - `status = skipped`：本地没有可用的当前用户 `open_id`，因此不会自动授权；可提示用户先完成 `lark-cli auth login`，再让 AI / agent 继续使用应用身份（bot）授予当前用户权限
+> - `status = skipped`：本地没有可用的当前用户 `open_id`，因此不会自动授权；可提示用户先完成 `lark-ka auth login`，再让 AI / agent 继续使用应用身份（bot）授予当前用户权限
 > - `status = failed`：文档已创建成功，但自动授权用户失败；会带上失败原因，并提示稍后重试或继续使用 bot 身份处理该文档
 >
 > `permission_grant.perm = full_access` 表示该资源已授予”可管理权限”。

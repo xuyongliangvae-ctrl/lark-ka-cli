@@ -2,8 +2,8 @@
   "node": ">=22",
   "implementation": "native-nodejs",
   "goRuntimeRequired": false,
-  "shortcutCount": 315,
-  "metadataAPICount": 252,
+  "shortcutCount": 248,
+  "metadataAPICount": 298,
   "missing": [],
   "commands": [
     {
@@ -38,41 +38,6 @@
     },
     {
       "service": "base",
-      "command": "+advperm-disable",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+advperm-enable",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+base-block-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+base-block-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+base-block-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+base-block-move",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+base-block-rename",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+base-copy",
       "implementation": "native-node"
     },
@@ -88,77 +53,7 @@
     },
     {
       "service": "base",
-      "command": "+dashboard-arrange",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-block-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-block-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-block-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-block-get-data",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-block-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-block-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+dashboard-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+data-query",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+field-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+field-delete",
       "implementation": "native-node"
     },
     {
@@ -173,67 +68,7 @@
     },
     {
       "service": "base",
-      "command": "+field-search-options",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+field-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-detail",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+form-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-questions-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-questions-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-questions-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-questions-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-submit",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+form-update",
       "implementation": "native-node"
     },
     {
@@ -253,17 +88,7 @@
     },
     {
       "service": "base",
-      "command": "+record-download-attachment",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+record-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+record-history-list",
       "implementation": "native-node"
     },
     {
@@ -273,62 +98,12 @@
     },
     {
       "service": "base",
-      "command": "+record-remove-attachment",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+record-search",
       "implementation": "native-node"
     },
     {
       "service": "base",
-      "command": "+record-share-link-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+record-upload-attachment",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+record-upsert",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+role-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+role-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+role-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+role-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+role-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+table-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+table-delete",
       "implementation": "native-node"
     },
     {
@@ -343,122 +118,12 @@
     },
     {
       "service": "base",
-      "command": "+table-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+view-get",
       "implementation": "native-node"
     },
     {
       "service": "base",
-      "command": "+view-get-card",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-get-filter",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-get-group",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-get-sort",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-get-timebar",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-get-visible-fields",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
       "command": "+view-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-rename",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-set-card",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-set-filter",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-set-group",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-set-sort",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-set-timebar",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+view-set-visible-fields",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+workflow-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+workflow-disable",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+workflow-enable",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+workflow-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+workflow-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+workflow-update",
       "implementation": "native-node"
     },
     {

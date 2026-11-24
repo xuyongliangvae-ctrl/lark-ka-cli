@@ -4,6 +4,7 @@ import { formatOutput } from "../src/io.mjs";
 import { knownFlags } from "../src/metadata.mjs";
 import { CliError, toErrorEnvelope } from "../src/errors.mjs";
 import { execute, help, VERSION, isCommandGroup } from "../src/cli.mjs";
+import { discoveryProfile } from "../src/management.mjs";
 import { STREAM_DONE } from "../src/events.mjs";
 if (Number(process.versions.node.split(".")[0]) < 22) {
   process.stderr.write(
@@ -23,10 +24,11 @@ try {
     process.exit(0);
   }
   const { positionals, flags } = parseArgs(rawArgs);
+  const showVersion = flags.version === true;
   if (
     process.env.LARKSUITE_CLI_AUTH_PROXY &&
     !flags.help &&
-    !flags.version &&
+    !showVersion &&
     !flags["dry-run"]
   )
     throw new CliError(
@@ -41,7 +43,30 @@ try {
       throw new CliError("validation", `Unknown flag: --${key}`, {
         hint: "Use --help to check the command flags.",
       });
-  if (flags.version) {
+  const expectedVersion = flags["expect-version"];
+  if (expectedVersion !== undefined) {
+    if (
+      !showVersion ||
+      typeof expectedVersion !== "string" ||
+      !/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?(?:\+[A-Za-z0-9.-]+)?$/.test(
+        expectedVersion,
+      )
+    )
+      throw new CliError(
+        "validation",
+        "Use --version --expect-version <exact version>",
+      );
+    if (expectedVersion !== VERSION)
+      throw new CliError(
+        "version_mismatch",
+        "The installed CLI does not match the requested version",
+        {
+          detail: { installed: VERSION, expected: expectedVersion },
+          hint: "Install the version configured by the connector.",
+        },
+      );
+  }
+  if (showVersion) {
     process.stdout.write(`lark-ka ${VERSION} (Node.js)\n`);
   } else if (
     flags.help ||
@@ -50,7 +75,10 @@ try {
     isCommandGroup(positionals)
   ) {
     process.stdout.write(
-      help(positionals[0] === "help" ? positionals.slice(1) : positionals),
+      help(
+        positionals[0] === "help" ? positionals.slice(1) : positionals,
+        await discoveryProfile(flags),
+      ),
     );
   } else {
     const data = await execute(positionals, flags);

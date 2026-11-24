@@ -5,19 +5,19 @@
 
 通过 `meeting_id` 离开当前身份所在的视频会议（bot leave）。这是一次**写操作**，会实际把当前身份从会议中移出。
 
-本 skill 对应 shortcut：`lark-cli vc +meeting-leave`（调用 `POST /open-apis/vc/v1/bots/leave`）。
+本 skill 对应 shortcut：`lark-ka vc +meeting-leave`（调用 `POST /open-apis/vc/v1/bots/leave`）。
 
 ## 命令
 
 ```bash
 # 通过 meeting_id 离会
-lark-cli vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28
+lark-ka vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28
 
 # 输出格式
-lark-cli vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28 --format json
+lark-ka vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28 --format json
 
 # 预览 API 调用（不实际离会）
-lark-cli vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28 --dry-run
+lark-ka vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28 --dry-run
 ```
 
 ## 参数
@@ -63,13 +63,13 @@ lark-cli vc +meeting-leave --meeting-id 69xxxxxxxxxxxxx28 --dry-run
 
 ```bash
 # 第 1 步：加入会议，记录 meeting.id
-lark-cli vc +meeting-join --meeting-number 123456789
+lark-ka vc +meeting-join --meeting-number 123456789
 
 # 第 2 步：在会中处理用户请求（如监听发言、记录信息等）
 # ...
 
 # 第 3 步：仅在用户明确要求退出 / 离开 / 结束参会时，使用上一步记录的 meeting.id 离会
-lark-cli vc +meeting-leave --meeting-id <meeting.id>
+lark-ka vc +meeting-leave --meeting-id <meeting.id>
 ```
 
 ### 场景 2：会后补拉产物（不需要离会）
@@ -78,10 +78,10 @@ lark-cli vc +meeting-leave --meeting-id <meeting.id>
 
 ```bash
 # 第 1 步：会议结束后查询录制
-lark-cli vc +recording --meeting-ids <meeting.id>
+lark-ka vc +recording --meeting-ids <meeting.id>
 
 # 第 2 步：查询会议纪要
-lark-cli vc +notes --meeting-ids <meeting.id>
+lark-ka vc +notes --meeting-ids <meeting.id>
 ```
 
 ## 常见错误与排查

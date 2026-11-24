@@ -110,7 +110,35 @@ export function validURL(value, label = "URL") {
     throw new CliError("validation", `${label} requires HTTPS`);
   return u.pathname === "/" && !u.search ? u.origin : u.href;
 }
+export function isHaiNengProfile(config) {
+  return (
+    config?.brand === "cnooc" ||
+    ((!config?.brand ||
+      config.brand === "custom" ||
+      /^https?:/.test(config.brand)) &&
+      (config?.profileName ?? config?.name) === "cnooc")
+  );
+}
+
+export function documentSearchApi(config) {
+  return (
+    config?.documentSearchApi ?? (isHaiNengProfile(config) ? "suite" : "v2")
+  );
+}
+
+function deploymentBrand(app) {
+  if (app.brand) return app.brand;
+  if (isHaiNengProfile(app)) return "cnooc";
+  if (!app.openBaseUrl) return "feishu";
+  const base = validURL(app.openBaseUrl, "openBaseUrl");
+  for (const brand of ["feishu", "lark"]) {
+    if (base === endpoints(brand).openBaseUrl) return brand;
+  }
+  return "custom";
+}
+
 export function endpoints(brand = "feishu", overrides = {}) {
+  const haiNeng = isHaiNengProfile({ ...overrides, brand });
   let defaults;
   if (brand === "feishu" || brand === "lark") {
     const suffix = brand === "lark" ? "larksuite.com" : "feishu.cn";
@@ -137,13 +165,20 @@ export function endpoints(brand = "feishu", overrides = {}) {
     };
   else defaults = { authFlow: "authorization-code" };
   const c = {
+    brand,
     tokenPath: "/open-apis/authen/v2/oauth/token",
     userInfoPath: "/open-apis/authen/v1/user_info",
     authorizePath: "/open-apis/authen/v1/index",
     devicePath: "/oauth/v1/device_authorization",
     tenantTokenPath: "/open-apis/auth/v3/tenant_access_token/internal",
     clientIdParam: "app_id",
+    tokenEncoding: "form",
     ...defaults,
+    ...(haiNeng && {
+      authorizePath: "/open-apis/authen/v1/authorize",
+      clientIdParam: "client_id",
+      tokenEncoding: "json",
+    }),
     ...overrides,
   };
   for (const key of [
@@ -204,6 +239,8 @@ export function endpoints(brand = "feishu", overrides = {}) {
       "validation",
       "authFlow must be device or authorization-code",
     );
+  if (!["json", "form"].includes(c.tokenEncoding))
+    throw new CliError("validation", "tokenEncoding must be json or form");
   if (
     c.docsBackend !== undefined &&
     !["native", "mcp", "docs-ai"].includes(c.docsBackend)
@@ -212,6 +249,15 @@ export function endpoints(brand = "feishu", overrides = {}) {
       "validation",
       "docsBackend must be native, mcp, or docs-ai",
     );
+  if (
+    c.documentSearchApi !== undefined &&
+    !["suite", "v2"].includes(c.documentSearchApi)
+  )
+    throw new CliError("validation", "documentSearchApi must be suite or v2");
+  const deployment = { ...c, brand };
+  c.documentSearchApi = documentSearchApi(deployment);
+  if (isHaiNengProfile(deployment))
+    c.contactSearchVersion ??= c.capabilities?.contactSearch ?? "v1";
   if (
     c.contactSearchVersion !== undefined &&
     !["v1", "v3"].includes(c.contactSearchVersion)
@@ -285,9 +331,7 @@ export async function loadConfig(
   const app =
     store.apps?.find((a) => (a.name || a.appId) === profile) ||
     (!profile ? store.apps?.[0] : undefined);
-  if (profile && !app && !env.LARKSUITE_CLI_APP_ID)
-    throw new CliError("config", `Profile ${profile} does not exist`);
-  let raw = { ...(app || {}) };
+  let raw = app ? { ...app } : profile ? { name: profile } : {};
   if (env.LARKSUITE_CLI_APP_ID) raw.appId = env.LARKSUITE_CLI_APP_ID;
   if (env.LARKSUITE_CLI_APP_SECRET)
     raw.appSecret = env.LARKSUITE_CLI_APP_SECRET;
@@ -317,7 +361,11 @@ export async function loadConfig(
       );
     raw = { ...raw, ...deployment };
   }
-  const c = endpoints(raw.brand || "feishu", raw);
+  if (profile && !app && !(raw.appId && (raw.brand || raw.openBaseUrl)))
+    throw new CliError("config", `Profile ${profile} does not exist`, {
+      hint: "Initialize the named profile with config init, or supply an explicit deployment for environment-only use.",
+    });
+  const c = endpoints(deploymentBrand(raw), raw);
   const credentials = await readStore("credentials.json", {}, env);
   c.profileName = raw.name || raw.appId || "default";
   c.storageKey = createHash("sha256")
@@ -434,7 +482,8 @@ export async function configure(flags, input) {
       if (flags[pathFlag] !== undefined && flags[urlFlag] === undefined)
         delete next[CONFIG_PARAMETERS[urlFlag].key];
     }
-    const resolved = endpoints(next.brand || "feishu", next);
+    next.brand = deploymentBrand(next);
+    const resolved = endpoints(next.brand, next);
     if (!resolved.appId || !resolved.openBaseUrl)
       throw new CliError(
         "validation",

@@ -9,19 +9,19 @@
 
 ```bash
 # 创建空白 PPT
-lark-cli slides +create --title "项目汇报"
+lark-ka slides +create --title "项目汇报"
 
 # 创建 PPT + 添加 slide 页面
-lark-cli slides +create --title "项目汇报" --slides '[
+lark-ka slides +create --title "项目汇报" --slides '[
   "<slide xmlns=\"http://www.larkoffice.com/sml/2.0\"><data><shape type=\"text\" topLeftX=\"80\" topLeftY=\"80\" width=\"800\" height=\"120\"><content textType=\"title\"><p>封面</p></content></shape></data></slide>",
   "<slide xmlns=\"http://www.larkoffice.com/sml/2.0\"><data><shape type=\"text\" topLeftX=\"80\" topLeftY=\"80\" width=\"800\" height=\"120\"><content textType=\"title\"><p>第二页</p></content></shape></data></slide>"
 ]'
 
 # 以应用身份创建（自动授权当前用户）
-lark-cli slides +create --title "项目汇报" --as bot
+lark-ka slides +create --title "项目汇报" --as bot
 
 # 预览（不执行）
-lark-cli slides +create --title "项目汇报" --slides '[...]' --dry-run
+lark-ka slides +create --title "项目汇报" --slides '[...]' --dry-run
 ```
 
 ## 返回值
@@ -42,7 +42,7 @@ lark-cli slides +create --title "项目汇报" --slides '[...]' --dry-run
 >
 > 传了 `--slides` 时，CLI 先创建空白演示文稿，再逐页调用 `xml_presentation.slide create` 添加页面。如果某一页添加失败，CLI 会停止并报错，已创建的演示文稿和已添加的页面会保留。
 >
-> 如果演示文稿是**以应用身份（bot）创建**的，如 `lark-cli slides +create --as bot`，CLI 会**尝试为当前 CLI 用户自动授予该演示文稿的 `full_access`（可管理权限）**。
+> 如果演示文稿是**以应用身份（bot）创建**的，如 `lark-ka slides +create --as bot`，CLI 会**尝试为当前 CLI 用户自动授予该演示文稿的 `full_access`（可管理权限）**。
 >
 > 以应用身份创建时，结果里会额外返回 `permission_grant` 字段，明确说明授权结果：
 > - `status = granted`：当前 CLI 用户已获得该演示文稿的可管理权限
@@ -74,7 +74,7 @@ JSON string 数组，每个元素是一页 slide 的完整 XML。CLI 内部负�
 `<img>` 元素的 `src` 属性如果以 `@` 开头，CLI 会把它当作本地文件路径，自动上传到当前演示文稿，并把占位符替换为返回的 `file_token`。
 
 ```bash
-lark-cli slides +create --as user --title "图测试" --slides '[
+lark-ka slides +create --as user --title "图测试" --slides '[
   "<slide xmlns=\"http://www.larkoffice.com/sml/2.0\"><data><img src=\"@./assets/chart.png\" topLeftX=\"100\" topLeftY=\"100\" width=\"320\" height=\"180\"/></data></slide>"
 ]'
 ```
@@ -97,11 +97,11 @@ lark-cli slides +create --as user --title "图测试" --slides '[
 
 ```bash
 # 1) 上传图片
-TOKEN=$(lark-cli slides +media-upload --as user \
+TOKEN=$(lark-ka slides +media-upload --as user \
   --file ./pic.png --presentation $PRES_ID | jq -r .data.file_token)
 
 # 2) 用返回的 file_token 创建带图新页
-lark-cli slides xml_presentation.slide create --as user \
+lark-ka slides xml_presentation.slide create --as user \
   --params "{\"xml_presentation_id\":\"$PRES_ID\"}" \
   --data "{\"slide\":{\"content\":\"<slide xmlns=\\\"http://www.larkoffice.com/sml/2.0\\\"><data><img src=\\\"$TOKEN\\\" topLeftX=\\\"100\\\" topLeftY=\\\"100\\\" width=\\\"200\\\" height=\\\"200\\\"/></data></slide>\"}}"
 ```
@@ -112,10 +112,10 @@ lark-cli slides xml_presentation.slide create --as user \
 
 ```bash
 # 第 1 步：创建空白 PPT
-PRES_ID=$(lark-cli slides +create --title "项目汇报" | jq -r '.data.xml_presentation_id')
+PRES_ID=$(lark-ka slides +create --title "项目汇报" | jq -r '.data.xml_presentation_id')
 
 # 第 2 步：添加页面（使用返回的 xml_presentation_id）
-lark-cli slides xml_presentation.slide create --as user \
+lark-ka slides xml_presentation.slide create --as user \
   --params "{\"xml_presentation_id\":\"$PRES_ID\"}" \
   --data '{
     "slide": {

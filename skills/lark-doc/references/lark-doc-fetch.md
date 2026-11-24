@@ -7,27 +7,27 @@
 
 ```bash
 # 获取文档（默认 XML，simple）
-lark-cli docs +fetch --api-version v2 --doc "https://xxx.feishu.cn/docx/Z1Fj...tnAc"
+lark-ka docs +fetch --api-version v2 --doc "https://xxx.feishu.cn/docx/Z1Fj...tnAc"
 
 # Markdown 格式
-lark-cli docs +fetch --api-version v2 --doc Z1Fj...tnAc --doc-format markdown
+lark-ka docs +fetch --api-version v2 --doc Z1Fj...tnAc --doc-format markdown
 
 # 带 block ID（用于后续 block 级更新）
-lark-cli docs +fetch --api-version v2 --doc Z1Fj...tnAc --detail with-ids
+lark-ka docs +fetch --api-version v2 --doc Z1Fj...tnAc --detail with-ids
 
 # 只拿目录
-lark-cli docs +fetch --api-version v2 --doc Z1Fj...tnAc --scope outline --max-depth 3
+lark-ka docs +fetch --api-version v2 --doc Z1Fj...tnAc --scope outline --max-depth 3
 
 # 按 block id 区间精读
-lark-cli docs +fetch --api-version v2 --doc Z1Fj...tnAc \
+lark-ka docs +fetch --api-version v2 --doc Z1Fj...tnAc \
   --scope range --start-block-id blkA --end-block-id blkB --detail with-ids
 
 # 读整个章节（以标题 id 为锚点，自动展开到下一个同级/更高级标题前）
-lark-cli docs +fetch --api-version v2 --doc Z1Fj...tnAc \
+lark-ka docs +fetch --api-version v2 --doc Z1Fj...tnAc \
   --scope section --start-block-id <标题id> --detail with-ids
 
 # 按关键词定位（多关键词用 | 分隔，任一命中即返回）
-lark-cli docs +fetch --api-version v2 --doc Z1Fj...tnAc \
+lark-ka docs +fetch --api-version v2 --doc Z1Fj...tnAc \
   --scope keyword --keyword "部署|发布|上线"
 ```
 

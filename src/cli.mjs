@@ -11,6 +11,7 @@ import {
   withLock,
   redactConfig,
   PACKAGE_ROOT,
+  isHaiNengProfile,
 } from "./config.mjs";
 import {
   authLogin,
@@ -36,9 +37,16 @@ import {
   eventStop,
   STREAM_DONE,
 } from "./events.mjs";
-import { executeManagement, enforcePolicy } from "./management.mjs";
+import {
+  executeManagement,
+  enforcePolicy,
+  availableShortcuts,
+  discoveryProfile,
+} from "./management.mjs";
+import { isHaiNengBaseShortcut } from "./domains/tables.mjs";
 import { resolveInput } from "./io.mjs";
-export const VERSION = "0.1.0";
+import { VERSION } from "./version.mjs";
+export { VERSION };
 const envFlags = new Set([
   "help",
   "profile",
@@ -67,21 +75,39 @@ const top = [
   "event",
   "mcp",
 ];
-export function help(words = []) {
+function assertAvailableBaseShortcut(service, command, config) {
+  if (
+    service === "base" &&
+    command?.startsWith("+") &&
+    isHaiNengProfile(config) &&
+    !isHaiNengBaseShortcut(command)
+  )
+    throw new CliError(
+      "validation",
+      `Base shortcut ${command} is unavailable on HaiNeng Work`,
+      {
+        hint: "Use lark-ka base --help for supported shortcuts and native Base commands such as lark-ka base app get.",
+      },
+    );
+}
+
+export function help(words = [], config) {
+  const visibleShortcuts = availableShortcuts(config);
   if (!words.length)
-    return `lark-ka ${VERSION} — native Node.js Feishu/Lark CLI\n\nUsage: lark-ka <command> [subcommand] [flags]\n\nCommands: ${[...top, ...new Set(shortcuts.map((s) => s.service))].join(", ")}\n\n${shortcuts.length} shortcut definitions; ${apiSpecs().length} metadata API methods.\nUse lark-ka <service> --help or lark-ka schema <service.resource.method>.\nGlobal flags: --profile NAME --as user|bot --format json|pretty|table|csv|ndjson --dry-run\n`;
+    return `lark-ka ${VERSION} — native Node.js Feishu/Lark CLI\n\nUsage: lark-ka <command> [subcommand] [flags]\n\nCommands: ${[...top, ...new Set(visibleShortcuts.map((s) => s.service))].join(", ")}\n\n${visibleShortcuts.length} shortcut definitions; ${apiSpecs().length} metadata API methods.\nUse lark-ka <service> --help or lark-ka schema <service.resource.method>.\nGlobal flags: --profile NAME --as user|bot --format json|pretty|table|csv|ndjson --dry-run\n`;
   const [service, command] = words;
+  assertAvailableBaseShortcut(service, command, config);
   if (service === "config") return configHelp();
   if (service === "auth")
-    return 'auth login --scope "approved scopes" [--json] [--no-open] [--redirect-uri URL]\nauth status [--verify] [--connector] | auth whoami --as user --json | logout | scopes | check --scope SCOPES | list\n';
-  const spec = shortcuts.find(
+    return 'auth login [--scope "approved scopes"] [--json] [--no-open] [--redirect-uri URL]\nWithout --scope, request the Profile’s approved user scopes or discover them from the application.\nauth status [--verify] [--connector] | auth whoami --as user --json | logout | scopes | check --scope SCOPES | list\n';
+  const spec = visibleShortcuts.find(
     (s) => s.service === service && s.command === command,
   );
   if (spec)
     return `${service} ${command} — ${spec.description}\n${spec.flags.map((f) => `  --${f.name}${f.required ? " (required)" : ""}${f.default !== undefined ? ` [default: ${f.default}]` : ""}  ${f.description}`).join("\n")}\n`;
   if (command && findAPI(words))
     return JSON.stringify(findAPI(words), null, 2) + "\n";
-  const list = shortcuts.filter((s) => s.service === service),
+  const list = visibleShortcuts.filter((s) => s.service === service),
     api = metadata.services.find((s) => s.name === service);
   if (list.length || api)
     return (
@@ -218,6 +244,8 @@ async function skillsCommand(action, args, flags) {
   });
 }
 export async function execute(words, flags = {}, options = {}) {
+  if (["__complete", "__completeNoDesc"].includes(words[0]))
+    return executeManagement(words, flags, options);
   const creating =
     (words[0] === "config" && ["init", "bind"].includes(words[1])) ||
     (words[0] === "profile" && words[1] === "add");
@@ -229,15 +257,19 @@ export async function execute(words, flags = {}, options = {}) {
   const policyEnv = creating
     ? { ...(options.env || process.env), LARK_KA_PROFILE: "" }
     : options.env || process.env;
+  const discovery = ["schema", "completion"].includes(words[0]);
   const config =
     options.config ||
-    (await loadConfig(policyFlags, policyEnv, { optional: true }));
+    (discovery
+      ? await discoveryProfile(policyFlags, policyEnv)
+      : await loadConfig(policyFlags, policyEnv, { optional: true }));
+  assertAvailableBaseShortcut(words[0], words[1], config);
   await enforcePolicy(words, flags, config, options);
   const managed = await executeManagement(words, flags, options);
   if (managed !== undefined) return managed;
-  return executeInternal(words, flags, options);
+  return executeInternal(words, flags, options, config);
 }
-async function executeInternal(words, flags = {}, options = {}) {
+async function executeInternal(words, flags, options, profileConfig) {
   const [service, command, ...args] = words;
   if (service === "config")
     return { ok: true, data: await configCommand(command, args, flags) };
@@ -249,20 +281,27 @@ async function executeInternal(words, flags = {}, options = {}) {
   }
   if (service === "schema") {
     const key = words.slice(1).join(".");
-    if (!key)
+    const [targetService, targetCommand] = key.split(".");
+    assertAvailableBaseShortcut(targetService, targetCommand, profileConfig);
+    const visibleShortcuts = availableShortcuts(profileConfig);
+    if (!key || key === "base")
       return {
         ok: true,
         data: {
-          services: metadata.services.map((s) => ({
-            name: s.name,
-            resources: Object.keys(s.resources),
-          })),
-          shortcuts: shortcuts.map((s) => `${s.service}.${s.command}`),
+          services: metadata.services
+            .filter((s) => !key || s.name === key)
+            .map((s) => ({
+              name: s.name,
+              resources: Object.keys(s.resources),
+            })),
+          shortcuts: visibleShortcuts
+            .filter((s) => !key || s.service === key)
+            .map((s) => `${s.service}.${s.command}`),
         },
       };
     const spec =
       findAPI(key.split(".")) ||
-      shortcuts.find((s) => `${s.service}.${s.command}` === key);
+      visibleShortcuts.find((s) => `${s.service}.${s.command}` === key);
     if (!spec) throw new CliError("validation", `Unknown schema ${key}`);
     return { ok: true, data: spec };
   }
@@ -271,19 +310,18 @@ async function executeInternal(words, flags = {}, options = {}) {
     const names = [
       ...new Set([...top, ...shortcuts.map((s) => s.service)]),
     ].join(" ");
-    if (shell === "bash")
-      return { __raw: `complete -W '${names}' lark-ka lark-cli\n` };
+    if (shell === "bash") return { __raw: `complete -W '${names}' lark-ka\n` };
     if (shell === "zsh")
       return {
-        __raw: `#compdef lark-ka lark-cli\n_arguments '1:command:(${names})'\n`,
+        __raw: `#compdef lark-ka\n_arguments '1:command:(${names})'\n`,
       };
     if (shell === "fish")
       return {
-        __raw: `complete -c lark-ka -f -a '${names}'\ncomplete -c lark-cli -f -a '${names}'\n`,
+        __raw: `complete -c lark-ka -f -a '${names}'\n`,
       };
     if (shell === "powershell")
       return {
-        __raw: `Register-ArgumentCompleter -Native -CommandName lark-ka,lark-cli -ScriptBlock { param($wordToComplete) '${names}'.Split(' ') | Where-Object { $_ -like "$wordToComplete*" } }\n`,
+        __raw: `Register-ArgumentCompleter -Native -CommandName lark-ka -ScriptBlock { param($wordToComplete) '${names}'.Split(' ') | Where-Object { $_ -like "$wordToComplete*" } }\n`,
       };
     throw new CliError("validation", "Unsupported shell");
   }

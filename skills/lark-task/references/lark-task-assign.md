@@ -8,16 +8,16 @@ Assign or remove members (assignees) from a task.
 
 ```bash
 # Add an assignee
-lark-cli task +assign --task-id "<task_guid>" --add "ou_aaa"
+lark-ka task +assign --task-id "<task_guid>" --add "ou_aaa"
 
 # Add an app assignee
-lark-cli task +assign --task-id "<task_guid>" --add "cli_xxx"
+lark-ka task +assign --task-id "<task_guid>" --add "cli_xxx"
 
 # Transfer an assignee (remove old, add new)
-lark-cli task +assign --task-id "<task_guid>" --remove "ou_old" --add "ou_new"
+lark-ka task +assign --task-id "<task_guid>" --remove "ou_old" --add "ou_new"
 
 # Add multiple assignees
-lark-cli task +assign --task-id "<task_guid>" --add "ou_aaa,ou_bbb"
+lark-ka task +assign --task-id "<task_guid>" --add "ou_aaa,ou_bbb"
 ```
 
 ## Parameters

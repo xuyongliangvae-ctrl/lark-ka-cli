@@ -160,7 +160,7 @@ export async function createContext(flags = {}, options = {}) {
     if (responseType === "buffer") return result;
     return result.data === undefined ? result : result.data;
   };
-  ctx.paginate = async (method, apiPath, opts = {}) => {
+  ctx.paginate = async (method, apiPath, { normalizePage, ...opts } = {}) => {
     if (ctx.dryRun) return ctx.request(method, apiPath, opts);
     const query = { ...(opts.query || {}) },
       body = opts.body
@@ -179,7 +179,12 @@ export async function createContext(flags = {}, options = {}) {
         "--page-limit must be 0..10000 (0 means unlimited)",
       );
     for (let page = 0; limit === 0 || page < limit; page++) {
-      last = await ctx.request(method, apiPath, { ...opts, query, body });
+      const response = await ctx.request(method, apiPath, {
+        ...opts,
+        query,
+        body,
+      });
+      last = normalizePage ? normalizePage(response) : response;
       const key =
         opts.itemsKey ||
         ["items", "records", "users", "tables", "fields", "views", "data"].find(

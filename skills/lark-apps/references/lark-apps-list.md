@@ -14,19 +14,19 @@
 
 ```bash
 # 拉第一页（默认 page_size=20）
-lark-cli apps +list
+lark-ka apps +list
 
 # 自定义页大小
-lark-cli apps +list --page-size 50
+lark-ka apps +list --page-size 50
 
 # 翻页（拿上一次响应的 page_token）
-lark-cli apps +list --page-token "eyJQaW5PcmRlciI6..."
+lark-ka apps +list --page-token "eyJQaW5PcmRlciI6..."
 
 # 取 ID 列表（脚本场景）
-lark-cli apps +list -q '.data.items[].app_id'
+lark-ka apps +list -q '.data.items[].app_id'
 
 # 按名字找 app_id
-lark-cli apps +list -q '.data.items[] | select(.name=="客户调研问卷") | .app_id'
+lark-ka apps +list -q '.data.items[] | select(.name=="客户调研问卷") | .app_id'
 ```
 
 ## 参数

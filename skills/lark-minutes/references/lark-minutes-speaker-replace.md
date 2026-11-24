@@ -4,7 +4,7 @@
 
 替换妙记逐字稿中的说话人身份：把妙记逐字稿里"原说话人"对应的所有发言段，重新归属到"新说话人"。常用于解决妙记自动识别错说话人，或需要手工把某段语音绑定到正确用户的场景。
 
-本 skill 对应 shortcut：`lark-cli minutes +speaker-replace`。
+本 skill 对应 shortcut：`lark-ka minutes +speaker-replace`。
 
 ## 典型触发表达
 
@@ -16,7 +16,7 @@
 ## 命令示例
 
 ```bash
-lark-cli minutes +speaker-replace \
+lark-ka minutes +speaker-replace \
   --minute-token obcnxxxxxxxxxxxxxxxxxxxx \
   --from-user-id ou_old_speaker_open_id \
   --to-user-id ou_new_speaker_open_id

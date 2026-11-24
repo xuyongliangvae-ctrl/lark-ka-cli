@@ -149,7 +149,7 @@ _公共：URL/token（无 sheet 定位） · 系统：`--dry-run`_
 示例：
 
 ```bash
-lark-cli sheets +sheet-create --url "https://example.feishu.cn/sheets/shtXXX" \
+lark-ka sheets +sheet-create --url "https://example.feishu.cn/sheets/shtXXX" \
   --title "汇总" --index 0
 ```
 
@@ -160,7 +160,7 @@ lark-cli sheets +sheet-create --url "https://example.feishu.cn/sheets/shtXXX" \
 ### `+sheet-rename`
 
 ```bash
-lark-cli sheets +sheet-rename --url "..." --sheet-id "$SID" --title "汇总"
+lark-ka sheets +sheet-rename --url "..." --sheet-id "$SID" --title "汇总"
 ```
 
 ### `+sheet-move`
@@ -173,21 +173,21 @@ standalone 路径在缺 `--source-index` / 只给 `--sheet-name` 时会自动发
 
 ```bash
 # --title 省略时由服务端生成副本名
-lark-cli sheets +sheet-copy --url "..." --sheet-id "$SID" --title "副本"
+lark-ka sheets +sheet-copy --url "..." --sheet-id "$SID" --title "副本"
 ```
 
 ### `+sheet-hide` / `+sheet-unhide`
 
 ```bash
-lark-cli sheets +sheet-hide   --url "..." --sheet-id "$SID"
-lark-cli sheets +sheet-unhide --url "..." --sheet-id "$SID"
+lark-ka sheets +sheet-hide   --url "..." --sheet-id "$SID"
+lark-ka sheets +sheet-unhide --url "..." --sheet-id "$SID"
 ```
 
 ### `+sheet-set-tab-color`
 
 ```bash
 # Hex 色值；传空字符串 "" 清除标签色
-lark-cli sheets +sheet-set-tab-color --url "..." --sheet-id "$SID" --color "#FF0000"
+lark-ka sheets +sheet-set-tab-color --url "..." --sheet-id "$SID" --color "#FF0000"
 ```
 
 ### Validate / DryRun / Execute 约束

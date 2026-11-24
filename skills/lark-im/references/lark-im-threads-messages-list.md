@@ -6,33 +6,33 @@ Fetch the reply message list inside a thread. When `im +chat-messages-list` retu
 
 By default each reply also carries a `reactions` block (counts + details from `im.reactions.batch_query`) when the server has reactions for it, and `update_time` for messages that were actually edited. Pass `--no-reactions` to skip the extra round-trip. See [message enrichment](lark-im-message-enrichment.md) for the full contract.
 
-This skill maps to the shortcut: `lark-cli im +threads-messages-list` (internally calls `GET /open-apis/im/v1/messages` with `container_id_type=thread` to fetch thread messages).
+This skill maps to the shortcut: `lark-ka im +threads-messages-list` (internally calls `GET /open-apis/im/v1/messages` with `container_id_type=thread` to fetch thread messages).
 
 ## Commands
 
 ```bash
 # Get thread replies (ascending by time by default, table output)
-lark-cli im +threads-messages-list --thread omt_xxx
+lark-ka im +threads-messages-list --thread omt_xxx
 
 # Reverse chronological order (latest first)
-lark-cli im +threads-messages-list --thread omt_xxx --sort desc
+lark-ka im +threads-messages-list --thread omt_xxx --sort desc
 
 # Control page size
-lark-cli im +threads-messages-list --thread omt_xxx --page-size 20
+lark-ka im +threads-messages-list --thread omt_xxx --page-size 20
 
 # Pagination
-lark-cli im +threads-messages-list --thread omt_xxx --page-token <PAGE_TOKEN>
+lark-ka im +threads-messages-list --thread omt_xxx --page-token <PAGE_TOKEN>
 
 # Output format options
-lark-cli im +threads-messages-list --thread omt_xxx --format pretty
-lark-cli im +threads-messages-list --thread omt_xxx --format table
-lark-cli im +threads-messages-list --thread omt_xxx --format csv
+lark-ka im +threads-messages-list --thread omt_xxx --format pretty
+lark-ka im +threads-messages-list --thread omt_xxx --format table
+lark-ka im +threads-messages-list --thread omt_xxx --format csv
 
 # View as a bot
-lark-cli im +threads-messages-list --thread omt_xxx --as bot
+lark-ka im +threads-messages-list --thread omt_xxx --as bot
 
 # Preview the request without executing it
-lark-cli im +threads-messages-list --thread omt_xxx --dry-run
+lark-ka im +threads-messages-list --thread omt_xxx --dry-run
 ```
 
 ## Parameters
@@ -76,20 +76,20 @@ Thread messages do not support `start_time` / `end_time` filtering because of Fe
 
 ```bash
 # Step 1: Fetch group messages and find one that contains thread_id
-lark-cli im +chat-messages-list --chat-id oc_xxx
+lark-ka im +chat-messages-list --chat-id oc_xxx
 
 # Step 2: Extract thread_id from the JSON output and fetch thread replies
-lark-cli im +threads-messages-list --thread omt_xxx
+lark-ka im +threads-messages-list --thread omt_xxx
 ```
 
 ### Scenario 2: Paginate through a long thread
 
 ```bash
 # First page
-lark-cli im +threads-messages-list --thread omt_xxx
+lark-ka im +threads-messages-list --thread omt_xxx
 
 # If has_more=true is returned, continue with page_token
-lark-cli im +threads-messages-list --thread omt_xxx --page-token <PAGE_TOKEN>
+lark-ka im +threads-messages-list --thread omt_xxx --page-token <PAGE_TOKEN>
 ```
 
 ## Resource Rendering

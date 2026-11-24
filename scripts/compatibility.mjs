@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { shortcuts, apiSpecs } from "../src/metadata.mjs";
+import { packagedShortcuts, apiSpecs } from "../src/metadata.mjs";
 import { commands as im } from "../src/domains/im.mjs";
 import { commandSpecs as collaboration } from "../src/domains/collaboration.mjs";
 import {
@@ -18,7 +18,7 @@ const coverage = {
 };
 for (const spec of Object.values(collaboration))
   (coverage[spec.service] ||= {})[spec.command] = "implemented";
-const commands = shortcuts.map((spec) => ({
+const commands = packagedShortcuts.map((spec) => ({
   service: spec.service,
   command: spec.command,
   implementation: coverage[spec.service]?.[spec.command]

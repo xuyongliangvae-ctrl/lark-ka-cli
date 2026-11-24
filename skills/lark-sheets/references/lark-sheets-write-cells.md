@@ -126,7 +126,7 @@ Step 2: `+cells-set` — range="A2", cells 含 value + cell_styles + border_styl
 
 ## 富文本单元格：超链接 / @人 / @文档（`rich_text`）
 
-带显示文本的超链接、@人、@文档这类富内容**必须**走 `+cells-set` 的 `rich_text` 字段（`cells[].rich_text` 数组，每段一个对象、带 `type`），**不能**直接传普通字符串——纯字符串只会被当作纯文本存进单元格。完整字段跑 `lark-cli sheets +cells-set --print-schema --flag-name cells`，常用段类型：
+带显示文本的超链接、@人、@文档这类富内容**必须**走 `+cells-set` 的 `rich_text` 字段（`cells[].rich_text` 数组，每段一个对象、带 `type`），**不能**直接传普通字符串——纯字符串只会被当作纯文本存进单元格。完整字段跑 `lark-ka sheets +cells-set --print-schema --flag-name cells`，常用段类型：
 
 - **超链接（带显示文本）**：`{"type":"link","text":"飞书","link":"https://www.feishu.cn"}`。纯 URL 不需要 `rich_text`，直接写普通字符串即可。
 - **@人**：`{"type":"mention","mention_token":"<userId>","notify":false}`。**仅支持同租户用户，单次写入最多 50 人。** `notify` **默认 `true`**（会给被 @ 的人发通知），不想发务必显式传 `false`。
@@ -166,7 +166,7 @@ Step 2: `+cells-set` — range="A2", cells 含 value + cell_styles + border_styl
 **`--options` 模式 — 默认色板（最常见）**：
 
 ```
-lark-cli sheets +dropdown-set \
+lark-ka sheets +dropdown-set \
   --url https://... --sheet-id <id> \
   --range A2:A100 \
   --options '["待开始","进行中","已完成","已取消"]'
@@ -175,7 +175,7 @@ lark-cli sheets +dropdown-set \
 **`--options` 模式 — 指定颜色**（4 个选项配 3 个颜色，第 4 个按色板补）：
 
 ```
-lark-cli sheets +dropdown-set \
+lark-ka sheets +dropdown-set \
   --url https://... --sheet-id <id> \
   --range A2:A100 \
   --options '["待开始","进行中","已完成","已取消"]' \
@@ -185,7 +185,7 @@ lark-cli sheets +dropdown-set \
 **`--source-range` 模式**（先在 `'Sheet1'!T1:T3` 维护「男/女/保密」三行，再让 `B2:B21` 引用它）：
 
 ```
-lark-cli sheets +dropdown-set \
+lark-ka sheets +dropdown-set \
   --url https://... --sheet-id <id> \
   --range B2:B21 \
   --source-range ''\''Sheet1'\''!T1:T3' \
@@ -195,7 +195,7 @@ lark-cli sheets +dropdown-set \
 **纯白下拉**（明确告诉用户"不要彩色"时才用）：
 
 ```
-lark-cli sheets +dropdown-set \
+lark-ka sheets +dropdown-set \
   --url https://... --sheet-id <id> \
   --range A2:A100 \
   --options '["低","中","高"]' \
@@ -359,12 +359,12 @@ _列表选项_
 
 ```bash
 # 纯值（数组形态）；默认即覆盖非空 cell，无需显式传 --allow-overwrite
-lark-cli sheets +cells-set --url "https://example.feishu.cn/sheets/shtXXX" \
+lark-ka sheets +cells-set --url "https://example.feishu.cn/sheets/shtXXX" \
   --sheet-name "Sheet1" --range "A1:B2" \
   --cells '[[{"value":"name"},{"value":"score"}],[{"value":"alice"},{"value":95}]]'
 
 # 富 cell（公式 + 样式，cells 是二维矩阵每元素一个 cell schema）
-lark-cli sheets +cells-set --spreadsheet-token shtXXX --sheet-id "$SID" \
+lark-ka sheets +cells-set --spreadsheet-token shtXXX --sheet-id "$SID" \
   --range "C2:C10" --cells @rich-cells.json
 ```
 
@@ -380,11 +380,11 @@ lark-cli sheets +cells-set --spreadsheet-token shtXXX --sheet-id "$SID" \
 
 ```bash
 # 加粗 + 黄底
-lark-cli sheets +cells-set-style --url "..." --sheet-name "Sheet1" \
+lark-ka sheets +cells-set-style --url "..." --sheet-name "Sheet1" \
   --range "A1:B2" --font-weight bold --background-color "#FFFF00"
 
 # 配套边框
-lark-cli sheets +cells-set-style --url "..." --sheet-id "$SID" \
+lark-ka sheets +cells-set-style --url "..." --sheet-id "$SID" \
   --range "A1:D10" --font-size 12 --horizontal-alignment center \
   --border-styles '{"top":{"style":"solid","color":"#000","weight":"thin"},"bottom":{"style":"solid","color":"#000","weight":"thin"}}'
 ```
@@ -394,7 +394,7 @@ lark-cli sheets +cells-set-style --url "..." --sheet-id "$SID" \
 把单张图片嵌入 cell（必须单 cell 范围）：
 
 ```bash
-lark-cli sheets +cells-set-image --url "..." --sheet-name "Sheet1" \
+lark-ka sheets +cells-set-image --url "..." --sheet-name "Sheet1" \
   --range "A1" --image ./logo.png
 ```
 
@@ -404,12 +404,12 @@ lark-cli sheets +cells-set-image --url "..." --sheet-name "Sheet1" \
 
 ```bash
 # 内联 CSV
-lark-cli sheets +csv-put --url "https://example.feishu.cn/sheets/shtXXX" \
+lark-ka sheets +csv-put --url "https://example.feishu.cn/sheets/shtXXX" \
   --sheet-name "Sheet1" --start-cell "A1" \
   --csv $'name,score\nalice,95\nbob,87'
 
 # 从文件
-lark-cli sheets +csv-put --spreadsheet-token shtXXX --sheet-id "$SID" \
+lark-ka sheets +csv-put --spreadsheet-token shtXXX --sheet-id "$SID" \
   --start-cell "A1" --csv @data.csv
 ```
 
@@ -418,7 +418,7 @@ lark-cli sheets +csv-put --spreadsheet-token shtXXX --sheet-id "$SID" \
 > ⚠️ `=` 开头的字符串会被当字面量写入（**不会变公式**）：
 >
 > ```bash
-> lark-cli sheets +csv-put --url "..." --sheet-name "Sheet1" \
+> lark-ka sheets +csv-put --url "..." --sheet-name "Sheet1" \
 >   --start-cell "A1" \
 >   --csv $'name,score\nalice,=SUM(B2:B10)'
 > # ↑ A2 实际写入字符串 "=SUM(B2:B10)"，**不是公式**。需要写公式请用 +cells-set。

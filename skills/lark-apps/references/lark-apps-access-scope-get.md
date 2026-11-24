@@ -7,7 +7,7 @@
 ## 命令
 
 ```bash
-lark-cli apps +access-scope-get --app-id app_xxx
+lark-ka apps +access-scope-get --app-id app_xxx
 ```
 
 ## 参数
@@ -69,7 +69,7 @@ lark-cli apps +access-scope-get --app-id app_xxx
 ### 场景 1：查看当前应用对谁可见
 
 ```bash
-lark-cli apps +access-scope-get --app-id app_xxx
+lark-ka apps +access-scope-get --app-id app_xxx
 ```
 
 按 `scope` 值组装报告：
@@ -81,7 +81,7 @@ lark-cli apps +access-scope-get --app-id app_xxx
 
 ```bash
 # 拼一个 --targets JSON 数组（jq）
-lark-cli apps +access-scope-get --app-id app_src -q '
+lark-ka apps +access-scope-get --app-id app_src -q '
   .data
   | (.users        // [] | map({type:"user",       id:.}))
   + (.departments // [] | map({type:"department", id:.}))

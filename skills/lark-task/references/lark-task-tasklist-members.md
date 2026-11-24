@@ -8,13 +8,13 @@ Manage tasklist members (editors/owners).
 
 ```bash
 # Add a member
-lark-cli task +tasklist-members --tasklist-id "tl_xxx" --add "ou_aaa"
+lark-ka task +tasklist-members --tasklist-id "tl_xxx" --add "ou_aaa"
 
 # Remove a member
-lark-cli task +tasklist-members --tasklist-id "tl_xxx" --remove "ou_aaa"
+lark-ka task +tasklist-members --tasklist-id "tl_xxx" --remove "ou_aaa"
 
 # Replace all members exactly
-lark-cli task +tasklist-members --tasklist-id "tl_xxx" --set "ou_aaa,ou_bbb"
+lark-ka task +tasklist-members --tasklist-id "tl_xxx" --set "ou_aaa,ou_bbb"
 ```
 
 ## Parameters

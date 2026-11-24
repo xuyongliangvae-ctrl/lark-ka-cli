@@ -2,6 +2,7 @@ import readline from "node:readline";
 import { shortcuts } from "./metadata.mjs";
 import { CliError, toErrorEnvelope } from "./errors.mjs";
 import { STREAM_DONE } from "./events.mjs";
+import { VERSION } from "./version.mjs";
 const curated = {
   lark_im_send: ["im", "+messages-send"],
   lark_im_reply: ["im", "+messages-reply"],
@@ -91,7 +92,7 @@ export async function serveMCP(execute, { profile, signal } = {}) {
         ].includes(requested)
           ? requested
           : "2024-11-05",
-        serverInfo: { name: "lark-ka-cli-node", version: "0.1.0" },
+        serverInfo: { name: "lark-ka-cli-node", version: VERSION },
         capabilities: { tools: {} },
       });
       return;

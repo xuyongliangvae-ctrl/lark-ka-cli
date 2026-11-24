@@ -82,7 +82,7 @@
 根据关键字、组织者、参与人、会议室等条件搜索会议，获取会议列表。
 
 ```bash
-lark-cli vc +search --start "<YYYY-MM-DD>" --end "<YYYY-MM-DD>" --format json
+lark-ka vc +search --start "<YYYY-MM-DD>" --end "<YYYY-MM-DD>" --format json
 ```
 
 详细用法请阅读 [`lark-vc-search.md`](lark-vc-search.md)。
@@ -92,7 +92,7 @@ lark-cli vc +search --start "<YYYY-MM-DD>" --end "<YYYY-MM-DD>" --format json
 ##### 获取会议产物
 
 ```bash
-lark-cli vc +notes --meeting-ids '<meeting_id1>,<meeting_id2>'
+lark-ka vc +notes --meeting-ids '<meeting_id1>,<meeting_id2>'
 ```
 
 可获取会议的所有产物信息，包括：
@@ -106,7 +106,7 @@ lark-cli vc +notes --meeting-ids '<meeting_id1>,<meeting_id2>'
 如果返回了 `minute_token`，可通过以下命令获取妙记的详细信息（总结、待办、章节、文字记录）：
 
 ```bash
-lark-cli vc +notes --minute-tokens '<minute_token1>,<minute_token2>'
+lark-ka vc +notes --minute-tokens '<minute_token1>,<minute_token2>'
 ```
 
 可获取妙记的总结、待办、章节、文字记录等信息。详细用法请阅读 [`lark-vc-notes.md`](lark-vc-notes.md)。
@@ -116,7 +116,7 @@ lark-cli vc +notes --minute-tokens '<minute_token1>,<minute_token2>'
 智能纪要和逐字稿都是飞书文档，需使用 `docs +fetch` 读取正文内容：
 
 ```bash
-lark-cli docs +fetch --api-version v2 --doc <doc_token> --doc-format markdown
+lark-ka docs +fetch --api-version v2 --doc <doc_token> --doc-format markdown
 ```
 
 详细用法请参考 [lark-doc](../../lark-doc/SKILL.md) skill。

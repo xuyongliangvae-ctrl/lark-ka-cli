@@ -1,7 +1,9 @@
-import { readFileSync } from "node:fs";
-import { readFile, writeFile, mkdir, stat, realpath } from "node:fs/promises";
+import { existsSync, readFileSync } from "node:fs";
+import { readFile, writeFile, stat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { CliError } from "../errors.mjs";
+import { isHaiNengProfile } from "../config.mjs";
+import { shortcuts as catalog } from "../metadata.mjs";
 import { setTimeout as delay } from "node:timers/promises";
 
 const defs = JSON.parse(
@@ -10,9 +12,8 @@ const defs = JSON.parse(
 const schemas = JSON.parse(
   readFileSync(new URL("../../data/sheets/flag-schemas.json", import.meta.url)),
 ).flags;
-const catalog = JSON.parse(
-  readFileSync(new URL("../../data/shortcuts.json", import.meta.url)),
-);
+const baseV3Module = new URL("./base-v3.mjs", import.meta.url);
+const hasSourceBaseV3 = existsSync(baseV3Module);
 export const commandSpecs = {
   base: Object.fromEntries(
     catalog.filter((x) => x.service === "base").map((x) => [x.command, x]),
@@ -93,16 +94,6 @@ async function req(ctx, method, url, query, body) {
   }
   return result;
 }
-function basePath(f, ...parts) {
-  return (
-    "/open-apis/base/v3/bases/" +
-    enc(required(f, "base-token")) +
-    (parts.length ? "/" + parts.map(enc).join("/") : "")
-  );
-}
-function tablePath(f, ...parts) {
-  return basePath(f, "tables", required(f, "table-id"), ...parts);
-}
 function uniqueStrings(values, name, max) {
   if (
     !Array.isArray(values) ||
@@ -113,58 +104,6 @@ function uniqueStrings(values, name, max) {
   if (values.length > max || new Set(values).size !== values.length)
     fail(`${name} must contain at most ${max} distinct values`);
   return values.map((x) => x.trim());
-}
-async function offsetPages(ctx, f, url, key, max = 100, all = false) {
-  const query = {
-    offset: ints(f, "offset", 0),
-    limit: ints(f, "limit", max, 1, max),
-  };
-  const rows = [];
-  let last;
-  for (let n = 0; n < 10000; n++) {
-    last = await req(ctx, "GET", url, query);
-    const batch = last[key] ?? last.items ?? [];
-    if (!Array.isArray(batch))
-      throw new CliError("api", `${key} response must be an array`, {
-        code: 5,
-      });
-    rows.push(...batch);
-    if (
-      ctx.dryRun ||
-      !all ||
-      !batch.length ||
-      batch.length < query.limit ||
-      (last.total > 0 && query.offset + batch.length >= last.total)
-    )
-      return { ...last, [key]: rows, total: last.total ?? rows.length };
-    query.offset += batch.length;
-  }
-  throw new CliError("api", "Pagination exceeded 10000 pages", { code: 5 });
-}
-async function tokenPages(ctx, method, url, options, key) {
-  const result = [];
-  const seen = new Set();
-  let next;
-  let last;
-  for (let page = 0; page < 10000; page++) {
-    const container = method === "GET" ? "query" : "body";
-    last = await ctx.request(method, url, {
-      ...options,
-      [container]: clean({ ...options[container], page_token: next }),
-    });
-    result.push(...(last[key] ?? []));
-    if (ctx.dryRun || !last.has_more)
-      return { ...last, [key]: result, total: result.length };
-    next = last.page_token;
-    if (!next || seen.has(next))
-      throw new CliError(
-        "api",
-        "Pagination returned a missing or repeated page token",
-        { code: 5 },
-      );
-    seen.add(next);
-  }
-  throw new CliError("api", "Pagination exceeded 10000 pages", { code: 5 });
 }
 async function safeFile(ctx, filename, output = false) {
   if (
@@ -339,691 +278,954 @@ async function upload(
   return { file_token: done.file_token, name, size: info.size };
 }
 
-async function executeBase(ctx, command, f) {
-  const action = command.slice(1);
-  if (["base-create", "base-copy", "base-get"].includes(action)) {
-    const method = action === "base-get" ? "GET" : "POST";
-    const url =
-      action === "base-create"
-        ? "/open-apis/base/v3/bases"
-        : basePath(f, ...(action === "base-copy" ? ["copy"] : []));
-    const body =
-      method === "GET"
-        ? undefined
-        : pick(f, ["name", "folder-token", "without-content", "time-zone"]);
-    if (action === "base-create") required(f, "name");
-    const base = await req(ctx, method, url, undefined, body);
-    const result = {
-      base,
-      ...(action === "base-get"
-        ? {}
-        : { [action === "base-create" ? "created" : "copied"]: true }),
+const bitablePagingFlags = [
+  "offset",
+  "limit",
+  "page-size",
+  "page-token",
+  "page-all",
+  "page-limit",
+  "page-delay",
+];
+const bitableRecordFlags = [
+  ...bitablePagingFlags,
+  "table-id",
+  "view-id",
+  "field-id",
+  "filter-json",
+  "sort-json",
+  "user-id-type",
+];
+const bitableV1Flags = {
+  "base-create": ["name", "folder-token", "time-zone"],
+  "base-copy": ["name", "folder-token", "time-zone", "without-content"],
+  "base-get": [],
+  "table-create": ["name", "fields", "view"],
+  "table-get": ["table-id"],
+  "table-list": bitablePagingFlags,
+  "field-get": ["table-id", "field-id"],
+  "field-list": [...bitablePagingFlags, "table-id"],
+  "view-get": ["table-id", "view-id"],
+  "view-list": [...bitablePagingFlags, "table-id"],
+  "record-get": ["table-id", "record-id", "field-id", "user-id-type"],
+  "record-list": bitableRecordFlags,
+  "record-search": [...bitableRecordFlags, "keyword", "search-field"],
+  "record-batch-create": ["table-id", "client-token", "user-id-type"],
+  "record-batch-update": ["table-id", "user-id-type"],
+  "record-delete": ["table-id", "record-id"],
+  "form-get": ["table-id", "form-id"],
+  "dashboard-list": ["page-size", "page-token", "page-all", "page-limit"],
+};
+export function isHaiNengBaseShortcut(command) {
+  return (
+    typeof command === "string" &&
+    command.startsWith("+") &&
+    has(bitableV1Flags, command.slice(1))
+  );
+}
+const bitableGlobalFlags = [
+  "base-token",
+  "as",
+  "profile",
+  "format",
+  "json",
+  "jq",
+  "output",
+  "dry-run",
+  "help",
+  "yes",
+  "force",
+  "quiet",
+  "verbose",
+  "debug",
+  "no-color",
+];
+const bitableAppsPath = "/open-apis/bitable/v1/apps";
+
+function onlyKeys(object, allowed, label) {
+  const unknown = Object.keys(object).find((k) => !allowed.includes(k));
+  if (unknown)
+    fail(`${label} does not support '${unknown}' with the Bitable v1 API`);
+}
+
+function bitableNames(value, label, max) {
+  const names = uniqueStrings(value, label, max);
+  if (new Set(names).size !== names.length)
+    fail(
+      `${label} must contain distinct field names after trimming whitespace`,
+    );
+  if (names.some((name) => /^fld[A-Za-z0-9]{7,}$/.test(name)))
+    fail(
+      `${label} requires field names for Bitable v1; get the names with base +field-list`,
+    );
+  return names;
+}
+
+function bitableCreateRecords(input) {
+  if (has(input, "records")) {
+    onlyKeys(input, ["records"], "--json");
+    if (
+      !Array.isArray(input.records) ||
+      !input.records.length ||
+      input.records.length > 500
+    )
+      fail("--json.records must contain 1..500 records");
+    for (const record of input.records) {
+      if (
+        !record ||
+        typeof record !== "object" ||
+        !record.fields ||
+        typeof record.fields !== "object" ||
+        Array.isArray(record.fields)
+      )
+        fail("Each record requires a fields object keyed by field name");
+      onlyKeys(record, ["fields"], "--json.records[]");
+    }
+    return input;
+  }
+  onlyKeys(input, ["fields", "rows"], "--json");
+  const names = bitableNames(input.fields, "--json.fields", 200);
+  if (
+    !Array.isArray(input.rows) ||
+    !input.rows.length ||
+    input.rows.length > 500
+  )
+    fail("--json.rows must contain 1..500 rows");
+  return {
+    records: input.rows.map((row) => {
+      if (!Array.isArray(row) || row.length !== names.length)
+        fail("Each --json.rows entry must match the number of fields");
+      return {
+        fields: Object.fromEntries(names.map((name, i) => [name, row[i]])),
+      };
+    }),
+  };
+}
+
+const bitableFieldTypes = {
+  text: 1,
+  number: 2,
+  datetime: 5,
+  checkbox: 7,
+  user: 11,
+  attachment: 17,
+  location: 22,
+  group_chat: 23,
+  created_at: 1001,
+  updated_at: 1002,
+  created_by: 1003,
+  updated_by: 1004,
+  auto_number: 1005,
+};
+
+function bitableTableField(field) {
+  if (!field || typeof field !== "object" || Array.isArray(field))
+    fail("Each --fields entry must be an object");
+  const name = field.name ?? field.field_name;
+  if (typeof name !== "string" || !name.trim())
+    fail("Each --fields entry requires a field_name or name");
+  if (field.name !== undefined && field.field_name !== undefined)
+    fail("Specify a field name once using name or field_name");
+  if (Number.isInteger(field.type)) {
+    onlyKeys(
+      field,
+      ["field_name", "name", "type", "ui_type", "property", "description"],
+      "--fields[]",
+    );
+    return clean({
+      field_name: name.trim(),
+      type: field.type,
+      ui_type: field.ui_type,
+      property: field.property,
+      description: field.description,
+    });
+  }
+  const isSelect = field.type === "select";
+  const hasMultiple = ["user", "group_chat", "select"].includes(field.type);
+  onlyKeys(
+    field,
+    [
+      "name",
+      "field_name",
+      "type",
+      "description",
+      ...(hasMultiple ? ["multiple"] : []),
+      ...(isSelect ? ["options"] : []),
+    ],
+    "--fields[]",
+  );
+  if (field.multiple !== undefined && typeof field.multiple !== "boolean")
+    fail("--fields[].multiple must be a boolean");
+  const type = isSelect
+    ? field.multiple
+      ? 4
+      : 3
+    : bitableFieldTypes[field.type];
+  if (!Number.isInteger(type))
+    fail(
+      "Use a supported field type or a Bitable v1 numeric type with property",
+    );
+  if (field.description !== undefined && typeof field.description !== "string")
+    fail("--fields[].description must be a string for named field types");
+  let property;
+  if (isSelect && field.options !== undefined) {
+    if (!Array.isArray(field.options))
+      fail("--fields[].options must be an array");
+    property = {
+      options: field.options.map((option) => {
+        if (!option || typeof option.name !== "string" || !option.name.trim())
+          fail("Each select option requires a name");
+        onlyKeys(option, ["name", "color"], "--fields[].options[]");
+        if (
+          option.color !== undefined &&
+          (!Number.isInteger(option.color) ||
+            option.color < 0 ||
+            option.color > 54)
+        )
+          fail("Select option color must be an integer from 0 to 54");
+        return option;
+      }),
     };
-    if (action !== "base-get" && ctx.identity === "bot")
+  } else if (!isSelect && field.multiple !== undefined) {
+    property = { multiple: field.multiple };
+  }
+  return clean({
+    field_name: name.trim(),
+    type,
+    property,
+    description:
+      field.description === undefined ? undefined : { text: field.description },
+  });
+}
+
+async function bitableTableViews(ctx, value) {
+  if (value === undefined) return [];
+  let raw = value;
+  if (typeof value === "string") {
+    try {
+      const input = await ctx.input(value);
+      raw = typeof input === "string" ? JSON.parse(input) : input;
+    } catch (error) {
+      if (error instanceof CliError) throw error;
+      fail("--view must be valid JSON");
+    }
+  }
+  const views = (Array.isArray(raw) ? raw : [raw]).map((view) => {
+    if (!view || typeof view !== "object" || Array.isArray(view))
+      fail("Each --view entry must be an object");
+    onlyKeys(view, ["name", "type", "view_name", "view_type"], "--view[]");
+    const name = view.name ?? view.view_name;
+    const type = view.type ?? view.view_type ?? "grid";
+    if (typeof name !== "string" || !name.trim())
+      fail("Each --view entry requires a name");
+    if (!["grid", "kanban", "gallery", "gantt", "form"].includes(type))
+      fail("Bitable v1 view type must be grid, kanban, gallery, gantt or form");
+    if (
+      (view.name !== undefined && view.view_name !== undefined) ||
+      (view.type !== undefined && view.view_type !== undefined)
+    )
+      fail("Specify each view name and type once");
+    return { view_name: name.trim(), view_type: type };
+  });
+  if (new Set(views.map((view) => view.view_name)).size !== views.length)
+    fail("--view names must be distinct");
+  return views;
+}
+
+async function bitableTableCreate(ctx, url, f) {
+  const name = required(f, "name");
+  if (typeof name !== "string" || !name.trim() || [...name.trim()].length > 100)
+    fail("--name must contain 1..100 characters");
+  const fields = (await json(ctx, f.fields, "fields", "array", [])).map(
+    bitableTableField,
+  );
+  if (fields.length > 300) fail("--fields must contain at most 300 items");
+  if (fields.length && ![1, 2, 5, 13, 15, 20, 22].includes(fields[0].type))
+    fail("The first field must use a Bitable v1 index field type");
+  if (new Set(fields.map((field) => field.field_name)).size !== fields.length)
+    fail("--fields names must be distinct");
+  const views = await bitableTableViews(ctx, f.view);
+  const table = await req(ctx, "POST", url, undefined, {
+    table: clean({
+      name: name.trim(),
+      fields: fields.length ? fields : undefined,
+    }),
+  });
+  const tableId = ctx.dryRun ? "<created_table_id>" : table?.table_id;
+  if (typeof tableId !== "string" || !tableId)
+    throw new CliError(
+      "partial_success",
+      "Table creation returned no table_id",
+      {
+        code: 5,
+        hint: "Check the Base before repeating the command.",
+      },
+    );
+  const result = { table };
+  if (views.length) {
+    result.views = [];
+    try {
+      for (const view of views)
+        result.views.push(
+          await req(
+            ctx,
+            "POST",
+            url + "/" + enc(tableId) + "/views",
+            undefined,
+            view,
+          ),
+        );
+    } catch (error) {
+      throw new CliError(
+        "partial_success",
+        "Table created but a view could not be created",
+        {
+          code: 5,
+          detail: { ...result, viewError: error.message },
+          hint: "Use the new table_id to create the missing views.",
+        },
+      );
+    }
+  }
+  return result;
+}
+
+function bitableRecordWriteIds(value, max) {
+  const ids = uniqueStrings(value, "record IDs", max);
+  if (new Set(ids).size !== ids.length)
+    fail("record IDs must be distinct after trimming whitespace");
+  return ids;
+}
+
+function bitableEditableFields(fields, label) {
+  if (
+    !fields ||
+    typeof fields !== "object" ||
+    Array.isArray(fields) ||
+    !Object.keys(fields).length
+  )
+    fail(`${label} must be a non-empty field map`);
+  bitableNames(Object.keys(fields), label, 200);
+  return fields;
+}
+
+async function bitableRecordBatchWrite(ctx, table, action, f) {
+  const deleting = action === "record-delete";
+  const input =
+    deleting && (f.json === true || f.json === undefined)
+      ? {}
+      : await json(ctx, f.json, "json");
+  let records;
+  if (deleting) {
+    onlyKeys(input, ["records", "record_id_list"], "--json");
+    if (
+      [f["record-id"], input.records, input.record_id_list].filter(
+        (x) => x !== undefined,
+      ).length !== 1
+    )
+      fail(
+        "Specify record IDs once using --record-id, --json.record_id_list or --json.records",
+      );
+    records = bitableRecordWriteIds(
+      input.records ?? input.record_id_list ?? list(f["record-id"]),
+      input.records !== undefined ? 500 : 200,
+    );
+  } else if (has(input, "records")) {
+    onlyKeys(input, ["records"], "--json");
+    if (
+      !Array.isArray(input.records) ||
+      !input.records.length ||
+      input.records.length > 500
+    )
+      fail("--json.records must contain 1..500 records");
+    for (const record of input.records) {
+      if (!record || typeof record !== "object" || Array.isArray(record))
+        fail("Each record must be an object");
+      onlyKeys(record, ["record_id", "fields"], "--json.records[]");
+    }
+    const ids = bitableRecordWriteIds(
+      input.records.map((record) => record.record_id),
+      500,
+    );
+    records = input.records.map((record, i) => ({
+      record_id: ids[i],
+      fields: bitableEditableFields(record.fields, "--json.records[].fields"),
+    }));
+  } else {
+    onlyKeys(input, ["record_id_list", "patch"], "--json");
+    const ids = bitableRecordWriteIds(input.record_id_list, 200);
+    const fields = bitableEditableFields(input.patch, "--json.patch");
+    records = ids.map((record_id) => ({ record_id, fields }));
+  }
+  const result = await req(
+    ctx,
+    "POST",
+    table + "/records/" + (deleting ? "batch_delete" : "batch_update"),
+    deleting ? undefined : pick(f, ["user-id-type"]),
+    { records },
+  );
+  if (ctx.dryRun) return result;
+  if (
+    !Array.isArray(result?.records) ||
+    result.records.some((record) => typeof record?.record_id !== "string")
+  )
+    throw new CliError(
+      "api",
+      "Bitable response does not identify affected records",
+      {
+        code: 5,
+        hint: "Check the table before repeating the command.",
+      },
+    );
+  const affected = deleting
+    ? result.records.filter((r) => r.deleted === true)
+    : result.records;
+  const output = {
+    ...result,
+    record_id_list: affected.map((r) => r.record_id),
+  };
+  if (input.patch) {
+    const firstFields = affected[0]?.fields ?? {};
+    output.update = Object.fromEntries(
+      Object.keys(input.patch)
+        .filter(
+          (key) =>
+            has(firstFields, key) &&
+            affected.every(
+              (record) =>
+                JSON.stringify(record.fields?.[key]) ===
+                JSON.stringify(firstFields[key]),
+            ),
+        )
+        .map((key) => [key, firstFields[key]]),
+    );
+  }
+  return output;
+}
+
+function validateBitableFilter(filter) {
+  if (!filter || !["and", "or"].includes(filter.conjunction))
+    fail(
+      "Bitable v1 filters require conjunction and conditions/children with field_name, operator and value; v3 logic/tuples are unsupported",
+    );
+  onlyKeys(filter, ["conjunction", "conditions", "children"], "filter");
+  if (filter.conditions !== undefined) {
+    if (!Array.isArray(filter.conditions))
+      fail("filter.conditions must be an array");
+    for (const condition of filter.conditions) {
+      if (
+        !condition ||
+        typeof condition.field_name !== "string" ||
+        !condition.field_name ||
+        typeof condition.operator !== "string" ||
+        !condition.operator
+      )
+        fail("Each Bitable v1 condition requires field_name and operator");
+      onlyKeys(
+        condition,
+        ["field_name", "operator", "value"],
+        "filter condition",
+      );
+    }
+  }
+  if (filter.children !== undefined) {
+    if (!Array.isArray(filter.children))
+      fail("filter.children must be an array");
+    filter.children.forEach(validateBitableFilter);
+  }
+}
+
+async function bitableSearchOptions(ctx, action, f) {
+  const input =
+    f.json === undefined || f.json === true
+      ? {}
+      : await json(ctx, f.json, "json");
+  onlyKeys(
+    input,
+    [
+      "keyword",
+      "search_fields",
+      "select_fields",
+      "field_names",
+      "view_id",
+      "filter",
+      "sort",
+      "limit",
+      "offset",
+      "automatic_fields",
+    ],
+    "--json",
+  );
+  for (const [key, flag] of Object.entries({
+    keyword: "keyword",
+    search_fields: "search-field",
+    select_fields: "field-id",
+    field_names: "field-id",
+    filter: "filter-json",
+    sort: "sort-json",
+    view_id: "view-id",
+  })) {
+    if (has(input, key) && f[flag] !== undefined)
+      fail(`Specify either --json.${key} or --${flag}`);
+  }
+  if (
+    has(input, "limit") &&
+    (ctx.providedFlags?.has("limit") || f["page-size"] !== undefined)
+  )
+    fail("Specify the Bitable v1 page size once");
+  if (has(input, "select_fields") && has(input, "field_names"))
+    fail("Specify either --json.select_fields or --json.field_names");
+  const projection =
+    f["field-id"] !== undefined
+      ? list(f["field-id"])
+      : (input.field_names ?? input.select_fields);
+  const view = f["view-id"] ?? input.view_id;
+  let filter =
+    f["filter-json"] !== undefined
+      ? await json(ctx, f["filter-json"], "filter-json")
+      : input.filter;
+  if (filter !== undefined) validateBitableFilter(filter);
+  const keyword = f.keyword ?? input.keyword;
+  const fields =
+    f["search-field"] === undefined
+      ? input.search_fields
+      : list(f["search-field"]);
+  if (keyword !== undefined || fields !== undefined) {
+    if (typeof keyword !== "string" || !keyword.trim())
+      fail("Specify a nonempty search keyword");
+    const names = bitableNames(fields, "search fields", 20);
+    const match = {
+      conjunction: "or",
+      conditions: names.map((field_name) => ({
+        field_name,
+        operator: "contains",
+        value: [keyword],
+      })),
+    };
+    filter = filter ? { conjunction: "and", children: [filter, match] } : match;
+  }
+  if (action === "record-search" && !filter)
+    fail("Specify --keyword with --search-field, or a Bitable v1 filter");
+  let sort = input.sort;
+  if (f["sort-json"] !== undefined) {
+    const raw = f["sort-json"];
+    const resolved = typeof raw === "string" ? await ctx.input(raw) : raw;
+    try {
+      sort = typeof resolved === "string" ? JSON.parse(resolved) : resolved;
+    } catch {
+      fail("--sort-json must contain valid JSON");
+    }
+    sort = sort?.sort_config ?? sort;
+  }
+  if (sort !== undefined) {
+    if (!Array.isArray(sort)) fail("Bitable v1 sort must be an array");
+    sort = sort.map((item) => {
+      if (!item || typeof item !== "object" || !(item.field_name ?? item.field))
+        fail("Each sort entry requires a field name");
+      onlyKeys(item, ["field_name", "field", "desc"], "sort");
+      return clean({
+        field_name: item.field_name ?? item.field,
+        desc: item.desc,
+      });
+    });
+  }
+  return {
+    body: clean({
+      view_id: view,
+      field_names:
+        projection === undefined
+          ? undefined
+          : bitableNames(projection, "projected fields", 200),
+      filter,
+      sort,
+      automatic_fields: input.automatic_fields,
+    }),
+    paging: {
+      ...f,
+      limit: input.limit ?? f.limit,
+      offset: input.offset ?? f.offset,
+    },
+  };
+}
+
+async function bitableSchemaItems(ctx, url) {
+  const result = await ctx.paginate("GET", url, {
+    query: { page_size: 100 },
+    itemsKey: "items",
+  });
+  if (result.has_more || result.truncated || !Array.isArray(result.items))
+    throw new CliError(
+      "api",
+      "Incomplete Bitable schema list; cannot resolve the requested object",
+      { code: 5 },
+    );
+  return result.items;
+}
+
+function bitableLookup(items, kind, selector) {
+  const id = kind + "_id";
+  const match = items.find((item) => item[id] === selector);
+  if (match) return match;
+  const name = kind === "table" ? "name" : kind + "_name";
+  const matches = items.filter((item) => item[name] === selector);
+  if (matches.length === 1) return matches[0];
+  if (matches.length > 1)
+    fail(`Ambiguous ${kind} name '${selector}'; supply its ID`);
+  fail(`No visible ${kind} matches '${selector}'; check its ID or exact name`);
+}
+
+async function bitableRecordGet(ctx, table, f) {
+  const input =
+    f.json === true || f.json === undefined
+      ? {}
+      : await json(ctx, f.json, "json");
+  onlyKeys(
+    input,
+    [
+      "record_ids",
+      "record_id_list",
+      "select_fields",
+      "automatic_fields",
+      "with_shared_url",
+      "user_id_type",
+    ],
+    "--json",
+  );
+  if (
+    [f["record-id"], input.record_ids, input.record_id_list].filter(
+      (v) => v !== undefined,
+    ).length !== 1
+  )
+    fail(
+      "Specify record IDs once using --record-id, --json.record_id_list or --json.record_ids",
+    );
+  if (f["field-id"] !== undefined || input.select_fields !== undefined)
+    fail(
+      "Bitable v1 batch_get returns all fields and cannot apply a field projection; omit --field-id/--json.select_fields or use base +record-search with a search field and projection",
+    );
+  if (input.user_id_type !== undefined && f["user-id-type"] !== undefined)
+    fail("Specify user_id_type only once");
+  const ids = uniqueStrings(
+    f["record-id"] === undefined
+      ? (input.record_ids ?? input.record_id_list)
+      : list(f["record-id"]),
+    "record IDs",
+    200,
+  );
+  if (new Set(ids).size !== ids.length)
+    fail("record IDs must be distinct after trimming whitespace");
+  const userIdType = input.user_id_type ?? f["user-id-type"];
+  if (
+    userIdType !== undefined &&
+    !["user_id", "open_id", "union_id"].includes(userIdType)
+  )
+    fail("user_id_type must be open_id, union_id or user_id");
+  for (const key of ["automatic_fields", "with_shared_url"]) {
+    if (input[key] !== undefined && typeof input[key] !== "boolean")
+      fail(`${key} must be a boolean`);
+  }
+  const records = [],
+    missing = [],
+    forbidden = [];
+  for (let i = 0; i < ids.length; i += 100) {
+    const body = clean({
+      record_ids: ids.slice(i, i + 100),
+      user_id_type: userIdType,
+      automatic_fields: input.automatic_fields,
+      with_shared_url: input.with_shared_url,
+    });
+    const result = await req(
+      ctx,
+      "POST",
+      table + "/records/batch_get",
+      undefined,
+      body,
+    );
+    if (ctx.dryRun) continue;
+    const lists = [
+      "records",
+      "absent_record_ids",
+      "forbidden_record_ids",
+    ].filter((key) => result?.[key] !== undefined);
+    if (!lists.length || !lists.every((key) => Array.isArray(result[key])))
+      throw new CliError(
+        "api",
+        "Bitable batch_get expected record and status arrays",
+        { code: 5 },
+      );
+    records.push(...(result.records ?? []));
+    missing.push(...(result.absent_record_ids ?? []));
+    forbidden.push(...(result.forbidden_record_ids ?? []));
+  }
+  const byId = new Map(records.map((record) => [record.record_id, record]));
+  const items = ids.filter((id) => byId.has(id)).map((id) => byId.get(id));
+  return bitableRecordRows({
+    items,
+    records: items,
+    absent_record_ids: missing,
+    forbidden_record_ids: forbidden,
+    record_not_found: missing,
+  });
+}
+
+function bitableRecordRows(result, projection) {
+  const fields = projection ?? [
+    ...new Set(
+      result.items.flatMap((record) => Object.keys(record.fields ?? {})),
+    ),
+  ];
+  return {
+    ...result,
+    fields,
+    record_id_list: result.items.map((record) => record.record_id),
+    data: result.items.map((record) =>
+      fields.map((name) => record.fields?.[name] ?? null),
+    ),
+  };
+}
+
+async function executeBitableV1(ctx, action, f) {
+  const accepted = new Set([...bitableGlobalFlags, ...bitableV1Flags[action]]);
+  for (const key of Object.keys(f)) {
+    if (
+      !accepted.has(key) ||
+      (key === "json" &&
+        f.json !== true &&
+        ![
+          "record-get",
+          "record-list",
+          "record-search",
+          "record-batch-create",
+          "record-batch-update",
+          "record-delete",
+        ].includes(action))
+    )
+      fail(`--${key} is unsupported for base +${action} on Bitable v1`);
+  }
+  if (action === "base-create" || action === "base-copy") {
+    const copying = action === "base-copy";
+    if (!copying) {
+      const name = required(f, "name");
+      if (typeof name !== "string" || !name.trim())
+        fail("--name must be a non-empty string");
+    }
+    const url = copying
+      ? bitableAppsPath + "/" + enc(required(f, "base-token")) + "/copy"
+      : bitableAppsPath;
+    const data = await req(
+      ctx,
+      "POST",
+      url,
+      undefined,
+      pick(f, ["name", "folder-token", "time-zone", "without-content"]),
+    );
+    if (ctx.dryRun) return data;
+    const app = data?.app;
+    if (typeof app?.app_token !== "string" || !app.app_token)
+      throw new CliError("api", "Bitable response is missing app.app_token", {
+        code: 5,
+        hint: "Check the destination folder before repeating the command.",
+      });
+    const result = {
+      ...data,
+      base: { ...app, base_token: app.app_token },
+      [copying ? "copied" : "created"]: true,
+    };
+    if (ctx.identity === "bot")
       result.permission_grant = await grantCurrentUser(
         ctx,
-        base.base_token ?? base.app_token ?? base.base?.base_token,
+        app.app_token,
         "bitable",
       );
     return result;
   }
-  if (action.startsWith("advperm-"))
-    return req(ctx, "PUT", basePath(f, "advperm", "enable"), {
-      enable: action === "advperm-enable",
-    });
-  if (action === "data-query") {
-    const body = await json(ctx, f.dsl, "dsl");
-    if (!has(body, "dimensions") && !has(body, "measures"))
-      fail("--dsl must include dimensions or measures");
-    return req(ctx, "POST", basePath(f, "data", "query"), undefined, body);
-  }
-  if (action.startsWith("base-block-")) {
-    const op = action.slice(11);
-    let body;
-    let method = "POST";
-    let url;
-    if (op === "list") {
-      url = basePath(f, "blocks", "list");
-      body = pick(f, ["parent-id"]);
-    } else if (op === "create") {
-      url = basePath(f, "blocks");
-      body = {
-        type: required(f, "type"),
-        name: required(f, "name"),
-        ...pick(f, ["parent-id"]),
-      };
-    } else {
-      url = basePath(
-        f,
-        "blocks",
-        required(f, "block-id"),
-        ...(op === "delete" ? [] : [op]),
-      );
-      if (op === "delete") method = "DELETE";
-      if (op === "rename") body = { name: required(f, "name") };
-      if (op === "move") {
-        if (f["before-id"] && f["after-id"])
-          fail("--before-id and --after-id are mutually exclusive");
-        body = {
-          parent_id: f["parent-id"] ?? null,
-          ...pick(f, ["before-id", "after-id"]),
-        };
-      }
-    }
-    const data = await req(ctx, method, url, undefined, body);
-    if (op === "list")
-      return f.type && Array.isArray(data.blocks)
-        ? {
-            ...data,
-            blocks: data.blocks.filter((x) => x.type === f.type),
-            total: data.blocks.filter((x) => x.type === f.type).length,
-          }
-        : data;
+  const app = `${bitableAppsPath}/${enc(required(f, "base-token"))}`;
+  const tables = app + "/tables";
+  if (action === "table-create") return bitableTableCreate(ctx, tables, f);
+  if (action === "base-get") {
+    const result = await req(ctx, "GET", app);
+    if (ctx.dryRun) return result;
+    if (!result.app?.app_token)
+      throw new CliError("api", "Bitable metadata is missing app.app_token", {
+        code: 5,
+      });
     return {
-      block: data,
-      [op === "create"
-        ? "created"
-        : op === "delete"
-          ? "deleted"
-          : op === "move"
-            ? "moved"
-            : "renamed"]: true,
+      ...result,
+      base: { ...result.app, base_token: result.app.app_token },
     };
   }
-  if (action.startsWith("table-")) {
-    const op = action.slice(6);
-    if (op === "list")
-      return offsetPages(ctx, f, basePath(f, "tables"), "tables", 100);
-    if (op === "get") {
-      const table = await req(ctx, "GET", tablePath(f));
-      const fields = await offsetPages(
-        ctx,
-        {},
-        tablePath(f, "fields"),
-        "fields",
-        100,
-        true,
-      );
-      const views = await offsetPages(
-        ctx,
-        {},
-        tablePath(f, "views"),
-        "views",
-        100,
-        true,
-      );
-      return { table, fields: fields.fields, views: views.views };
-    }
-    if (op === "delete") {
-      await req(ctx, "DELETE", tablePath(f));
-      return {
-        deleted: true,
-        table_id: f["table-id"],
-        table_name: f["table-id"],
-      };
-    }
-    const name = required(f, "name");
-    const fields = f.fields ? await json(ctx, f.fields, "fields", "array") : [];
-    const viewsRaw = f.view ? await ctx.input(f.view) : undefined;
-    let views = [];
-    if (viewsRaw) {
-      try {
-        const v =
-          typeof viewsRaw === "object" ? viewsRaw : JSON.parse(viewsRaw);
-        views = Array.isArray(v) ? v : [v];
-      } catch {
-        fail("--view must be valid JSON");
-      }
-    }
-    const table = await req(
-      ctx,
-      op === "create" ? "POST" : "PATCH",
-      op === "create" ? basePath(f, "tables") : tablePath(f),
-      undefined,
-      { name },
-    );
-    const result = { table, ...(op === "update" ? { updated: true } : {}) };
-    if (op === "create" && (fields.length || views.length)) {
-      const tableId =
-        table.table_id ??
-        table.id ??
-        table.table?.table_id ??
-        (ctx.dryRun ? "<created_table_id>" : undefined);
+  let collection = tables;
+  if (!["table-list", "dashboard-list"].includes(action)) {
+    const table = required(f, "table-id");
+    let tableId = table,
+      metadata;
+    const isTableId = /^tbl[\w-]+$/.test(table);
+    if (
+      action === "table-get" ||
+      (!isTableId && action !== "record-batch-create")
+    ) {
+      const items = await bitableSchemaItems(ctx, tables);
+      metadata = ctx.dryRun
+        ? { table_id: isTableId ? table : "<resolved_table_id>" }
+        : bitableLookup(items, "table", table);
+      tableId = metadata.table_id;
       if (!tableId)
-        throw new CliError(
-          "partial_success",
-          "Table created but response has no table_id for subsequent field/view operations",
-          { code: 5, detail: { table } },
-        );
-      const target = { ...f, "table-id": tableId };
-      if (fields.length) {
-        const initial = await offsetPages(
-          ctx,
-          {},
-          tablePath(target, "fields"),
-          "fields",
-          100,
-          true,
-        );
-        result.fields = [];
-        for (let i = 0; i < fields.length; i++) {
-          const id =
-            i === 0
-              ? (initial.fields[0]?.field_id ?? initial.fields[0]?.id)
-              : undefined;
-          result.fields.push(
-            await req(
-              ctx,
-              id ? "PUT" : "POST",
-              tablePath(target, "fields", ...(id ? [id] : [])),
-              undefined,
-              fields[i],
-            ),
-          );
-        }
-      }
-      if (views.length) {
-        result.views = [];
-        for (const body of views)
-          result.views.push(
-            await req(ctx, "POST", tablePath(target, "views"), undefined, body),
-          );
-      }
+        throw new CliError("api", "Matched Bitable table has no table_id", {
+          code: 5,
+        });
     }
-    return result;
+    collection = `${tables}/${enc(tableId)}`;
+    if (action === "table-get") {
+      const fields = await bitableSchemaItems(ctx, collection + "/fields");
+      const views = await bitableSchemaItems(ctx, collection + "/views");
+      return { table: metadata, fields, views };
+    }
+    if (action === "field-get" || action === "view-get") {
+      const kind = action === "field-get" ? "field" : "view";
+      const selector = required(f, kind + "-id");
+      const items = await bitableSchemaItems(
+        ctx,
+        collection + "/" + kind + "s",
+      );
+      return ctx.dryRun ? {} : { [kind]: bitableLookup(items, kind, selector) };
+    }
+    if (action === "form-get") {
+      const id = required(f, "form-id");
+      const result = await req(ctx, "GET", collection + "/forms/" + enc(id));
+      if (ctx.dryRun) return result;
+      if (!result.form)
+        throw new CliError("api", "Bitable form response is missing form", {
+          code: 5,
+        });
+      return { ...result.form, id, form: result.form };
+    }
+    if (action === "record-get") return bitableRecordGet(ctx, collection, f);
   }
-  if (action.startsWith("field-")) {
-    const op = action.slice(6);
-    const collection = tablePath(f, "fields");
-    if (op === "list") return offsetPages(ctx, f, collection, "fields", 200);
-    const url =
-      op === "create"
-        ? collection
-        : tablePath(
-            f,
-            "fields",
-            required(f, "field-id"),
-            ...(op === "search-options" ? ["options"] : []),
-          );
-    if (op === "search-options")
-      return req(ctx, "GET", url, {
-        offset: ints(f, "offset", 0),
-        limit: ints(f, "limit", 30, 1, 200),
-        ...clean({ query: f.keyword }),
-      });
-    let body;
-    if (op === "create" || op === "update") {
-      body = await json(ctx, f.json, "json");
-      if (
-        ["formula", "lookup"].includes(body.type) &&
-        !yes(f["i-have-read-guide"])
-      )
-        fail("--i-have-read-guide is required for formula and lookup fields");
-    }
-    const field = await req(
+  if (action === "record-batch-create") {
+    const clientToken = f["client-token"];
+    if (
+      clientToken !== undefined &&
+      (typeof clientToken !== "string" ||
+        !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(
+          clientToken,
+        ))
+    )
+      fail("--client-token must be a UUIDv4");
+    const body = bitableCreateRecords(await json(ctx, f.json, "json"));
+    return req(
       ctx,
-      { get: "GET", create: "POST", update: "PUT", delete: "DELETE" }[op],
-      url,
-      undefined,
+      "POST",
+      `${collection}/records/batch_create`,
+      pick(f, ["client-token", "user-id-type"]),
       body,
     );
-    return op === "delete"
-      ? { deleted: true, field_id: f["field-id"], field_name: f["field-id"] }
-      : {
-          field,
-          ...(op === "get"
-            ? {}
-            : { [op === "create" ? "created" : "updated"]: true }),
-        };
   }
-  if (action.startsWith("view-")) {
-    const op = action.slice(5);
-    if (op === "list")
-      return offsetPages(ctx, f, tablePath(f, "views"), "views", 200);
-    if (op === "create") {
-      let raw = f.json;
-      if (typeof raw === "string") {
-        try {
-          raw = JSON.parse(await ctx.input(raw));
-        } catch {
-          fail("--json must be valid JSON");
-        }
-      }
-      const bodies = Array.isArray(raw) ? raw : [raw];
-      const views = [];
-      for (const body of bodies) {
-        if (!body || typeof body !== "object" || !body.name)
-          fail("Each view requires a name");
-        views.push(
-          await req(ctx, "POST", tablePath(f, "views"), undefined, {
-            type: "grid",
-            ...body,
-          }),
-        );
-      }
-      return { views };
-    }
-    const base = tablePath(f, "views", required(f, "view-id"));
-    if (op === "get") return { view: await req(ctx, "GET", base) };
-    if (op === "delete") {
-      await req(ctx, "DELETE", base);
-      return { deleted: true, view_id: f["view-id"] };
-    }
-    if (op === "rename")
-      return req(ctx, "PATCH", base, undefined, { name: required(f, "name") });
-    const [mode, ...rest] = op.split("-");
-    const segment = rest.join("_");
-    const body = mode === "set" ? await json(ctx, f.json, "json") : undefined;
-    return {
-      [segment]: await req(
-        ctx,
-        mode === "get" ? "GET" : "PUT",
-        `${base}/${segment}`,
-        undefined,
-        body,
-      ),
-    };
-  }
-  if (action.startsWith("record-")) return executeRecords(ctx, action, f);
-  if (action === "form-detail")
-    return req(
-      ctx,
-      "POST",
-      "/open-apis/base/v3/bases/tables/forms/detail",
-      undefined,
-      { share_token: required(f, "share-token") },
+  if (action === "record-batch-update" || action === "record-delete")
+    return bitableRecordBatchWrite(ctx, collection, action, f);
+  const records = action.startsWith("record-");
+  const { body, paging } = records
+    ? await bitableSearchOptions(ctx, action, f)
+    : { paging: f };
+  if (ints(f, "offset", 0) !== 0 || ints(paging, "offset", 0) !== 0)
+    fail(
+      "Bitable v1 requires --page-token for continuation; a numeric --offset cannot identify a page",
     );
-  if (action === "form-submit") {
-    const data = await json(ctx, f.json, "json");
-    if (!data.fields && !data.attachments)
-      fail("--json must contain fields or attachments");
-    const content = data.fields ?? {};
-    if (!content || Array.isArray(content) || typeof content !== "object")
-      fail("--json.fields must be an object");
-    if (data.attachments)
-      for (const [field, files] of Object.entries(data.attachments)) {
-        if (!Array.isArray(files))
-          fail("--json.attachments must map fields to file arrays");
-        const items = [];
-        for (const filename of files)
-          items.push(
-            await upload(
-              ctx,
-              filename,
-              required(f, "base-token"),
-              "bitable_tmp_point",
-              JSON.stringify({ share_token: required(f, "share-token") }),
-            ),
-          );
-        content[field] = [...(content[field] ?? []), ...items];
-      }
-    return req(
-      ctx,
-      "POST",
-      "/open-apis/base/v3/bases/tables/forms/submit",
-      undefined,
-      { share_token: required(f, "share-token"), content },
-    );
-  }
-  if (action.startsWith("form-")) {
-    const op = action.slice(5);
-    const url = tablePath(f, "forms");
-    if (op === "list")
-      return tokenPages(
-        ctx,
-        "GET",
+  if (
+    f["page-token"] !== undefined &&
+    (typeof f["page-token"] !== "string" || !f["page-token"].trim())
+  )
+    fail("--page-token requires an opaque token string");
+  if (f["page-size"] !== undefined && ctx.providedFlags?.has("limit"))
+    fail("Specify either --page-size or --limit");
+  const query = clean({
+    page_size: ints(
+      f,
+      "page-size",
+      paging.limit ?? 100,
+      1,
+      records || action === "dashboard-list" ? 500 : 100,
+    ),
+    page_token: f["page-token"],
+    ...(records ? pick(f, ["user-id-type"]) : {}),
+  });
+  const key = action === "dashboard-list" ? "dashboards" : "items";
+  const url = records
+    ? collection + "/records/search"
+    : {
+        "field-list": collection + "/fields",
+        "view-list": collection + "/views",
+        "dashboard-list": app + "/dashboards",
+        "table-list": tables,
+      }[action];
+  const method = records ? "POST" : "GET";
+  const normalizePage = (page) => {
+    const entries = page?.[key];
+    if (Array.isArray(entries)) return page;
+    // HaiNeng sometimes omits the collection for an explicitly empty page.
+    if (entries == null && page?.has_more === false && page.total === 0)
+      return { ...page, [key]: [] };
+    throw new CliError("api", `Bitable v1 response requires the ${key} array`, {
+      code: 5,
+    });
+  };
+  const response = yes(f["page-all"])
+    ? await ctx.paginate(
+        method,
         url,
-        { query: { page_size: ints(f, "page-size", 100, 1, 100) } },
-        "forms",
-      );
-    if (op === "create")
-      return req(ctx, "POST", url, undefined, {
-        name: required(f, "name"),
-        ...pick(f, ["description"]),
-      });
-    const form = `${url}/${enc(required(f, "form-id"))}`;
-    if (op.startsWith("questions-")) {
-      const operation = op.slice(10);
-      const method = {
-        list: "GET",
-        create: "POST",
-        update: "PATCH",
-        delete: "DELETE",
-      }[operation];
-      const body =
-        operation === "list"
-          ? undefined
-          : operation === "delete"
-            ? {
-                question_ids: await json(
-                  ctx,
-                  f["question-ids"],
-                  "question-ids",
-                  "array",
-                ),
-              }
-            : { questions: await json(ctx, f.questions, "questions", "array") };
-      return req(ctx, method, `${form}/questions`, undefined, body);
-    }
-    return req(
-      ctx,
-      { get: "GET", update: "PATCH", delete: "DELETE" }[op],
-      form,
-      undefined,
-      op === "update" ? pick(f, ["name", "description"]) : undefined,
-    );
-  }
-  if (action.startsWith("role-")) {
-    const op = action.slice(5);
-    const url = basePath(
-      f,
-      "roles",
-      ...(["list", "create"].includes(op) ? [] : [required(f, "role-id")]),
-    );
-    const body = ["create", "update"].includes(op)
-      ? await json(ctx, f.json, "json")
-      : undefined;
-    return req(
-      ctx,
-      {
-        list: "GET",
-        get: "GET",
-        create: "POST",
-        update: "PUT",
-        delete: "DELETE",
-      }[op],
-      url,
-      undefined,
-      body,
-    );
-  }
-  if (action.startsWith("workflow-")) {
-    const op = action.slice(9);
-    if (op === "list")
-      return tokenPages(
-        ctx,
-        "POST",
-        basePath(f, "workflows", "list"),
-        {
-          body: {
-            page_size: ints(f, "page-size", 100, 1, 100),
-            ...pick(f, ["status"]),
-          },
-        },
-        "items",
-      );
-    const url = basePath(
-      f,
-      "workflows",
-      ...(op === "create" ? [] : [required(f, "workflow-id")]),
-      ...(["enable", "disable"].includes(op) ? [op] : []),
-    );
-    const body = ["create", "update"].includes(op)
-      ? await json(ctx, f.json, "json")
-      : undefined;
-    return req(
-      ctx,
-      {
-        get: "GET",
-        create: "POST",
-        update: "PUT",
-        enable: "PATCH",
-        disable: "PATCH",
-      }[op],
-      url,
-      op === "get" ? pick(f, ["user-id-type"]) : undefined,
-      body,
-    );
-  }
-  if (action.startsWith("dashboard-")) {
-    if (action === "dashboard-block-get-data")
-      return req(
-        ctx,
-        "GET",
-        basePath(f, "dashboards", "blocks", required(f, "block-id"), "data"),
-      );
-    const block = action.startsWith("dashboard-block-");
-    const op = action.slice(block ? 16 : 10);
-    const parts = ["dashboards"];
-    if (block || !["list", "create"].includes(op))
-      parts.push(required(f, "dashboard-id"));
-    if (block) {
-      parts.push("blocks");
-      if (!["list", "create"].includes(op)) parts.push(required(f, "block-id"));
-    }
-    if (op === "arrange") parts.push("arrange");
-    let body;
-    if (["create", "update"].includes(op)) {
-      if (op === "create" && !block) required(f, "name");
-      body = pick(f, ["name", ...(block ? ["type"] : [])]);
-      if (f["theme-style"]) body.theme = { theme_style: f["theme-style"] };
-      if (f["data-config"])
-        body.data_config = await json(ctx, f["data-config"], "data-config");
-    }
-    if (op === "arrange") body = {};
-    const query =
-      op === "list"
-        ? pick(f, ["page-size", "page-token"])
-        : pick(f, ["user-id-type"]);
-    return req(
-      ctx,
-      {
-        list: "GET",
-        get: "GET",
-        create: "POST",
-        update: "PATCH",
-        delete: "DELETE",
-        arrange: "POST",
-      }[op],
-      basePath(f, ...parts),
-      query,
-      body,
-    );
-  }
-  return undefined;
+        clean({ query, body, itemsKey: key, normalizePage }),
+      )
+    : await req(ctx, method, url, query, body);
+  if (ctx.dryRun) return response;
+  const result = normalizePage(response);
+  if (records) return bitableRecordRows(result, body.field_names);
+  if (key === "dashboards")
+    return {
+      ...result,
+      dashboards: result.dashboards.map((dashboard) => ({
+        ...dashboard,
+        dashboard_id: dashboard.block_id,
+      })),
+    };
+  const alias = {
+    "field-list": "fields",
+    "view-list": "views",
+    "table-list": "tables",
+  }[action];
+  return { ...result, [alias]: result.items };
 }
 
-async function executeRecords(ctx, action, f) {
-  if (action === "record-history-list")
-    return req(ctx, "GET", basePath(f, "record_history"), {
-      table_id: required(f, "table-id"),
-      record_id: required(f, "record-id"),
-      page_size: ints(f, "page-size", 20, 1, 100),
-      ...pick(f, ["max-version"]),
-    });
-  const records = tablePath(f, "records");
-  if (action === "record-list") {
-    const query = {
-      offset: ints(f, "offset", 0),
-      limit: ints(f, "limit", 20, 1, 200),
-      ...pick(f, ["view-id"]),
-    };
-    if (f["field-id"]) query.field_id = list(f["field-id"]);
-    if (f["filter-json"])
-      query.filter = JSON.stringify(
-        await json(ctx, f["filter-json"], "filter-json"),
-      );
-    if (f["sort-json"]) {
-      const v = await json(
-        ctx,
-        f["sort-json"],
-        "sort-json",
-        Array.isArray(f["sort-json"]) ||
-          String(f["sort-json"]).trim().startsWith("[")
-          ? "array"
-          : "object",
-      );
-      query.sort = JSON.stringify(v.sort_config ?? v);
-    }
-    return req(ctx, "GET", records, query);
-  }
-  if (["record-get", "record-delete"].includes(action)) {
-    if (f.json && f["record-id"])
-      fail("--json and --record-id are mutually exclusive");
-    const body = f.json
-      ? await json(ctx, f.json, "json")
-      : { record_id_list: list(required(f, "record-id")) };
-    uniqueStrings(body.record_id_list, "record_id_list", 200);
-    if (f["field-id"]) {
-      if (body.select_fields)
-        fail("--field-id and --json.select_fields are mutually exclusive");
-      body.select_fields = list(f["field-id"]);
-    }
-    if (body.select_fields)
-      uniqueStrings(body.select_fields, "select_fields", 100);
-    return req(
-      ctx,
-      "POST",
-      `${records}/${action === "record-get" ? "batch_get" : "batch_delete"}`,
-      undefined,
-      action === "record-delete"
-        ? { record_id_list: body.record_id_list }
-        : body,
-    );
-  }
-  if (action === "record-search") {
-    const body = f.json
-      ? await json(ctx, f.json, "json")
-      : {
-          keyword: required(f, "keyword"),
-          search_fields: list(required(f, "search-field")),
-          offset: ints(f, "offset", 0),
-          limit: ints(f, "limit", 10, 1, 200),
-          ...pick(f, ["view-id"]),
-        };
-    uniqueStrings(body.search_fields, "search_fields", 20);
-    if (typeof body.keyword !== "string" || !body.keyword)
-      fail("Search keyword must not be empty");
-    if (f["field-id"]) body.select_fields = list(f["field-id"]);
-    if (f["filter-json"])
-      body.filter = await json(ctx, f["filter-json"], "filter-json");
-    if (f["sort-json"]) {
-      const raw = await ctx.input(f["sort-json"]);
-      const parsed = typeof raw === "object" ? raw : JSON.parse(raw);
-      body.sort = parsed.sort_config ?? parsed;
-    }
-    return req(ctx, "POST", `${records}/search`, undefined, body);
-  }
-  if (action === "record-upsert")
-    return req(
-      ctx,
-      f["record-id"] ? "PATCH" : "POST",
-      `${records}${f["record-id"] ? "/" + enc(f["record-id"]) : ""}`,
-      undefined,
-      await json(ctx, f.json, "json"),
-    );
-  if (action === "record-batch-create" || action === "record-batch-update")
-    return req(
-      ctx,
-      "POST",
-      `${records}/${action === "record-batch-create" ? "batch_create" : "batch_update"}`,
-      undefined,
-      await json(ctx, f.json, "json"),
-    );
-  if (action === "record-share-link-create") {
-    const ids = [...new Set(list(required(f, "record-ids")))];
-    if (ids.length > 100) fail("--record-ids supports at most 100 records");
-    return req(ctx, "POST", `${records}/share_links/batch`, undefined, {
-      record_ids: ids,
-    });
-  }
-  if (
-    action === "record-upload-attachment" ||
-    action === "record-remove-attachment"
-  ) {
-    const record = required(f, "record-id"),
-      field = required(f, "field-id");
-    await req(ctx, "GET", tablePath(f, "fields", field));
-    let items;
-    if (action === "record-upload-attachment") {
-      const files = list(required(f, "file"));
-      if (files.length > 50) fail("At most 50 attachments are allowed");
-      items = [];
-      for (const file of files)
-        items.push(
-          await upload(ctx, file, required(f, "base-token"), "bitable_file"),
-        );
-    } else
-      items = uniqueStrings(
-        list(required(f, "file-token")),
-        "file-token",
-        50,
-      ).map((file_token) => ({ file_token }));
-    const body = { attachments: { [record]: { [field]: items } } };
-    return req(
-      ctx,
-      "POST",
-      tablePath(
-        f,
-        action === "record-upload-attachment"
-          ? "append_attachments"
-          : "remove_attachments",
-      ),
-      undefined,
-      body,
-    );
-  }
-  if (action === "record-download-attachment") {
-    const data = await req(
-      ctx,
-      "POST",
-      tablePath(f, "get_attachments"),
-      undefined,
-      { record_id_list: [required(f, "record-id")] },
-    );
-    const wanted = list(f["file-token"]);
-    const attachments = [];
-    const collect = (value) => {
-      if (Array.isArray(value)) for (const item of value) collect(item);
-      else if (value && typeof value === "object") {
-        if (value.file_token) attachments.push(value);
-        else for (const item of Object.values(value)) collect(item);
-      }
-    };
-    collect(data.attachments);
-    const files = attachments.filter(
-      (x) => !wanted.length || wanted.includes(x.file_token),
-    );
-    const output = required(f, "output");
-    if (ctx.dryRun) {
-      await req(
-        ctx,
-        "GET",
-        "/open-apis/drive/v1/medias/<file_token>/download",
-        { extra: "<attachment_extra_info>" },
-      );
-      return data;
-    }
-    let directory = false;
-    try {
-      directory = (
-        await stat(path.resolve(ctx.cwd ?? process.cwd(), output))
-      ).isDirectory();
-    } catch {}
-    if (!directory && files.length !== 1)
-      fail(
-        "--output must be an existing directory when downloading multiple attachments",
-      );
-    const downloaded = [];
-    for (const item of files) {
-      const filename = directory
-        ? path.join(output, path.basename(item.name ?? item.file_token))
-        : output;
-      const target = await safeFile(ctx, filename, true);
-      const bytes = await ctx.request(
-        "GET",
-        `/open-apis/drive/v1/medias/${enc(item.file_token)}/download`,
-        { query: clean({ extra: item.extra_info }), responseType: "buffer" },
-      );
-      await writeFile(target, bytes, {
-        flag: yes(f.overwrite) ? "w" : "wx",
-        mode: 0o600,
-      });
-      downloaded.push({ file_token: item.file_token, output: target });
-    }
-    return { downloaded };
-  }
-  return undefined;
+function usesBitableV1(ctx) {
+  return !hasSourceBaseV3 || isHaiNengProfile(ctx.config);
+}
+
+let baseV3Executor;
+async function executeBase(ctx, command, f) {
+  const action = command.slice(1);
+  if (usesBitableV1(ctx))
+    return isHaiNengBaseShortcut(command)
+      ? executeBitableV1(ctx, action, f)
+      : undefined;
+  const execute = await (baseV3Executor ??= import(baseV3Module.href).then(
+    ({ createBaseV3Executor }) =>
+      createBaseV3Executor({
+        has,
+        clean,
+        yes,
+        fail,
+        required,
+        enc,
+        ints,
+        list,
+        pick,
+        json,
+        req,
+        uniqueStrings,
+        safeFile,
+        upload,
+        grantCurrentUser,
+      }),
+  ));
+  return execute(ctx, action, f);
 }
 
 export async function executeTables(ctx, service, command, flags = {}) {
@@ -1048,7 +1250,9 @@ export async function executeTables(ctx, service, command, flags = {}) {
             ? def.default === "true"
             : def.default;
     if (["+record-list", "+record-get", "+record-search"].includes(command)) {
-      const format = f.format ?? (f.jq ? "json" : "markdown");
+      const format =
+        f.format ??
+        (f.jq || (usesBitableV1(ctx) && f.json === true) ? "json" : "markdown");
       if (!["json", "markdown"].includes(format))
         fail("--format must be json or markdown");
       if (format === "markdown" && f.jq)
@@ -1109,7 +1313,7 @@ async function grantCurrentUser(ctx, token, type) {
 function recordMarkdown(data, single) {
   if (
     !Array.isArray(data?.fields) ||
-    !data.fields.length ||
+    (!data.fields.length && !Array.isArray(data.items)) ||
     !Array.isArray(data.data)
   )
     return undefined;
@@ -1160,6 +1364,8 @@ function recordMarkdown(data, single) {
   if (ignored.length)
     text += `Ignored fields: ${ignored.slice(0, 20).join(", ")}${ignored.length > 20 ? `, ...(${ignored.length} total)` : ""}\n`;
   if (missing.length) text += `Missing records: ${missing.join(", ")}\n`;
+  if (data.forbidden_record_ids?.length)
+    text += `Access denied for records: ${data.forbidden_record_ids.join(", ")}\n`;
   return { __raw: text };
 }
 

@@ -29,12 +29,12 @@ Dashboard 是 Base 中的数据可视化看板，可以把表格数据变成**�
 
 ```bash
 # 第 1 步：创建空白仪表盘
-lark-cli base +dashboard-create --base-token xxx --name "销售数据分析"
+lark-ka base +dashboard-create --base-token xxx --name "销售数据分析"
 # 记录返回的 dashboard_id
 
 # 第 2 步：获取数据源信息
-lark-cli base +table-list --base-token xxx
-lark-cli base +field-list --base-token xxx --table-id <table_id>
+lark-ka base +table-list --base-token xxx
+lark-ka base +field-list --base-token xxx --table-id <table_id>
 
 # 第 3 步：规划应该创建哪些组件（根据用户需求确定组件类型和数量）
 # 例如：总销售额（指标卡）、月度趋势（折线图）、品类占比（饼图）
@@ -44,7 +44,7 @@ lark-cli base +field-list --base-token xxx --table-id <table_id>
 # 再阅读 dashboard-block-data-config.md 了解 data_config 结构、组件类型和 filter 规则
 
 # 第 1 个组件
-lark-cli base +dashboard-block-create \
+lark-ka base +dashboard-block-create \
   --base-token xxx \
   --dashboard-id blk_xxx \
   --name "总销售额" \
@@ -52,7 +52,7 @@ lark-cli base +dashboard-block-create \
   --data-config '{"table_name":"订单表","series":[{"field_name":"金额","rollup":"SUM"}]}'
 
 # 第 2 个组件（等上一个完成后再执行）
-lark-cli base +dashboard-block-create \
+lark-ka base +dashboard-block-create \
   --base-token xxx \
   --dashboard-id blk_xxx \
   --name "月度趋势" \
@@ -63,7 +63,7 @@ lark-cli base +dashboard-block-create \
 
 # 第 5 步：组件创建完成后，使用 arrange 命令智能重排布局（可选但推荐）
 # 默认布局可能不够美观，arrange 会根据组件数量和类型自动优化布局
-lark-cli base +dashboard-arrange \
+lark-ka base +dashboard-arrange \
   --base-token xxx \
   --dashboard-id blk_xxx
 ```
@@ -72,21 +72,21 @@ lark-cli base +dashboard-arrange \
 
 ```bash
 # 第 1 步：列出仪表盘，定位到当前仪表盘
-lark-cli base +dashboard-list --base-token xxx
+lark-ka base +dashboard-list --base-token xxx
 # 获取目标 dashboard_id
 
 # 第 2 步：根据用户诉求规划组件类型和数据源
 # 建议先查看当前仪表盘已有组件，避免重复创建，或作为参考
-lark-cli base +dashboard-get --base-token xxx --dashboard-id blk_xxx
+lark-ka base +dashboard-get --base-token xxx --dashboard-id blk_xxx
 
 # 第 3 步：获取数据源信息
-lark-cli base +table-list --base-token xxx
-lark-cli base +field-list --base-token xxx --table-id <table_id>
+lark-ka base +table-list --base-token xxx
+lark-ka base +field-list --base-token xxx --table-id <table_id>
 
 # 第 4 步：顺序创建每个新组件（必须串行执行，不能并发）
 # 重要：先确定 dashboard_id、组件 name/type 和真实表字段
 # 再阅读 dashboard-block-data-config.md 了解 data_config 结构
-lark-cli base +dashboard-block-create \
+lark-ka base +dashboard-block-create \
   --base-token xxx \
   --dashboard-id blk_xxx \
   --name "新组件名" \
@@ -102,25 +102,25 @@ lark-cli base +dashboard-block-create \
 
 ```bash
 # 第 1 步：列出仪表盘，定位到当前仪表盘
-lark-cli base +dashboard-list --base-token xxx
+lark-ka base +dashboard-list --base-token xxx
 
 # 第 2 步：列出组件，获取到目标组件
-lark-cli base +dashboard-block-list --base-token xxx --dashboard-id blk_xxx
+lark-ka base +dashboard-block-list --base-token xxx --dashboard-id blk_xxx
 # 获取目标 block_id
 # 提示：查看已有组件可作为参考，或检查是否重复创建相似组件
 
 # 第 3 步：获取组件当前详情
-lark-cli base +dashboard-block-get --base-token xxx --dashboard-id blk_xxx --block-id chtxxxxxxxx
+lark-ka base +dashboard-block-get --base-token xxx --dashboard-id blk_xxx --block-id chtxxxxxxxx
 
 # 第 4 步：根据用户编辑诉求准备更新
 # 如果编辑诉求涉及数据源变更，需要先获取数据源信息
-lark-cli base +table-list --base-token xxx
-lark-cli base +field-list --base-token xxx --table-id <table_id>
+lark-ka base +table-list --base-token xxx
+lark-ka base +field-list --base-token xxx --table-id <table_id>
 
 # 第 5 步：执行更新
 # 重要：先读取当前 block 的 name/type/data_config
 # 再阅读 dashboard-block-data-config.md 了解 data_config 更新规则
-lark-cli base +dashboard-block-update \
+lark-ka base +dashboard-block-update \
   --base-token xxx \
   --dashboard-id blk_xxx \
   --block-id chtxxxxxxxx \
@@ -138,10 +138,10 @@ lark-cli base +dashboard-block-update \
 
 ```bash
 # 第 1 步：列出仪表盘，定位到目标仪表盘
-lark-cli base +dashboard-list --base-token xxx
+lark-ka base +dashboard-list --base-token xxx
 
 # 第 2 步：执行智能重排
-lark-cli base +dashboard-arrange \
+lark-ka base +dashboard-arrange \
   --base-token xxx \
   --dashboard-id blk_xxx
 ```
@@ -156,21 +156,21 @@ lark-cli base +dashboard-arrange \
 
 ```bash
 # 第 1 步：列出仪表盘，定位到当前仪表盘
-lark-cli base +dashboard-list --base-token xxx
+lark-ka base +dashboard-list --base-token xxx
 
 # 第 2 步：根据用户诉求查看详情
 
 # 方式 A：查看仪表盘整体情况（包含所有组件列表）
-lark-cli base +dashboard-get --base-token xxx --dashboard-id blk_xxx
+lark-ka base +dashboard-get --base-token xxx --dashboard-id blk_xxx
 
 # 方式 B：列出所有组件
-lark-cli base +dashboard-block-list --base-token xxx --dashboard-id blk_xxx
+lark-ka base +dashboard-block-list --base-token xxx --dashboard-id blk_xxx
 
 # 方式 C：查看某个组件的详细配置
-lark-cli base +dashboard-block-get --base-token xxx --dashboard-id blk_xxx --block-id chtxxxxxxxx
+lark-ka base +dashboard-block-get --base-token xxx --dashboard-id blk_xxx --block-id chtxxxxxxxx
 
 # 方式 D：查看某个图表组件的计算结果（AI 友好的 chart protocol）
-lark-cli base +dashboard-block-get-data --base-token xxx --block-id chtxxxxxxxx
+lark-ka base +dashboard-block-get-data --base-token xxx --block-id chtxxxxxxxx
 
 # 最后：把获取到的现状信息整理好告诉用户
 ```

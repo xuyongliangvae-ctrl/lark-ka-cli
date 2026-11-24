@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书日历（calendar）：提供日历与日程（会议）的全面管理能力。核心场景包括：查看/搜索日程、创建/更新日程、管理参会人、查询忙闲状态及推荐空闲时段、查询/搜索与预定会议室。注意：涉及【预约日程/会议】或【查询/预定会议室】时，必须先读取 references/lark-calendar-schedule-meeting.md 工作流！高频操作请优先使用 Shortcuts：+agenda（快速概览今日/近期行程）、+create（创建日程并按需邀请参会人及预定会议室）、+update（更新既有日程字段，或独立增删参会人/会议室）、+freebusy（查询用户主日历的忙闲信息和rsvp的状态）、+rsvp（回复日程邀请）"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli calendar --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka calendar --help"
 ---
 
 # calendar (v4)
@@ -68,7 +68,7 @@ Calendar (日历)
 
 ## Shortcuts（推荐优先使用）
 
-Shortcut 是对常用操作的高级封装（`lark-cli calendar +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka calendar +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut | 说明 |
 |----------|------|
@@ -91,8 +91,8 @@ Shortcut 是对常用操作的高级封装（`lark-cli calendar +<verb> [flags]`
 ## API Resources
 
 ```bash
-lark-cli schema calendar.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli calendar <resource> <method> [flags] # 调用 API
+lark-ka schema calendar.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka calendar <resource> <method> [flags] # 调用 API
 ```
 
 > **重要**：使用原生 API 时，必须先运行 `schema` 查看 `--data` / `--params` 参数结构，不要猜测字段格式。

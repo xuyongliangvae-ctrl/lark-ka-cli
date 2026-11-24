@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书视频会议：搜索历史会议、查询会议纪要产物（总结、待办、章节、逐字稿）、查询会议参会人快照。1. 查询已经结束的会议数量或详情时使用本技能（如历史日期｜昨天｜上周｜今天已经开过的会议等场景），查询未开始的会议日程使用 lark-calendar 技能。2. 支持通过关键词、时间范围、组织者、参与者、会议室等筛选条件搜索会议。3. 获取或整理会议纪要、逐字稿、录制产物时使用本技能。4. 查询“谁参加过某会议”“参会人列表”等参会人快照信息用 vc meeting get --with-participants（任意时点可查，含已结束会议）。注意：**Agent 真实入会/离会、感知正在进行中会议的实时事件**请使用 lark-vc-agent 技能，本技能不覆盖写操作和会中事件流。"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli vc --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka vc --help"
 ---
 
 # vc (v1)
@@ -55,11 +55,11 @@ metadata:
 3. 读取智能纪要（`note_doc_token`）内容时，纪要文档的**第一个 `<whiteboard>`** 标签是封面图（AI 生成的总结可视化），应同时下载展示给用户：
 ```bash
 # 1. 读取纪要内容
-lark-cli docs +fetch --api-version v2 --doc <note_doc_token> --doc-format markdown
+lark-ka docs +fetch --api-version v2 --doc <note_doc_token> --doc-format markdown
 # 2. 从返回的 markdown 中提取第一个 <whiteboard token="xxx"/> 的 token
 # 3. 下载封面图到聚合目录（和逐字稿、录像同目录，保持产物归拢）
 #    并非所有纪要都有封面画板，没有 <whiteboard> 标签时跳过即可
-lark-cli docs +media-download --type whiteboard --token <whiteboard_token> --output ./minutes/<minute_token>/cover
+lark-ka docs +media-download --type whiteboard --token <whiteboard_token> --output ./minutes/<minute_token>/cover
 ```
 > **产物目录规范**：同一会议的所有下载产物（录像、逐字稿、封面图等）统一放到 `./minutes/{minute_token}/` 目录下。这与 `minutes +download` 和 `vc +notes --minute-tokens` 的默认落点保持一致，便于 Agent 聚合。显式路径（如封面图）需手动对齐到同一目录。
 
@@ -73,18 +73,18 @@ lark-cli docs +media-download --type whiteboard --token <whiteboard_token> --out
 
 ### 3. 纪要文档与逐字稿链接
 1. 纪要文档、逐字稿文档与关联的共享文档默认使用文档 Token 返回。
-2. 仅需要获取文档名称和 URL 等基本信息时，使用 `lark-cli drive metas batch_query` 查询
+2. 仅需要获取文档名称和 URL 等基本信息时，使用 `lark-ka drive metas batch_query` 查询
 ```bash
 # 学习命令使用方式
-lark-cli schema drive.metas.batch_query
+lark-ka schema drive.metas.batch_query
 
 # 批量获取文档基本信息: 一次最多查询 10 个文档
-lark-cli drive metas batch_query --data '{"request_docs": [{"doc_type": "docx", "doc_token": "<doc_token>"}], "with_url": true}'
+lark-ka drive metas batch_query --data '{"request_docs": [{"doc_type": "docx", "doc_token": "<doc_token>"}], "with_url": true}'
 ```
-3. 需要获取文档内容时，使用 `lark-cli docs +fetch --api-version v2`。
+3. 需要获取文档内容时，使用 `lark-ka docs +fetch --api-version v2`。
 ```bash
 # 获取文档内容
-lark-cli docs +fetch --api-version v2 --doc <doc_token> --doc-format markdown
+lark-ka docs +fetch --api-version v2 --doc <doc_token> --doc-format markdown
 ```
 
 ### 4. 查询参会人快照（读操作）
@@ -92,7 +92,7 @@ lark-cli docs +fetch --api-version v2 --doc <doc_token> --doc-format markdown
 用户问"谁参加过这场会议""这个会议有哪些参会人""某某参会了吗"等**参会人快照**类问题时，使用 **`vc meeting get --with-participants`**：这是参会人服务端快照 API，不依赖 bot 身份参会，**已结束会议也可查**：
 
 ```bash
-lark-cli vc meeting get --params '{"meeting_id":"<meeting_id>","with_participants":true}'
+lark-ka vc meeting get --params '{"meeting_id":"<meeting_id>","with_participants":true}'
 ```
 
 选型判断表：
@@ -135,7 +135,7 @@ Meeting (视频会议)
 
 ## Shortcuts（推荐优先使用）
 
-Shortcut 是对常用操作的高级封装（`lark-cli vc +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka vc +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut | 说明 |
 |----------|------|
@@ -152,8 +152,8 @@ Shortcut 是对常用操作的高级封装（`lark-cli vc +<verb> [flags]`）。
 ## API Resources
 
 ```bash
-lark-cli schema vc.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli vc <resource> <method> [flags] # 调用 API
+lark-ka schema vc.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka vc <resource> <method> [flags] # 调用 API
 ```
 
 > **重要**：使用原生 API 时，必须先运行 `schema` 查看 `--data` / `--params` 参数结构，不要猜测字段格式。
@@ -164,11 +164,11 @@ lark-cli vc <resource> <method> [flags] # 调用 API
 
 ```bash
 # 获取会议基础信息：不包含参会人列表
-lark-cli vc meeting get --params '{"meeting_id": "<meeting_id>"}'
+lark-ka vc meeting get --params '{"meeting_id": "<meeting_id>"}'
 
 
 # 获取会议基础信息：包含参会人列表
-lark-cli vc meeting get --params '{"meeting_id": "<meeting_id>", "with_participants": true}'
+lark-ka vc meeting get --params '{"meeting_id": "<meeting_id>", "with_participants": true}'
 ```
 
 ### minutes（跨域，详见 [lark-minutes](../lark-minutes/SKILL.md)）

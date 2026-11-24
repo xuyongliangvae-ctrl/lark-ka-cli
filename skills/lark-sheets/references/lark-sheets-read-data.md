@@ -127,10 +127,10 @@ _公共四件套 · 系统：`--dry-run`_
 
 ```bash
 # 简单读（sheet 定位必填：--sheet-name 或 --sheet-id 必给一个；range 的 Sheet1! 前缀不能替代它）
-lark-cli sheets +csv-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet-name "Sheet1" --range "A1:F30"
+lark-ka sheets +csv-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet-name "Sheet1" --range "A1:F30"
 
 # 用 sheet-name 模糊定位（运行时框架会先解析到 sheet-id）
-lark-cli sheets +csv-get --spreadsheet-token shtXXX --sheet-name "销售明细" --range "A1:F30"
+lark-ka sheets +csv-get --spreadsheet-token shtXXX --sheet-name "销售明细" --range "A1:F30"
 ```
 
 输出契约（envelope.data）：
@@ -143,7 +143,7 @@ lark-cli sheets +csv-get --spreadsheet-token shtXXX --sheet-name "销售明细" 
 **加 `--rows-json`：返回结构化 rows（而非 CSV 字符串）**
 
 ```bash
-lark-cli sheets +csv-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet-name "Sheet1" --range "A1:G20" --rows-json
+lark-ka sheets +csv-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet-name "Sheet1" --range "A1:G20" --rows-json
 ```
 
 `--rows-json` 下的输出契约（替换 `annotated_csv` / `col_indices` / `row_indices`）：
@@ -158,7 +158,7 @@ lark-cli sheets +csv-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet
 
 ```bash
 # 读 A1:F10 的公式 + 样式（sheet 定位必填）
-lark-cli sheets +cells-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet-name "Sheet1" \
+lark-ka sheets +cells-get --url "https://example.feishu.cn/sheets/shtXXX" --sheet-name "Sheet1" \
   --range "A1:F10" --include formula,style
 ```
 

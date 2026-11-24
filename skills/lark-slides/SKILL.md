@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书幻灯片：创建和编辑幻灯片，接口通过 XML 协议通信。创建演示文稿、读取幻灯片内容、管理幻灯片页面（创建、删除、读取、局部替换）。当用户需要创建或编辑幻灯片、读取或修改单个页面时使用。当用户给出 doubao.com 的 /slides/ URL/token 时，也应直接使用本 skill，不要因为域名不是飞书而回退到 WebFetch；路由依据是 URL 路径模式和 token，而不是域名。"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli slides --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka slides --help"
 ---
 
 # slides (v1)
@@ -55,7 +55,7 @@ metadata:
 - **`--as user`（推荐）**：以当前登录用户身份创建、读取、管理演示文稿。执行前先完成用户授权：
 
 ```bash
-lark-cli auth login --domain slides
+lark-ka auth login --domain slides
 ```
 
 - **`--as bot`**：仅在用户明确要求以应用身份操作，或需要让 bot 持有/创建资源时使用。使用 bot 身份时，要额外确认 bot 是否真的有目标演示文稿的访问权限。
@@ -182,7 +182,7 @@ Step 4: 审查 & 交付
 
 ```bash
 # 追加到末尾
-lark-cli slides xml_presentation.slide create \
+lark-ka slides xml_presentation.slide create \
   --as user \
   --params '{"xml_presentation_id":"YOUR_ID"}' \
   --data "$(jq -n --arg content '<slide xmlns="http://www.larkoffice.com/sml/2.0">
@@ -194,7 +194,7 @@ lark-cli slides xml_presentation.slide create \
 
 # 插到指定页之前：before_slide_id 必须在 --data body 里，与 slide 同级
 # ⚠️ 不要把 before_slide_id 写进 --params —— CLI 会当未知 query 参数静默下发，服务端忽略，新页跑到末尾
-lark-cli slides xml_presentation.slide create \
+lark-ka slides xml_presentation.slide create \
   --as user \
   --params '{"xml_presentation_id":"YOUR_ID"}' \
   --data "$(jq -n --arg content '<slide ...>...</slide>' --arg before 'TARGET_SLIDE_ID' \
@@ -238,7 +238,7 @@ N. 结尾页：[结尾文案]
 知识库链接（`/wiki/TOKEN`）不能直接当 `xml_presentation_id`。直接调用原生 API 前，先查询 wiki 节点，确认 `node.obj_type == "slides"`，再用 `node.obj_token` 作为真实 presentation ID。
 
 ```bash
-lark-cli wiki spaces get_node --as user --params '{"token":"wiki_token"}'
+lark-ka wiki spaces get_node --as user --params '{"token":"wiki_token"}'
 ```
 
 Shortcut `+replace-slide` 和 `+media-upload` 会自动解析 `/wiki/` URL；手动调用 `xml_presentations.*` / `xml_presentation.slide.*` 时才需要自己做这一步。
@@ -259,7 +259,7 @@ Slides (演示文稿)
 
 ## Shortcuts 与 API
 
-Shortcut 是对常用操作的高级封装（`lark-cli slides +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka slides +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut | 说明 |
 |----------|------|
@@ -268,8 +268,8 @@ Shortcut 是对常用操作的高级封装（`lark-cli slides +<verb> [flags]`�
 | [`+replace-slide`](references/lark-slides-replace-slide.md) | 对已有幻灯片页面进行块级替换/插入（`block_replace` / `block_insert`），自动注入 id 和 `<content/>`，不改变页序 |
 
 ```bash
-lark-cli schema slides.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli slides <resource> <method> [flags] # 调用 API
+lark-ka schema slides.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka slides <resource> <method> [flags] # 调用 API
 ```
 
 原生 API 高频资源：`xml_presentations.get` 读取全文；`xml_presentation.slide.create/delete/get/replace` 管理单页。使用原生 API 时，必须先运行 `schema` 查看 `--data` / `--params` 参数结构，不要猜字段。
@@ -298,4 +298,4 @@ lark-cli slides <resource> <method> [flags] # 调用 API
 | `xml_presentation.slide.get` | `slides:presentation:read` |
 | `xml_presentation.slide.replace` | `slides:presentation:update` |
 
-> **注意**：如果 md 内容与 `slides_xml_schema_definition.xml` 或 `lark-cli schema slides.<resource>.<method>` 输出不一致，以后两者为准。
+> **注意**：如果 md 内容与 `slides_xml_schema_definition.xml` 或 `lark-ka schema slides.<resource>.<method>` 输出不一致，以后两者为准。

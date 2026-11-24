@@ -1,5 +1,6 @@
 import { readdir, readFile, mkdir, writeFile, cp } from "node:fs/promises";
 import path from "node:path";
+import { isHaiNengBaseShortcut } from "../src/domains/tables.mjs";
 const source = path.resolve(process.argv[2] || "../lark_-ka_-cli-main");
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -112,7 +113,23 @@ const unique = [
   `${a.service} ${a.command}`.localeCompare(`${b.service} ${b.command}`),
 );
 await mkdir("data/sheets", { recursive: true });
-await writeFile("data/shortcuts.json", JSON.stringify(unique, null, 2) + "\n");
+const published = [],
+  sourceOnly = [];
+for (const spec of unique) {
+  const destination =
+    spec.service === "base" && !isHaiNengBaseShortcut(spec.command)
+      ? sourceOnly
+      : published;
+  destination.push(spec);
+}
+await writeFile(
+  "data/shortcuts.json",
+  JSON.stringify(published, null, 2) + "\n",
+);
+await writeFile(
+  "data/base-v3-shortcuts.json",
+  JSON.stringify(sourceOnly, null, 2) + "\n",
+);
 for (const name of ["flag-defs.json", "flag-schemas.json"])
   await cp(
     path.join(source, "shortcuts/sheets/data", name),

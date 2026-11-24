@@ -8,6 +8,8 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { setTimeout as delay } from "node:timers/promises";
+import { isHaiNengProfile } from "../config.mjs";
 import { CliError } from "../errors.mjs";
 
 export const services = [
@@ -257,13 +259,30 @@ function attendees(value, me = "") {
 
 async function calendar(ctx, command, f) {
   const calendarId = text(f, "calendar-id", "primary") || "primary";
-  const base = `/open-apis/calendar/v4/calendars/${enc(calendarId)}/events`;
+  const calendars = "/open-apis/calendar/v4/calendars";
+  const base = `${calendars}/${enc(calendarId)}/events`;
   if (command === "agenda") {
     const { start, end } = timeRange(f);
+    let events = base;
+    if (calendarId === "primary" && isHaiNengProfile(ctx.config)) {
+      const primary = await ctx.request("POST", `${calendars}/primary`);
+      const resolvedId = ctx.dryRun
+        ? "<primary_calendar_id>"
+        : primary?.calendars?.[0]?.calendar?.calendar_id;
+      if (typeof resolvedId !== "string" || !resolvedId)
+        throw new CliError(
+          "api",
+          "Primary calendar response has no calendar_id",
+          {
+            code: 5,
+          },
+        );
+      events = `${calendars}/${enc(resolvedId)}/events`;
+    }
     const data = await paged(
       ctx,
       "GET",
-      `${base}/instance_view`,
+      `${events}/instance_view`,
       { query: { start_time: String(start), end_time: String(end) } },
       f,
     );
@@ -1282,6 +1301,10 @@ async function contact(ctx, command, f) {
     return ctx.dryRun ? data : { user: data.users?.[0] || {} };
   }
   if (command === "search-user") {
+    const searchVersion =
+      ctx.config?.capabilities?.contactSearch ??
+      (ctx.config?.brand === "gjgw" ? "v1" : "v3");
+    if (searchVersion === "v1") return searchContactV1(ctx, f);
     const filter = {};
     const map = {
       "has-chatted": "has_contact",
@@ -1313,29 +1336,17 @@ async function contact(ctx, command, f) {
       fail("Search accepts at most 20 queries of at most 50 characters");
     if (!queries.some(Boolean) && !Object.keys(filter).length)
       fail("Specify --query, --queries, --user-ids, or a search filter");
-    const legacy =
-      ctx.config?.brand === "gjgw" ||
-      ctx.config?.capabilities?.contactSearch === "v1";
-    const pageSize = count(f, "page-size", 20, 1, legacy ? 200 : 30);
-    if (
-      legacy &&
-      (!f.query ||
-        f.queries ||
-        f["user-ids"] ||
-        f.lang ||
-        Object.keys(filter).length)
-    )
-      fail("This deployment supports --query keyword search only");
+    const pageSize = count(f, "page-size", 20, 1, 30);
     const results = [];
     for (const query of queries) {
-      const data = legacy
-        ? await ctx.request("GET", "/open-apis/search/v1/user", {
-            query: { query, page_size: pageSize },
-          })
-        : await ctx.request("POST", "/open-apis/contact/v3/users/search", {
-            query: { page_size: pageSize },
-            body: { query, ...(Object.keys(filter).length ? { filter } : {}) },
-          });
+      const data = await ctx.request(
+        "POST",
+        "/open-apis/contact/v3/users/search",
+        {
+          query: { page_size: pageSize },
+          body: { query, ...(Object.keys(filter).length ? { filter } : {}) },
+        },
+      );
       if (ctx.dryRun) {
         results.push(data);
         continue;
@@ -1361,6 +1372,77 @@ async function contact(ctx, command, f) {
           })),
         };
   }
+}
+
+const contactV1Flags = new Set([
+  "query",
+  "page-size",
+  "page-token",
+  "page-all",
+  "page-limit",
+  "page-delay",
+  "profile",
+  "as",
+  "format",
+  "json",
+  "jq",
+  "dry-run",
+]);
+
+async function searchContactV1(ctx, flags) {
+  for (const key of Object.keys(flags)) {
+    if (!contactV1Flags.has(key))
+      fail(
+        `--${key} is unsupported by search/v1/user; use --query for keyword search`,
+      );
+  }
+  const keyword = typeof flags.query === "string" ? flags.query.trim() : "";
+  if (!keyword || [...keyword].length > 50)
+    fail("--query must be a keyword of 1–50 characters");
+  const pageSize = count(flags, "page-size", 20, 1, 200);
+  const all = yes(flags, "page-all");
+  if (!all && (has(flags, "page-limit") || has(flags, "page-delay")))
+    fail("--page-limit and --page-delay require --page-all for user search");
+  const pageLimit = all ? count(flags, "page-limit", 40, 1, 1000) : 1;
+  const delayMs = count(flags, "page-delay", 0, 0, 60_000);
+  let token = flags["page-token"];
+  if (token !== undefined && typeof token !== "string")
+    fail("--page-token must be the string returned by the previous search");
+  const users = [];
+  const seen = new Set(token ? [token] : []);
+  let data;
+  for (let page = 0; page < pageLimit; page++) {
+    data = await ctx.request("GET", "/open-apis/search/v1/user", {
+      query: clean({ query: keyword, page_size: pageSize, page_token: token }),
+    });
+    if (ctx.dryRun) return data;
+    for (const user of data.users ?? data.items ?? []) {
+      users.push({
+        ...user,
+        open_id: user.open_id || user.id,
+        localized_name:
+          user.localized_name ||
+          user.name ||
+          user.en_name ||
+          user.open_id ||
+          user.id,
+        ...(Array.isArray(user.department_ids)
+          ? { department: user.department_ids.join(",") }
+          : {}),
+      });
+    }
+    if (!data.has_more || !all) break;
+    token = data.page_token;
+    if (typeof token !== "string" || !token || seen.has(token))
+      throw new CliError(
+        "api",
+        "User search returned a missing or repeated continuation token",
+      );
+    seen.add(token);
+    if (delayMs && page + 1 < pageLimit)
+      await delay(delayMs, undefined, { signal: ctx.signal });
+  }
+  return { ...data, users };
 }
 
 function normalizeContact(user, lang, brand) {

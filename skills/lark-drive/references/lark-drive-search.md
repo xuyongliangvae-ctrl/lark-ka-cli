@@ -3,7 +3,22 @@
 
 > **前置条件：** 先阅读 [`../lark-shared/SKILL.md`](../../lark-shared/SKILL.md) 了解认证、全局参数和安全规则。
 
-基于 Search v2 接口 `POST /open-apis/search/v2/doc_wiki/search`，以**用户身份**统一搜索云空间（云盘/云存储）对象。
+## 海能 Work 7.54
+
+海能 Work 的 `cnooc` Profile 默认通过员工 `user_access_token` 调用 `POST /open-apis/suite/docs-api/search/object`。`--query` 传非空业务关键词。`docs +search --filter` 接受 `owner_ids`、`chat_ids`、`docs_types` 的非空列表；`drive +search` 用 `--mine`、`--creator-ids`（归属人）、`--chat-ids`、`--doc-types` 表达相同条件。文档类型 `doc` 同时包括旧版及新版文档；还可指定 `sheet`、`slides`、`bitable`、`mindnote`、`file`。
+
+```bash
+lark-ka --profile cnooc drive +search --as user --query '项目周报' --doc-types doc,sheet --page-size 10
+lark-ka --profile cnooc docs +search --as user --query '项目周报' --filter '{"docs_types":["doc"]}'
+```
+
+每条 `data.docs_entities[]` 返回 `docs_token`、`docs_type`、`title` 和 `owner_id`。`--page-size` 默认 15，范围 0–50，0 用于只查询数量。下一页使用 `data.page_token` 作为 `--page-token`（十进制偏移量），`--page-all` 可合并多页。接口限定 `offset + count < 200`，到达窗口上限后若仍有数据会返回 `has_more: true`、`truncated: true`，应缩小查询范围。该接口缺少目录、Wiki 空间、时间窗口、排序及仅标题/评论等 v2 筛选，传入这些选项会报错。
+
+接口接受 `search:docs:read`、`drive:drive:readonly`、`drive:drive` 任一权限。前者仅用于搜索，后两者权限更广，须由管理员按租户的权限目录和实际获批范围配置。
+
+## Search v2
+
+以下参数和示例用于选择 v2 搜索接口的环境。基于 Search v2 接口 `POST /open-apis/search/v2/doc_wiki/search`，以**用户身份**统一搜索云空间（云盘/云存储）对象。
 
 核心特性：
 
@@ -17,8 +32,8 @@
 ## 命令
 
 > **关键约束：搜索关键词必须通过 `--query` 传递。**
-> 正确：`lark-cli drive +search --query "方案"`
-> 错误：`lark-cli drive +search 方案`
+> 正确：`lark-ka drive +search --query "方案"`
+> 错误：`lark-ka drive +search 方案`
 > `+search` 不接受位置参数；空 `--query` 或省略 `--query` 表示纯靠 filter 浏览（合法）。
 >
 > **列表型请求不要硬塞关键词**：如果用户只是要求"我这月创建的所有文档"、"最近半年我编辑过的文档"、"按类型分类统计"这类范围浏览 / 汇总请求，且没有给出标题片段或业务关键词，应使用 `--query ""` 搭配 `--mine`、`--created-*`、`--edited-*`、`--doc-types` 等过滤条件。不要把"查找"、"所有文档"、"最近更新过"、"按类型分类统计"这类动作词或统计意图放进 `--query`，否则会把本来应靠 filter 命中的结果过度收窄。
@@ -27,50 +42,50 @@
 
 | 用户说 | 命令 |
 |---|---|
-| 我这月创建的所有文档，按类型分类统计 | `lark-cli drive +search --query "" --mine --created-since "<YYYY-MM-DD>" --created-until "<YYYY-MM-DD>"` |
-| 最近半年我编辑过的文档，看看哪些最近更新过 | `lark-cli drive +search --query "" --edited-since 6m --sort edit_time` |
-| 最近一个月我编辑过的文档 | `lark-cli drive +search --query "" --edited-since 1m` |
-| 最近一个月我编辑过 且 我评论过的 | `lark-cli drive +search --query "" --edited-since 1m --commented-since 1m` |
-| 最近一周我打开过的表格 | `lark-cli drive +search --query "" --opened-since 7d --doc-types sheet` |
-| 我 owner 的所有文档（owner 语义，非"我最初创建"） | `lark-cli drive +search --query "" --mine` |
-| 我 owner、30-60 天前创建的文档（粗略"上个月"，按 30 天滑窗算；`--mine` 是 owner，`--created-*` 才是文档创建时间） | `lark-cli drive +search --query "" --mine --created-since 2m --created-until 1m` |
-| 我 owner、2026 年 3 月创建的文档（精确日历月；同上，owner + 创建时间窗两个维度） | `lark-cli drive +search --query "" --mine --created-since 2026-03-01 --created-until 2026-04-01` |
-| 关键词"预算"，最近一周我打开过，按编辑时间降序 | `lark-cli drive +search --query 预算 --opened-since 7d --sort edit_time` |
-| 某个 wiki space 下、我 owner 且 30-60 天前创建的 | `lark-cli drive +search --query "" --mine --space-ids space_xxx --created-since 2m --created-until 1m` |
-| 张三 owner / 负责的文档（注意是 owner 语义，不是张三最初创建的）| `lark-cli drive +search --query "" --creator-ids ou_zhangsan` |
-| 我最近 3 个月评论过的 docx | `lark-cli drive +search --query "" --commented-since 3m --doc-types docx` |
+| 我这月创建的所有文档，按类型分类统计 | `lark-ka drive +search --query "" --mine --created-since "<YYYY-MM-DD>" --created-until "<YYYY-MM-DD>"` |
+| 最近半年我编辑过的文档，看看哪些最近更新过 | `lark-ka drive +search --query "" --edited-since 6m --sort edit_time` |
+| 最近一个月我编辑过的文档 | `lark-ka drive +search --query "" --edited-since 1m` |
+| 最近一个月我编辑过 且 我评论过的 | `lark-ka drive +search --query "" --edited-since 1m --commented-since 1m` |
+| 最近一周我打开过的表格 | `lark-ka drive +search --query "" --opened-since 7d --doc-types sheet` |
+| 我 owner 的所有文档（owner 语义，非"我最初创建"） | `lark-ka drive +search --query "" --mine` |
+| 我 owner、30-60 天前创建的文档（粗略"上个月"，按 30 天滑窗算；`--mine` 是 owner，`--created-*` 才是文档创建时间） | `lark-ka drive +search --query "" --mine --created-since 2m --created-until 1m` |
+| 我 owner、2026 年 3 月创建的文档（精确日历月；同上，owner + 创建时间窗两个维度） | `lark-ka drive +search --query "" --mine --created-since 2026-03-01 --created-until 2026-04-01` |
+| 关键词"预算"，最近一周我打开过，按编辑时间降序 | `lark-ka drive +search --query 预算 --opened-since 7d --sort edit_time` |
+| 某个 wiki space 下、我 owner 且 30-60 天前创建的 | `lark-ka drive +search --query "" --mine --space-ids space_xxx --created-since 2m --created-until 1m` |
+| 张三 owner / 负责的文档（注意是 owner 语义，不是张三最初创建的）| `lark-ka drive +search --query "" --creator-ids ou_zhangsan` |
+| 我最近 3 个月评论过的 docx | `lark-ka drive +search --query "" --commented-since 3m --doc-types docx` |
 
 ### 更多示例
 
 ```bash
 # 纯关键词搜索
-lark-cli drive +search --query "季度总结"
+lark-ka drive +search --query "季度总结"
 
 # 使用服务端 query 高级语法
-lark-cli drive +search --query 'intitle:方案'
-lark-cli drive +search --query '"季度 总结"'
-lark-cli drive +search --query '方案 OR 草稿'
-lark-cli drive +search --query '方案 -草稿'
+lark-ka drive +search --query 'intitle:方案'
+lark-ka drive +search --query '"季度 总结"'
+lark-ka drive +search --query '方案 OR 草稿'
+lark-ka drive +search --query '方案 -草稿'
 
 # 只搜某个文件夹下的文档
-lark-cli drive +search --query 方案 --folder-tokens fld_123456
+lark-ka drive +search --query 方案 --folder-tokens fld_123456
 
 # 只搜某个知识空间下的 Wiki
-lark-cli drive +search --query 研发规范 --space-ids space_1234567890fedcba
+lark-ka drive +search --query 研发规范 --space-ids space_1234567890fedcba
 
 # 指定群内分享过的文档
-lark-cli drive +search --query 方案 --chat-ids oc_1234567890abcdef
+lark-ka drive +search --query 方案 --chat-ids oc_1234567890abcdef
 
 # 只搜标题 / 只搜评论
-lark-cli drive +search --query 周报 --only-title
-lark-cli drive +search --query 延期原因 --only-comment
+lark-ka drive +search --query 周报 --only-title
+lark-ka drive +search --query 延期原因 --only-comment
 
 # 人类可读格式
-lark-cli drive +search --query OKR --format pretty
+lark-ka drive +search --query OKR --format pretty
 
 # 翻页（--format json 先拿 page_token）
-lark-cli drive +search --query 方案 --format json
-lark-cli drive +search --query 方案 --page-token '<PAGE_TOKEN>'
+lark-ka drive +search --query 方案 --format json
+lark-ka drive +search --query 方案 --page-token '<PAGE_TOKEN>'
 ```
 
 ### 列表 / 统计型请求的执行步骤
@@ -109,7 +124,7 @@ lark-cli drive +search --query 方案 --page-token '<PAGE_TOKEN>'
 
 | 参数 | 映射 | 说明 |
 |---|---|---|
-| `--mine` | `creator_ids = [当前用户 open_id]` | bool。一键“我 owner 的”（**不是**“我最初创建的”）；从当前登录用户身份（`runtime.UserOpenId()`）解析 open_id，取不到直接报错（提示运行 `lark-cli auth login`） |
+| `--mine` | `creator_ids = [当前用户 open_id]` | bool。一键“我 owner 的”（**不是**“我最初创建的”）；从当前登录用户身份（`runtime.UserOpenId()`）解析 open_id，取不到直接报错（提示运行 `lark-ka auth login`） |
 | `--creator-ids ou_x,ou_y` | `creator_ids = [...]` | 显式 open_id 列表，逗号分隔，按 **owner** 匹配；**与 `--mine` 互斥** |
 
 ### 时间维度（每个维度一对 since/until）

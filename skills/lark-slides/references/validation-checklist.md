@@ -19,7 +19,7 @@
 回读命令：
 
 ```bash
-lark-cli slides xml_presentations get --as user \
+lark-ka slides xml_presentations get --as user \
   --params '{"xml_presentation_id":"YOUR_ID"}'
 ```
 

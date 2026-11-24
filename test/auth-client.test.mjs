@@ -23,6 +23,7 @@ import {
 } from "../src/auth.mjs";
 import { createContext } from "../src/context.mjs";
 import { apiURL, fetchJSON } from "../src/http.mjs";
+import { toErrorEnvelope } from "../src/errors.mjs";
 
 async function isolated(t) {
   const dir = await mkdtemp(path.join(os.tmpdir(), "lark-auth-client-"));
@@ -286,6 +287,48 @@ test("status recognizes Feishu invalid-token codes without confusing missing sco
     authStatus(c, { verify: true }),
     (e) => e.type === "api" && e.apiCode === 99991679,
   );
+});
+
+test("scope errors preserve server alternatives and stay API errors", async (t) => {
+  const violations = [
+    { type: "action_privilege_required", subject: "base:record:retrieve" },
+    { type: "action_scope_required", subject: "bitable:app:readonly" },
+    { type: "scope", subject: "bitable:app:readonly" },
+    { scope: "base:app:read" },
+    { type: "resource_access", subject: "private:resource" },
+    { type: "action_scope_required", subject: "base:search and more" },
+    null,
+  ];
+  const base = await server(t, (req, res) => {
+    const code = Number(req.url.slice(1));
+    respond(
+      res,
+      {
+        code,
+        msg: "upstream diagnostic",
+        error: { permission_violations: violations },
+      },
+      code === 99991679 ? 401 : 403,
+    );
+  });
+  for (const [code, expectedHint] of [
+    [99991672, /Enable one of the listed scopes/],
+    [99991679, /Authorize one of the listed scopes/],
+  ]) {
+    await assert.rejects(fetchJSON(`${base}/${code}`), (error) => {
+      const envelope = toErrorEnvelope(error);
+      assert.equal(envelope.error.type, "api");
+      assert.equal(envelope.error.message, "upstream diagnostic");
+      assert.equal(envelope.error.detail.apiCode, code);
+      assert.deepEqual(envelope.error.detail.scopeAlternatives, [
+        "base:record:retrieve",
+        "bitable:app:readonly",
+        "base:app:read",
+      ]);
+      assert.match(envelope.error.hint, expectedHint);
+      return true;
+    });
+  }
 });
 
 test("malformed token lifetimes never get persisted as a successful login", async (t) => {

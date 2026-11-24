@@ -1,4 +1,5 @@
 import { CliError } from "../errors.mjs";
+import { isHaiNengProfile } from "../config.mjs";
 import { realpath, stat } from "node:fs/promises";
 import path from "node:path";
 const enc = encodeURIComponent;
@@ -1036,17 +1037,45 @@ export async function executeIM(ctx, service, command, f) {
     return result;
   }
   if (command === "+chat-search") {
-    if (!f.query && !f["member-ids"])
-      throw new CliError("validation", "Provide --query or --member-ids");
     if ([...String(f.query || "")].length > 64)
       throw new CliError("validation", "--query must not exceed 64 characters");
-    const body = {},
+    const keyword =
+      String(f.query || "").includes("-") && !String(f.query).startsWith('"')
+        ? `"${f.query}"`
+        : f.query;
+    const paging = {
+      page_size: limit(f, "page-size", 20, 1, 100),
+      ...query(f, ["page-token"]),
+    };
+    if (isHaiNengProfile(ctx.config)) {
+      const unsupported = [
+        ...["search-types", "member-ids", "sort-by"].filter((key) => f[key]),
+        ...["is-manager", "disable-search-by-user", "exclude-muted"].filter(
+          (key) => yes(f, key),
+        ),
+      ];
+      if (unsupported.length)
+        throw new CliError(
+          "validation",
+          `HaiNeng chat search does not support ${unsupported.map((key) => `--${key}`).join(", ")}`,
+          {
+            hint: "Search by --query with optional --page-size and --page-token.",
+          },
+        );
+      if (!String(f.query ?? "").trim())
+        throw new CliError(
+          "validation",
+          "HaiNeng chat search requires --query",
+        );
+      const data = await ctx.request("GET", "/open-apis/im/v1/chats/search", {
+        query: { query: keyword, ...paging },
+      });
+      return muteFilter(ctx, data, f);
+    }
+    if (!f.query && !f["member-ids"])
+      throw new CliError("validation", "Provide --query or --member-ids");
+    const body = f.query ? { query: keyword } : {},
       filter = {};
-    if (f.query)
-      body.query =
-        String(f.query).includes("-") && !String(f.query).startsWith('"')
-          ? `"${f.query}"`
-          : f.query;
     if (f["search-types"]) {
       filter.search_types = csv(f["search-types"]);
       for (const type of filter.search_types)
@@ -1079,10 +1108,7 @@ export async function executeIM(ctx, service, command, f) {
       body.sorter = f["sort-by"];
     }
     const data = await ctx.request("POST", "/open-apis/im/v2/chats/search", {
-      query: {
-        page_size: limit(f, "page-size", 20, 1, 100),
-        ...query(f, ["page-token"]),
-      },
+      query: paging,
       body,
     });
     if (ctx.dryRun) return data;

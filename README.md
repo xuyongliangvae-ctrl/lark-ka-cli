@@ -2,7 +2,7 @@
 
 面向飞书 / Lark / 私有化部署的 **Node.js 原生 CLI**。要求 **Node.js >=22**。运行、安装和业务请求均不依赖 Go、Go 二进制或 Go 源码。
 
-命令名为 `lark-ka`，同时提供 `lark-cli` 别名以便迁移现有调用；若本机已经装有官方 `lark-cli`，优先使用 `lark-ka` 避免混淆。
+命令名为 `lark-ka`。安装包仅注册此命令，可与官方 `lark-cli` 共存。
 
 ## 本地运行
 
@@ -25,7 +25,7 @@ npm run compatibility
 
 ```bash
 # 发布后从实际企业 npm 仓库安装；本地也可以安装生成的 tgz。
-npm install -g @lark-ka/hn-work-cli@0.1.0 --registry="https://npm.customer-a.example.invalid/"
+npm install -g @lark-ka/hn-work-cli@7.54.0 --registry="https://npm.customer-a.example.invalid/"
 
 # 只传客户参数，不需要配置文件。
 lark-ka config init --name customer-a \
@@ -40,7 +40,7 @@ lark-ka config init --name customer-a \
   --auth-flow authorization-code \
   --client-id-param client_id \
   --redirect-uri "http://127.0.0.1:8989/lark/oauth/callback" \
-  --scope "客户已批准的 Scope" \
+  --scope "该应用已批准的全部员工 Scope" \
   --docs-backend native \
   --default-as user \
   --strict-mode user
@@ -77,6 +77,8 @@ lark-ka --profile customer-a auth status --connector
 lark-ka --profile customer-a auth logout
 ```
 
+部署时在 Profile 中预置该应用已批准的完整员工 Scope 清单，并在应用支持续期时包含 `offline_access`。员工运行 `auth login` 时会在一次 OAuth 请求中申请整组权限。显式传入 `--scope` 可为单次联调指定范围。未配置清单时，CLI 会尝试从应用信息读取允许员工身份使用的 Scope。租户若限制应用信息接口读取，在部署时填写已批准的清单即可。
+
 配置第二个客户时，复制初始化命令，将 `--name` 改为 `customer-b`，并替换对应地址、App ID、Scope 和凭据。随后所有业务命令使用 `--profile customer-b`；同一个 npm 包可服务多个客户。
 
 ### 可选接口参数
@@ -84,6 +86,7 @@ lark-ka --profile customer-a auth logout
 | 参数                                  | 用途                                                           |
 | ------------------------------------- | -------------------------------------------------------------- |
 | `--refresh-token-url`                 | 刷新 token 的完整地址；客户刷新接口与换取 token 接口不同时使用 |
+| `--token-encoding json\|form`         | 换码与续期请求的编码。海能 Work 7.54 使用 JSON                 |
 | `--device-url`                        | 使用设备授权流程时的完整授权接口地址                           |
 | `--tenant-token-url`                  | 需要机器人身份时，获取 tenant token 的完整地址                 |
 | `--mcp-url`                           | 客户实际可用的 MCP 文档服务完整地址                            |
@@ -100,6 +103,24 @@ lark-ka config init --name customer-a --deployment @./config/cnooc.example.json
 默认配置目录是 `~/.lark-ka-cli`；可通过 `LARK_KA_CONFIG_DIR` 覆盖，也支持 `LARKSUITE_CLI_CONFIG_DIR`。凭据和会话使用独立的、权限为 `0600` 的本地 JSON 文件，按应用和接口环境隔离。
 
 ## 使用示例
+
+海能 Work 7.54 使用 `cnooc` 私有化 Profile。已配置的 `--brand custom --name cnooc` 和 `--brand cnooc` 会选择套件文档搜索与通讯录 v1。也可在初始化时显式设置 `--document-search-api suite --contact-search-version v1`。开放平台域名和员工令牌来自当前 Profile。
+
+```sh
+lark-ka --profile cnooc drive +search --as user --query '周报' --page-size 5
+lark-ka --profile cnooc docs +search --as user --query '周报' --filter '{"docs_types":["doc"]}'
+lark-ka --profile cnooc contact +search-user --as user --query '姓名' --page-size 20
+```
+
+两条文档搜索命令调用 `POST /open-apis/suite/docs-api/search/object`。文档在 `data.docs_entities`，续页使用返回的 `data.page_token`。接口限定 `offset + count < 200`，超出窗口时应缩小搜索范围。该接口要求员工令牌具备文档搜索或相应云盘权限，现有 `docx:document` 仅覆盖文档读写。搜索用户调用 `GET /open-apis/search/v1/user`，可使用 `--page-token` 续页。在其他租户使用对应的新版搜索时，可显式指定 `--document-search-api v2` 和 `--contact-search-version v3`。
+
+海能 Work 的员工授权使用 Accounts 域下的 `/open-apis/authen/v1/authorize` 和 `client_id`。签发用户令牌和续期使用 OpenAPI 域的 `POST /open-apis/authen/v2/oauth/token`，均发送 JSON。获取当前员工身份使用 `GET /open-apis/authen/v1/user_info`。初始化示例保留客户域名占位符，接口路径已填入。
+
+群聊搜索 `im +chat-search` 使用 `GET /open-apis/im/v1/chats/search`。多维表格的元数据、字段、视图、表单、仪表盘和常用记录操作已适配 Bitable v1 的相应接口。对表、字段和记录列表翻页时使用服务端返回的 `page_token`。
+
+7.54.1 起，海能 Work 的 `base +base-create --name '项目台账'` 使用 Bitable v1 创建多维表格。按条件查询记录使用 `base:record:retrieve`，按记录 ID 获取使用 `base:record:read`。如果开放平台在权限拒绝时返回可用的 Scope，CLI 会在错误详情的 `scopeAlternatives` 中列出。
+
+海能 Work 发布包内提供 46 个原生 Base API 命令和已适配的快捷命令。用 `lark-ka --profile cnooc base --help` 查看命令，用 `lark-ka schema base.app.table.record.search` 核对原生命令参数。[多维表格接口对照](docs/bitable-v1.md)
 
 ```bash
 # 不调用真实 API 的请求预览
@@ -129,7 +150,7 @@ JSON 结果写 stdout，错误写 stderr；支持 `@file` / stdin、分页、dry
 
 `npm run compatibility` 生成 `docs/compatibility.json`，列出每条命令的实现登记与已知差异；可读版见 [兼容性说明](docs/compatibility.md)。**命令入口覆盖不等于 Go 版每个选项、输出归一化及所有边界行为均已等价**。高级文档格式、白板、邮件合成、同步等分支以兼容性报告和测试为准；不支持的输入会明确报错，不会伪装成已成功执行。
 
-测试使用本地 HTTP 服务及 mock API，覆盖授权回调与 state、令牌、身份检查、请求结构、文档及业务工作流等。客户环境尚未提供真实域名和凭据，未执行海油的真实 API 联调。
+7.54.0 已对照海能 Work 测试租户的服务端 API 目录和部分接口单页。本地 HTTP 测试覆盖授权回调与 state、换码、续期、身份检查、请求结构和业务工作流。员工令牌、实际业务数据和资源权限仍待在租户内联调。
 
 本版本的本地凭据方案不等同于“真实飞书 token 全部保存在集中认证后端”的方案。
 
@@ -137,18 +158,20 @@ JSON 结果写 stdout，错误写 stderr；支持 `@file` / stdin、分页、dry
 
 ```bash
 # 公开版本发布至 npm 官方后安装，要求 Node.js >=22。
-npm install -g @lark-ka/hn-work-cli@0.1.0 --registry=https://registry.npmjs.org/
+npm install -g @lark-ka/hn-work-cli@7.54.0 --registry=https://registry.npmjs.org/
 
 # 国内镜像同步到该版本后也可以安装。
-npm install -g @lark-ka/hn-work-cli@0.1.0 --registry=https://registry.npmmirror.com/
+npm install -g @lark-ka/hn-work-cli@7.54.0 --registry=https://registry.npmmirror.com/
 lark-ka --version
 
 # 本地打包与安装。
 npm pack
-npm install -g /absolute/path/to/lark-ka-hn-work-cli-0.1.0.tgz
+npm install -g /absolute/path/to/lark-ka-hn-work-cli-7.54.2.tgz
 ```
 
-镜像同步可能有延迟，可通过 `npm view @lark-ka/hn-work-cli@0.1.0 version --registry=https://registry.npmmirror.com/` 查询。企业后台配置见 [docs/doubao-connector.md](docs/doubao-connector.md)。
+豆包工作安装版本和版本检查需填写同一版本。例如版本 `7.54.2` 使用 `lark-ka --version --expect-version 7.54.2`。该命令仅在实际版本匹配时退出成功。
+
+镜像同步可能有延迟，可通过 `npm view @lark-ka/hn-work-cli@7.54.0 version --registry=https://registry.npmmirror.com/` 查询。企业后台配置见 [docs/doubao-connector.md](docs/doubao-connector.md)。
 
 ## 更新命令定义
 

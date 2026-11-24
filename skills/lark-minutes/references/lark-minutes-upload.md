@@ -4,7 +4,7 @@
 
 上传音视频文件到飞书妙记并生成妙记（Minute）。
 
-本 skill 对应 shortcut：`lark-cli minutes +upload`。
+本 skill 对应 shortcut：`lark-ka minutes +upload`。
 
 ## 典型触发表达
 
@@ -18,16 +18,16 @@
 当用户要求将音视频文件转换为妙记，或进一步要纪要/逐字稿/文字稿/撰写文字时，必须按照以下步骤执行：
 
 1. **上传文件至云空间（云盘/云存储）获取 file_token**
-   - 使用 `lark-cli drive +upload` 命令上传本地文件到云空间/云盘/云存储（Drive）：
+   - 使用 `lark-ka drive +upload` 命令上传本地文件到云空间/云盘/云存储（Drive）：
      ```bash
-     lark-cli drive +upload --file <path/to/media/file>
+     lark-ka drive +upload --file <path/to/media/file>
      ```
    - 从命令的返回结果中提取生成的 `file_token`。
 
 2. **将 file_token 转换为妙记链接（minute_url）**
    - 调用本 shortcut，将获取到的 `file_token` 转换为妙记：
      ```bash
-     lark-cli minutes +upload --file-token <file_token>
+     lark-ka minutes +upload --file-token <file_token>
      ```
    - 命令执行成功后，将返回生成的妙记链接 `minute_url`。
 
@@ -35,7 +35,7 @@
    - 从返回的 `minute_url` 中提取路径最后一段，得到 `minute_token`。
    - 如果用户要的是纪要、逐字稿、文字稿、撰写文字、总结、待办或章节，继续调用：
      ```bash
-     lark-cli vc +notes --minute-tokens <minute_token>
+     lark-ka vc +notes --minute-tokens <minute_token>
      ```
    - `vc +notes --minute-tokens` 会返回纪要文档、逐字稿文档，以及 AI 内置产物（总结、待办、章节）；必要时还会把逐字稿落地到本地文件。
 
@@ -45,10 +45,10 @@
 
 ```bash
 # 通过已上传到云空间（云盘/云存储）的 file_token 生成妙记
-lark-cli minutes +upload --file-token boxcnxxxxxxxxxxxxxxxx
+lark-ka minutes +upload --file-token boxcnxxxxxxxxxxxxxxxx
 
 # 通过 minute_token 继续获取纪要 / 逐字稿 / 文字稿 / AI 产物
-lark-cli vc +notes --minute-tokens obcnxxxxxxxxxxxxxxxx
+lark-ka vc +notes --minute-tokens obcnxxxxxxxxxxxxxxxx
 ```
 
 ## 参数
@@ -78,10 +78,10 @@ lark-cli vc +notes --minute-tokens obcnxxxxxxxxxxxxxxxx
 
 推荐流程如下：
 
-1. 使用 `lark-cli drive +upload --file <path>` 上传本地音视频文件到云空间（云盘/云存储）
+1. 使用 `lark-ka drive +upload --file <path>` 上传本地音视频文件到云空间（云盘/云存储）
 2. 从返回结果中取出 `file_token`
-3. 调用 `lark-cli minutes +upload --file-token <file_token>` 生成妙记
-4. 如果目标是纪要、逐字稿、文字稿、撰写文字、总结、待办或章节，再从 `minute_url` 提取 `minute_token`，继续调用 `lark-cli vc +notes --minute-tokens <minute_token>`
+3. 调用 `lark-ka minutes +upload --file-token <file_token>` 生成妙记
+4. 如果目标是纪要、逐字稿、文字稿、撰写文字、总结、待办或章节，再从 `minute_url` 提取 `minute_token`，继续调用 `lark-ka vc +notes --minute-tokens <minute_token>`
 
 > **边界说明**：`minutes +upload` 本身只负责把文件转成妙记并返回 `minute_url`。纪要内容、逐字稿、文字稿、撰写文字、总结、待办、章节属于后续产物获取，应由 [vc +notes](../../lark-vc/references/lark-vc-notes.md) 承接。
 

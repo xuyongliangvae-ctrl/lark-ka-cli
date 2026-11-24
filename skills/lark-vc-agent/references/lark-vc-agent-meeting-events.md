@@ -5,25 +5,25 @@
 
 查询当前 bot 在一场正在进行的视频会议中收到的会中事件列表。该命令是**读操作**。对进行中会议，要求 bot 当前仍在会中；对已结束会议，存在一个**结束后 5 分钟内的宽限窗口**，只要 bot 曾经在这场会里出现过，仍可继续拉取事件。
 
-本 skill 对应 shortcut：`lark-cli vc +meeting-events`（调用 `GET /open-apis/vc/v1/bots/events`）。
+本 skill 对应 shortcut：`lark-ka vc +meeting-events`（调用 `GET /open-apis/vc/v1/bots/events`）。
 
 ## 命令
 
 ```bash
 # 默认用法：全量拉取当前可见事件
-lark-cli vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --page-all --format pretty
+lark-ka vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --page-all --format pretty
 
 # 指定时间范围，并拉全该时间窗内当前可见事件
-lark-cli vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --start 2026-04-17T15:00:00+08:00 --end 2026-04-17T16:00:00+08:00 --page-all --format pretty
+lark-ka vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --start 2026-04-17T15:00:00+08:00 --end 2026-04-17T16:00:00+08:00 --page-all --format pretty
 
 # 基于上一次保存的 page_token 继续查新增事件
-lark-cli vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --page-token <last_page_token> --page-all --format pretty
+lark-ka vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --page-token <last_page_token> --page-all --format pretty
 
 # 调试或控制返回体大小时，显式只查一页
-lark-cli vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --page-size 20 --format json
+lark-ka vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --page-size 20 --format json
 
 # 预览 API 调用（不实际请求）
-lark-cli vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --dry-run
+lark-ka vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --dry-run
 ```
 
 ## 参数
@@ -62,12 +62,12 @@ lark-cli vc +meeting-events --meeting-id 69xxxxxxxxxxxxx28 --dry-run
 
 ```bash
 # 先入会
-lark-cli vc +meeting-join --meeting-number 123456789
+lark-ka vc +meeting-join --meeting-number 123456789
 
 # 记录返回的 meeting.id
 
 # 再查询事件
-lark-cli vc +meeting-events --meeting-id <meeting.id>
+lark-ka vc +meeting-events --meeting-id <meeting.id>
 ```
 
 更精确地说，后端当前的判断规则是：
@@ -87,9 +87,9 @@ lark-cli vc +meeting-events --meeting-id <meeting.id>
 
 执行准则：
 
-- **默认命令模板**：`lark-cli vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty`
+- **默认命令模板**：`lark-ka vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty`
 - 如果你发现自己执行成了不带 `--page-all` 的单页查询，而响应里又出现 `has_more=true` / `more available` / 非空 `page_token`，应立刻意识到这只是部分结果。
-- 遇到上述情况，默认补救方式是继续使用返回的 `page_token` 续拉，例如：`lark-cli vc +meeting-events --meeting-id <meeting.id> --page-token <returned_page_token> --page-all --format pretty`
+- 遇到上述情况，默认补救方式是继续使用返回的 `page_token` 续拉，例如：`lark-ka vc +meeting-events --meeting-id <meeting.id> --page-token <returned_page_token> --page-all --format pretty`
 - 只有在用户明确要求“就看第一页”“先不要翻页”时，才不要默认带 `--page-all`
 - 只要你是基于 `+meeting-events` 来回答一场**正在进行中的会议内容**，就不能直接复用上一次查询结果。无论用户是在问“现在是谁在说话”“刚刚发生了什么”“最新事件有哪些”，还是让你“总结一下这个会议讲什么”，都必须先重新执行一次 `+meeting-events`，确认拿到的是最新事件流，再回答用户。只有在用户明确要求基于某次历史快照继续分析时，才可以复用旧结果。
 
@@ -115,7 +115,7 @@ lark-cli vc +meeting-events --meeting-id <meeting.id>
 
 执行准则：
 
-- 这类问题默认先用 `lark-cli vc +meeting-events --meeting-id <meeting.id> --page-all --format json` 拉取最新事件流。
+- 这类问题默认先用 `lark-ka vc +meeting-events --meeting-id <meeting.id> --page-all --format json` 拉取最新事件流。
 - 如果事件中出现共享文档线索，例如：
   - `magic_share_started`
   - `share_doc.title`
@@ -181,16 +181,16 @@ lark-cli vc +meeting-events --meeting-id <meeting.id>
 
 ```bash
 # 第 1 步：加入会议，记录返回的 meeting.id
-lark-cli vc +meeting-join --meeting-number 123456789
+lark-ka vc +meeting-join --meeting-number 123456789
 
 # 第 2 步：查询事件流
-lark-cli vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty
+lark-ka vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty
 ```
 
 ### 场景 2：过滤某段时间内的事件
 
 ```bash
-lark-cli vc +meeting-events \
+lark-ka vc +meeting-events \
   --meeting-id <meeting.id> \
   --start 2026-04-17T15:00:00+08:00 \
   --end 2026-04-17T16:00:00+08:00 \
@@ -203,7 +203,7 @@ lark-cli vc +meeting-events \
 ```bash
 # 上一次查询结束后，保留最后返回的 page_token
 # 这次直接从该游标继续拉新增事件
-lark-cli vc +meeting-events \
+lark-ka vc +meeting-events \
   --meeting-id <meeting.id> \
   --page-token <last_page_token> \
   --page-all \
@@ -221,8 +221,8 @@ lark-cli vc +meeting-events \
 | 错误现象 | 根本原因 | 解决方案 |
 |---------|---------|---------|
 | `--meeting-id is required` | 未传入 `--meeting-id` | 传入长数字 `meeting.id` |
-| `10005 bot is not in meeting` | bot 从未真实入会该会议；或会议已结束但 bot 从未在会中出现过 | 先 `+meeting-join --meeting-number <9位号>` 真实入会再查；如果会议已经结束且当时 bot 没进过会，本接口也拉不到数据。**如果只是想看参会人快照，改用 `lark-cli vc meeting get --params '{"meeting_id":"<meeting.id>"}' --with-participants`**（不依赖 bot 身份参会） |
-| `20001 meeting_status_MEETING_END` | 会议已结束且已超出后端允许的 5 分钟宽限窗口 | 本接口不再适合继续拉取事件。若要拿纪要文档或逐字稿 token，用 `lark-cli vc +notes --meeting-ids <meeting.id>`；若要拿 AI 产物（summary / todos / chapters）或导出逐字稿文件，先用 `lark-cli vc +recording --meeting-ids <meeting.id>` 拿 `minute_token`，再用 `lark-cli vc +notes --minute-tokens <minute_token>`；参会人请用 `lark-cli vc meeting get --params '{"meeting_id":"<meeting.id>"}' --with-participants` |
+| `10005 bot is not in meeting` | bot 从未真实入会该会议；或会议已结束但 bot 从未在会中出现过 | 先 `+meeting-join --meeting-number <9位号>` 真实入会再查；如果会议已经结束且当时 bot 没进过会，本接口也拉不到数据。**如果只是想看参会人快照，改用 `lark-ka vc meeting get --params '{"meeting_id":"<meeting.id>"}' --with-participants`**（不依赖 bot 身份参会） |
+| `20001 meeting_status_MEETING_END` | 会议已结束且已超出后端允许的 5 分钟宽限窗口 | 本接口不再适合继续拉取事件。若要拿纪要文档或逐字稿 token，用 `lark-ka vc +notes --meeting-ids <meeting.id>`；若要拿 AI 产物（summary / todos / chapters）或导出逐字稿文件，先用 `lark-ka vc +recording --meeting-ids <meeting.id>` 拿 `minute_token`，再用 `lark-ka vc +notes --minute-tokens <minute_token>`；参会人请用 `lark-ka vc meeting get --params '{"meeting_id":"<meeting.id>"}' --with-participants` |
 | `20002 meeting not exist` | `meeting_id` 错误，或会议实例当前已不可获取（常见于把 9 位会议号当 meeting_id 传） | 确认传入的是长数字 `meeting_id`，不是 9 位会议号 |
 | `HTTP 404` / `HTTP 500` | 服务端当前无法找到或处理该会议实例 | 换一个正在进行且 bot 可见的 meeting_id，或排查后端问题 |
 
@@ -230,8 +230,8 @@ lark-cli vc +meeting-events \
 
 - 这是**会中事件流**查询，不适合拿来搜历史会议记录；搜历史会议请用 `+search`。
 - 如果会议已经结束，不要卡在 `+meeting-events`：  
-  - 想拿纪要文档或逐字稿 token：用 `lark-cli vc +notes --meeting-ids <meeting.id>`
-  - 想拿 AI 产物（summary / todos / chapters）或导出逐字稿文件：先用 `lark-cli vc +recording --meeting-ids <meeting.id>` 拿 `minute_token`，再用 `lark-cli vc +notes --minute-tokens <minute_token>`
+  - 想拿纪要文档或逐字稿 token：用 `lark-ka vc +notes --meeting-ids <meeting.id>`
+  - 想拿 AI 产物（summary / todos / chapters）或导出逐字稿文件：先用 `lark-ka vc +recording --meeting-ids <meeting.id>` 拿 `minute_token`，再用 `lark-ka vc +notes --minute-tokens <minute_token>`
 - 事件列表是否完整，取决于 bot 何时入会、何时离会，以及后端当前可见的会中事件范围。对于已结束会议，通常只在**结束后 5 分钟内**、且 bot **曾经在会中**时还能继续拉到事件。
 - 查询"谁参加过某会议"请用 `vc meeting get --params '{"meeting_id":"<id>","with_participants":true}'`——这是参会人**快照** API，不依赖 bot 是否参会，对已结束会议也可查；**不要** 用 `+meeting-events` 做参会人查询。
 

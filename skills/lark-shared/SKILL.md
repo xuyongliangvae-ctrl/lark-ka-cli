@@ -14,23 +14,23 @@ description: "Use when first setting up lark-cli, running auth login, switching 
 
 如果当前进程的环境变量包含 `OPENCLAW_*`，说明本机已被人工预配置（如 `brand=gjgw` 私有化飞书）。此时：
 
-- ❌ **不要** 运行 `lark-cli config init` / `config init --new`
-- ❌ **不要** 运行 `lark-cli config bind`
-- ❌ **不要** 运行 `lark-cli auth login`
+- ❌ **不要** 运行 `lark-ka config init` / `config init --new`
+- ❌ **不要** 运行 `lark-ka config bind`
+- ❌ **不要** 运行 `lark-ka auth login`
 
-`lark-cli config show` 报 "not configured" 在 OpenClaw 子进程下是路径隔离问题，**不是配置丢失**——直接执行原命令即可。如果遇到 5xx / token_missing，**原样反馈错误给用户**，不要尝试自动修复（任何 bind/auth/init 都会污染 active profile）。
+`lark-ka config show` 报 "not configured" 在 OpenClaw 子进程下是路径隔离问题，**不是配置丢失**——直接执行原命令即可。如果遇到 5xx / token_missing，**原样反馈错误给用户**，不要尝试自动修复（任何 bind/auth/init 都会污染 active profile）。
 
 ## 配置初始化
 
-首次使用需运行 `lark-cli config init` 完成应用配置。
+首次使用需运行 `lark-ka config init` 完成应用配置。
 
 当你帮用户初始化配置时，使用background方式使用下面的命令发起配置应用流程，启动后读取输出，从中提取授权链接并发给用户。
 
-**URL 转发规则**：当命令输出 `verification_url`、`verification_uri_complete`、`console_url` 等 URL 字段时：**必须生成二维码**：你必须调用 `lark-cli auth qrcode` 将 URL 转为二维码并展示给用户，这是必须步骤，不要跳过。优先生成 PNG 二维码（--output）；仅当用户明确要求时才使用 ASCII（--ascii）。**URL 输出规则**：将 URL 视为不可修改的 opaque string，不要做任何修改（包括 URL 编码/解码、添加空格或标点、重新拼接 query），二维码和链接请一起展示给用户。
+**URL 转发规则**：当命令输出 `verification_url`、`verification_uri_complete`、`console_url` 等 URL 字段时：**必须生成二维码**：你必须调用 `lark-ka auth qrcode` 将 URL 转为二维码并展示给用户，这是必须步骤，不要跳过。优先生成 PNG 二维码（--output）；仅当用户明确要求时才使用 ASCII（--ascii）。**URL 输出规则**：将 URL 视为不可修改的 opaque string，不要做任何修改（包括 URL 编码/解码、添加空格或标点、重新拼接 query），二维码和链接请一起展示给用户。
 
 ```bash
 # 发起配置（该命令会阻塞直到用户打开链接并完成操作或过期）
-lark-cli config init --new
+lark-ka config init --new
 ```
 
 ## 认证
@@ -41,7 +41,7 @@ lark-cli config init --new
 
 | 身份 | 标识 | 获取方式 | 适用场景 |
 |------|------|---------|---------|
-| user 用户身份 | `--as user` | `lark-cli auth login` 等 | 访问用户自己的资源（日历、云空间/云盘/云存储等） |
+| user 用户身份 | `--as user` | `lark-ka auth login` 等 | 访问用户自己的资源（日历、云空间/云盘/云存储等） |
 | bot 应用身份 | `--as bot` | 自动，只需 appId + appSecret | 应用级操作,访问bot自己的资源 |
 
 ### 身份选择原则
@@ -70,8 +70,8 @@ lark-cli config init --new
 #### User 身份（`--as user`）
 
 ```bash
-lark-cli auth login --domain <domain>           # 按业务域授权
-lark-cli auth login --scope "<missing_scope>"   # 按具体 scope 授权（推荐,符合最小权限原则）
+lark-ka auth login --domain <domain>           # 按业务域授权
+lark-ka auth login --scope "<missing_scope>"   # 按具体 scope 授权（推荐,符合最小权限原则）
 ```
 
 **规则**：auth login 必须指定范围（`--domain` 或 `--scope`）。多次 login 的 scope 会累积（增量授权）。
@@ -82,7 +82,7 @@ lark-cli auth login --scope "<missing_scope>"   # 按具体 scope 授权（推�
 
 ```bash
 # 发起授权（立即返回 device_code 和 verification_url）
-lark-cli auth login --scope "calendar:calendar:readonly" --no-wait --json
+lark-ka auth login --scope "calendar:calendar:readonly" --no-wait --json
 ```
 
 拿到 `verification_url` 后，将它原样作为本轮最终消息发给用户，并结束本轮/交还控制权。不要在同一轮中展示 URL 后立刻执行 `--device-code` 阻塞轮询；在不透传中间输出的 agent harness 里，这会导致用户永远看不到 URL。
@@ -90,23 +90,23 @@ lark-cli auth login --scope "calendar:calendar:readonly" --no-wait --json
 用户回复已完成授权后，再在后续步骤执行：
 
 ```bash
-lark-cli auth login --device-code <device_code>
+lark-ka auth login --device-code <device_code>
 ```
 
 **Split-Flow 完整步骤**：
 
 **第一步：发起授权（当前轮）**
 
-1. 执行 `lark-cli auth login --scope "xxx" --no-wait --json`（必须加 `--no-wait --json`）
+1. 执行 `lark-ka auth login --scope "xxx" --no-wait --json`（必须加 `--no-wait --json`）
 2. 从 JSON 输出中提取 `verification_url` 和 `device_code`
-3. 生成二维码：`lark-cli auth qrcode <verification_url> --output "xxx"`
+3. 生成二维码：`lark-ka auth qrcode <verification_url> --output "xxx"`
 4. 将 URL 和二维码展示给用户（先 URL，后二维码）
 5. **结束本轮对话前，必须明确告知用户**："请完成授权后，回来告诉我已授权完成，我会帮你完成后续步骤"
 
 **第二步：完成授权（后续轮）**
 
 1. 等待用户回复"已完成授权"
-2. **由你（AI agent）亲自执行**：`lark-cli auth login --device-code <device_code>`
+2. **由你（AI agent）亲自执行**：`lark-ka auth login --device-code <device_code>`
 3. 此命令会轮询授权状态并完成登录
 4. 如果返回授权成功，流程结束
 
@@ -114,7 +114,7 @@ lark-cli auth login --device-code <device_code>
 
 - **你必须亲自执行 `--device-code` 命令**，不要指示用户自行执行
 - **不要在同一轮中展示 URL 后立刻执行 `--device-code`**，这会导致用户看不到 URL
-- **禁止缓存 `verification_url` 或 `device_code`**：每次需要授权时，必须重新执行 `lark-cli auth login --no-wait --json` 生成新的链接。不要将授权链接和 device code 存入上下文供后续复用
+- **禁止缓存 `verification_url` 或 `device_code`**：每次需要授权时，必须重新执行 `lark-ka auth login --no-wait --json` 生成新的链接。不要将授权链接和 device code 存入上下文供后续复用
 
 ## 更新检查
 
@@ -125,11 +125,11 @@ lark-cli 命令执行后，如果检测到新版本，JSON 输出中会包含 `_
 1. 告知用户当前版本和最新版本号
 2. 提议执行更新（同时更新 CLI 和 Skills）：
    ```bash
-   lark-cli update
+   lark-ka update
    ```
 3. 更新完成后提醒用户：**退出并重新打开 AI Agent** 以加载最新 Skills
 
-**重要**：始终使用 `lark-cli update` 更新，它会同时更新 CLI 和 AI Skills。
+**重要**：始终使用 `lark-ka update` 更新，它会同时更新 CLI 和 AI Skills。
 
 **规则**：不要静默忽略更新提示。即使当前任务与更新无关，也应在完成用户请求后补充告知。
 
@@ -176,5 +176,5 @@ lark-cli 对高风险写操作（`risk: "high-risk-write"`）有强制确认门�
 
 ### 如何识别一条命令是高风险
 
-- shortcut：`lark-cli <service> +<cmd> --help` 顶部会显示 `Risk: high-risk-write`
-- service 命令：`lark-cli schema <service>.<resource>.<method> --format json` 的返回值里 `"risk": "high-risk-write"`
+- shortcut：`lark-ka <service> +<cmd> --help` 顶部会显示 `Risk: high-risk-write`
+- service 命令：`lark-ka schema <service>.<resource>.<method> --format json` 的返回值里 `"risk": "high-risk-write"`

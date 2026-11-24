@@ -7,9 +7,9 @@
 ## 命令
 
 ```bash
-lark-cli apps +update --app-id app_xxx --name "调研问卷 v2"
-lark-cli apps +update --app-id app_xxx --description "新描述"
-lark-cli apps +update --app-id app_xxx --name "v2" --description "新描述"
+lark-ka apps +update --app-id app_xxx --name "调研问卷 v2"
+lark-ka apps +update --app-id app_xxx --description "新描述"
+lark-ka apps +update --app-id app_xxx --name "v2" --description "新描述"
 ```
 
 ## 参数
@@ -62,7 +62,7 @@ lark-cli apps +update --app-id app_xxx --name "v2" --description "新描述"
 ### 场景 1：用户说"把应用 X 改名叫 Y"
 
 ```bash
-lark-cli apps +update --app-id app_xxx --name "Y"
+lark-ka apps +update --app-id app_xxx --name "Y"
 ```
 
 > 应用 `{app_id}` 已更新，新名字「{name}」。

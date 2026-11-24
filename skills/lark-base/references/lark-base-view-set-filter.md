@@ -68,7 +68,7 @@ location 筛选只按 `full_address` 字符串匹配，不能直接按经纬度�
 
 用对象数组：
 
-> **人员筛选：不要猜 ID。** 不知道 `open_id` 时，先用 `lark-contact` 查 id：`lark-cli contact +search-user --query "<姓名/邮箱/手机号>" --as user`。
+> **人员筛选：不要猜 ID。** 不知道 `open_id` 时，先用 `lark-contact` 查 id：`lark-ka contact +search-user --query "<姓名/邮箱/手机号>" --as user`。
 
 ```json
 ["负责人", "intersects", [{ "id": "ou_xxx" }]]
@@ -78,7 +78,7 @@ location 筛选只按 `full_address` 字符串匹配，不能直接按经纬度�
 
 用对象数组：
 
-> **群组筛选：不要猜 ID。** 不知道 `chat_id` 时，先用 `lark-im` 搜群：`lark-cli im +chat-search --query "<群名关键词>" --as user`；取结果里的 `oc_xxx`。
+> **群组筛选：不要猜 ID。** 不知道 `chat_id` 时，先用 `lark-im` 搜群：`lark-ka im +chat-search --query "<群名关键词>" --as user`；取结果里的 `oc_xxx`。
 
 ```json
 ["负责群", "intersects", [{ "id": "oc_xxx" }]]
@@ -142,7 +142,7 @@ location 筛选只按 `full_address` 字符串匹配，不能直接按经纬度�
 ## 4. 推荐命令
 
 ```bash
-lark-cli base +view-set-filter \
+lark-ka base +view-set-filter \
   --base-token <base_token> \
   --table-id <table_id> \
   --view-id <view_id> \

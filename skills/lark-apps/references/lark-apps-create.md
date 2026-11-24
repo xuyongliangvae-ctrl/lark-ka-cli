@@ -8,17 +8,17 @@
 
 ```bash
 # 最小调用
-lark-cli apps +create --name "客户调研问卷" --app-type HTML
+lark-ka apps +create --name "客户调研问卷" --app-type HTML
 
 # 全参数
-lark-cli apps +create \
+lark-ka apps +create \
   --name "客户调研问卷" \
   --app-type HTML \
   --description "本季度客户满意度调研" \
   --icon-url "https://lf3-static.bytednsdoc.com/.../feisuda/avatar/5.svg"
 
 # Dry-run（仅打印请求，不执行）
-lark-cli apps +create --name "Demo" --app-type HTML --dry-run
+lark-ka apps +create --name "Demo" --app-type HTML --dry-run
 ```
 
 ## 参数
@@ -77,7 +77,7 @@ lark-cli apps +create --name "Demo" --app-type HTML --dry-run
 目前只支持 HTML 类型，统一传 `--app-type HTML`（用户没说类型时不要追问，直接用大写 HTML，区分大小写）：
 
 ```bash
-lark-cli apps +create --name "X" --app-type HTML
+lark-ka apps +create --name "X" --app-type HTML
 ```
 
 向用户报告：
@@ -91,7 +91,7 @@ lark-cli apps +create --name "X" --app-type HTML
 ### 场景 2：用户提供完整元信息
 
 ```bash
-lark-cli apps +create --name "Q4 调研" --app-type HTML --description "..."
+lark-ka apps +create --name "Q4 调研" --app-type HTML --description "..."
 ```
 
 返回后同场景 1。

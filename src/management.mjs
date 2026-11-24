@@ -16,17 +16,23 @@ import {
   withLock,
   PACKAGE_ROOT,
   validURL,
+  isHaiNengProfile,
 } from "./config.mjs";
 import {
   getBotToken,
+  getApplicationUserScopes,
   currentUser,
   authURL,
+  tokenRequest,
   profileSessions,
   isProfileSessionKey,
 } from "./auth.mjs";
 import { fetchJSON } from "./http.mjs";
 import { resolveInput } from "./io.mjs";
-import { shortcuts, apiSpecs } from "./metadata.mjs";
+import { shortcuts, apiSpecs, findAPI } from "./metadata.mjs";
+import { CONFIG_PARAMETERS } from "./config-options.mjs";
+import { isHaiNengBaseShortcut } from "./domains/tables.mjs";
+import { parseArgs } from "./args.mjs";
 
 const has = (o, k) => Object.hasOwn(o, k);
 const yes = (v) => v === true || v === "true";
@@ -267,29 +273,91 @@ async function bindConfig(flags, options) {
 
 async function newApp(flags, options) {
   const env = envFor(options);
-  let deployment = {};
-  if (flags.deployment)
-    deployment = JSON.parse(
-      await getInput(
-        flags.deployment.startsWith("@")
-          ? flags.deployment
-          : "@" + flags.deployment,
-        options,
-      ),
-    );
-  const brand = flags.brand || deployment.brand || "feishu";
+  const store = await readStore("config.json", { apps: [] }, env);
+  const selected = flags.profile || env.LARK_KA_PROFILE;
+  const name = flags.name || selected || store.currentApp || "default";
+  if (!/^[a-zA-Z0-9][\w.-]{0,63}$/.test(name))
+    throw new CliError("validation", "Invalid profile name");
+  const find = (profile) =>
+    store.apps.find((app) => (app.name || app.appId) === profile);
+  const stored = find(selected || name);
+  const active = find(store.currentApp);
+  const sessionOptions = ["appId", "appSecretEnv"];
+  const deployment = {};
+  for (const { key } of Object.values(CONFIG_PARAMETERS))
+    if (stored?.[key] !== undefined && !sessionOptions.includes(key))
+      deployment[key] = stored[key];
+  if (env.LARKSUITE_CLI_BRAND) deployment.brand = env.LARKSUITE_CLI_BRAND;
+  const file = flags.deployment || env.LARK_KA_DEPLOYMENT;
+  if (file) {
+    let supplied;
+    try {
+      supplied = JSON.parse(
+        await getInput(file.startsWith("@") ? file : "@" + file, options),
+      );
+    } catch {
+      throw new CliError(
+        "config",
+        "Cannot read deployment JSON for app registration",
+      );
+    }
+    if (!supplied || typeof supplied !== "object" || Array.isArray(supplied))
+      throw new CliError(
+        "config",
+        "App registration deployment must be a JSON object",
+      );
+    Object.assign(deployment, supplied);
+  }
+  for (const [flag, { key }] of Object.entries(CONFIG_PARAMETERS)) {
+    if (flags[flag] === undefined || sessionOptions.includes(key)) continue;
+    if (Array.isArray(flags[flag]) && flag !== "scope")
+      throw new CliError("validation", `--${flag} must be specified once`);
+    deployment[key] = flags[flag];
+    if (flag.endsWith("-path") && !flags[flag.replace(/-path$/, "-url")])
+      delete deployment[key.replace(/Path$/, "Url")];
+  }
+  if (flags["app-registration-url"])
+    deployment.registrationUrl = flags["app-registration-url"];
+  if (stored && stored.accountsBaseUrl === deployment.accountsBaseUrl) {
+    deployment.registrationUrl ??= stored.registrationUrl;
+    if (deployment.registrationUrl === stored.registrationUrl)
+      deployment.registrationPollUrl ??= stored.registrationPollUrl;
+  }
+  const hasCustomDomain = Object.keys(deployment).some(
+    (key) => key.endsWith("Url") && deployment[key],
+  );
+  const privateContext = active && !["feishu", "lark"].includes(active.brand);
+  const brand =
+    deployment.brand ||
+    (name === "cnooc" ||
+    selected === "cnooc" ||
+    hasCustomDomain ||
+    privateContext
+      ? "custom"
+      : "feishu");
   const config = endpoints(brand, deployment);
-  const explicit = flags["app-registration-url"] || deployment.registrationUrl;
-  if (!explicit && !["feishu", "lark"].includes(brand))
+  const publicRegistration =
+    ["feishu", "lark"].includes(brand) && !hasCustomDomain;
+  const explicit = deployment.registrationUrl;
+  const registrationAccounts =
+    deployment.accountsBaseUrl ||
+    (/^https?:/.test(brand) ? config.accountsBaseUrl : undefined);
+  if (!explicit && !registrationAccounts && !publicRegistration)
     throw new CliError(
       "config",
       "Private deployment app registration endpoint is not configured",
       {
-        hint: "Create an enterprise application in the customer console and pass --app-id/--app-secret-stdin, or configure registrationUrl.",
+        hint: "Pass --app-registration-url or --accounts-base-url for this deployment, or initialize an existing enterprise application with --app-id.",
       },
     );
   const begin = validURL(
-    explicit || "https://accounts.feishu.cn/oauth/v1/app/registration",
+    explicit ||
+      new URL(
+        "/oauth/v1/app/registration",
+        publicRegistration
+          ? "https://accounts.feishu.cn"
+          : registrationAccounts,
+      ).href,
   );
   const poll = validURL(
     deployment.registrationPollUrl ||
@@ -317,7 +385,7 @@ async function newApp(flags, options) {
     data.verification_uri_complete ||
     new URL(
       `/page/cli?user_code=${encodeURIComponent(data.user_code || "")}`,
-      config.openBaseUrl,
+      config.openBaseUrl || config.accountsBaseUrl || begin,
     ).href;
   (
     options.emit ??
@@ -358,8 +426,10 @@ async function newApp(flags, options) {
         code: 5,
       });
     let secret = result.client_secret;
-    const resultBrand = result.user_info?.tenant_brand || brand;
-    if (!secret && resultBrand === "lark" && !explicit) {
+    const resultBrand = publicRegistration
+      ? result.user_info?.tenant_brand || brand
+      : brand;
+    if (!secret && resultBrand === "lark" && publicRegistration) {
       result = unbox(
         await fetcher(
           "https://accounts.larksuite.com/oauth/v1/app/registration",
@@ -379,7 +449,7 @@ async function newApp(flags, options) {
     return persistProfile(
       {
         ...deployment,
-        name: flags.name || flags.profile || "default",
+        name,
         appId: result.client_id,
         brand: resultBrand,
         lang: flags.lang,
@@ -451,17 +521,18 @@ async function serverBridge(flags, options) {
   required(c.appSecret, "Server application secret");
   const fetcher = options.fetchJSON ?? fetchJSON;
   const token = unbox(
-    await fetcher(authURL(c, "token"), {
-      method: "POST",
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        code: input.code,
-        client_id: c.appId,
-        client_secret: c.appSecret,
-        redirect_uri: redirect.href,
-      }),
-      signal: options.signal,
-    }),
+    await fetcher(
+      authURL(c, "token"),
+      tokenRequest(
+        c,
+        {
+          grant_type: "authorization_code",
+          code: input.code,
+          redirect_uri: redirect.href,
+        },
+        options.signal,
+      ),
+    ),
   );
   if (!token.access_token)
     throw new CliError("auth", "Token exchange response has no access_token", {
@@ -607,11 +678,32 @@ const MANAGEMENT = {
   doctor: [],
   update: [],
 };
-function commandTree() {
+export async function discoveryProfile(flags = {}, env = process.env) {
+  try {
+    return await loadConfig(flags, env, { optional: true });
+  } catch (error) {
+    if (!(error instanceof CliError)) throw error;
+    return {
+      profileName: flags.profile || env.LARK_KA_PROFILE,
+      brand: env.LARKSUITE_CLI_BRAND,
+    };
+  }
+}
+
+export function availableShortcuts(config) {
+  return isHaiNengProfile(config)
+    ? shortcuts.filter(
+        (spec) =>
+          spec.service !== "base" || isHaiNengBaseShortcut(spec.command),
+      )
+    : shortcuts;
+}
+
+function commandTree(visibleShortcuts) {
   const tree = new Map(
     Object.entries(MANAGEMENT).map(([key, value]) => [key, new Set(value)]),
   );
-  for (const spec of shortcuts) {
+  for (const spec of visibleShortcuts) {
     if (!tree.has(spec.service)) tree.set(spec.service, new Set());
     tree.get(spec.service).add(spec.command);
   }
@@ -621,11 +713,21 @@ function commandTree() {
     const key = `${spec.service}/${spec.resource}`;
     if (!tree.has(key)) tree.set(key, new Set());
     tree.get(key).add(spec.name || spec.methodName || spec.method);
+    if (spec.service === "base" && spec.resource.includes(".")) {
+      let group = spec.service;
+      for (const segment of spec.resource.split(".")) {
+        tree.get(group).add(segment);
+        group += `/${segment}`;
+        if (!tree.has(group)) tree.set(group, new Set());
+      }
+      tree.get(group).add(spec.method);
+    }
   }
   return tree;
 }
-export function completionCandidates(words) {
-  const tree = commandTree();
+export function completionCandidates(words, config) {
+  const visibleShortcuts = availableShortcuts(config);
+  const tree = commandTree(visibleShortcuts);
   const parts = [...words];
   const prefix = parts.pop() || "";
   const key = parts.join("/");
@@ -633,9 +735,17 @@ export function completionCandidates(words) {
     ? tree.get(key) || []
     : [...tree.keys()].filter((x) => !x.includes("/"));
   if (prefix.startsWith("-")) {
-    const spec = shortcuts.find(
+    const spec = visibleShortcuts.find(
       (x) => x.service === parts[0] && x.command === parts[1],
     );
+    if (
+      parts[0] === "base" &&
+      parts[1]?.startsWith("+") &&
+      isHaiNengProfile(config) &&
+      !spec
+    )
+      return [];
+    const nativeBase = parts[0] === "base" && findAPI(parts);
     return [
       ...new Set([
         "--help",
@@ -645,6 +755,7 @@ export function completionCandidates(words) {
         "--dry-run",
         "--page-all",
         "--yes",
+        ...(nativeBase ? ["--params", "--data"] : []),
         ...(spec?.flags || []).map((f) => `--${f.name}`),
       ]),
     ]
@@ -658,19 +769,19 @@ export function completionCandidates(words) {
 function shellCompletion(shell) {
   if (shell === "bash")
     return {
-      __raw: `_lark_ka_complete() { local IFS=$'\\n'; COMPREPLY=($(lark-ka __complete "\${COMP_WORDS[@]:1}" 2>/dev/null | sed '/^:/d')); }\ncomplete -F _lark_ka_complete lark-ka lark-cli\n`,
+      __raw: `_lark_ka_complete() { local IFS=$'\\n'; COMPREPLY=($(lark-ka __complete "\${COMP_WORDS[@]:1}" 2>/dev/null | sed '/^:/d')); }\ncomplete -F _lark_ka_complete lark-ka\n`,
     };
   if (shell === "zsh")
     return {
-      __raw: `#compdef lark-ka lark-cli\n_lark_ka_complete() { local -a candidates; candidates=(\"\${(@f)$(lark-ka __complete \"\${words[@]:1}\" 2>/dev/null)}\"); compadd -- \${candidates:#:*}; }\ncompdef _lark_ka_complete lark-ka lark-cli\n`,
+      __raw: `#compdef lark-ka\n_lark_ka_complete() { local -a candidates; candidates=(\"\${(@f)$(lark-ka __complete \"\${words[@]:1}\" 2>/dev/null)}\"); compadd -- \${candidates:#:*}; }\ncompdef _lark_ka_complete lark-ka\n`,
     };
   if (shell === "fish")
     return {
-      __raw: `function __lark_ka_complete\n set -l words (commandline -opc)\n lark-ka __complete $words[2..-1] (commandline -ct) 2>/dev/null | string match -rv '^:'\nend\ncomplete -c lark-ka -f -a '(__lark_ka_complete)'\ncomplete -c lark-cli -f -a '(__lark_ka_complete)'\n`,
+      __raw: `function __lark_ka_complete\n set -l words (commandline -opc)\n lark-ka __complete $words[2..-1] (commandline -ct) 2>/dev/null | string match -rv '^:'\nend\ncomplete -c lark-ka -f -a '(__lark_ka_complete)'\n`,
     };
   if (shell === "powershell")
     return {
-      __raw: `Register-ArgumentCompleter -Native -CommandName lark-ka,lark-cli -ScriptBlock { param($wordToComplete,$commandAst,$cursorPosition) $parts=@($commandAst.CommandElements | Select-Object -Skip 1 | ForEach-Object { $_.Extent.Text }); if (-not $wordToComplete) {$parts += ''}; lark-ka __complete @parts | Where-Object { $_ -notmatch '^:' } }\n`,
+      __raw: `Register-ArgumentCompleter -Native -CommandName lark-ka -ScriptBlock { param($wordToComplete,$commandAst,$cursorPosition) $parts=@($commandAst.CommandElements | Select-Object -Skip 1 | ForEach-Object { $_.Extent.Text }); if (-not $wordToComplete) {$parts += ''}; lark-ka __complete @parts | Where-Object { $_ -notmatch '^:' } }\n`,
     };
   throw new CliError(
     "validation",
@@ -798,12 +909,7 @@ export async function enforcePolicy(
   const shortcut = shortcuts.find(
     (s) => s.service === words[0] && s.command === words[1],
   );
-  const api = apiSpecs().find(
-    (s) =>
-      s.service === words[0] &&
-      s.resource === words[1] &&
-      (s.name || s.methodName || s.method) === words[2],
-  );
+  const api = findAPI(words);
   const key =
     words[0] === "api"
       ? "api"
@@ -1072,10 +1178,19 @@ export async function executeManagement(words, flags = {}, options = {}) {
   const env = envFor(options);
   if (service === "update") return updatePackage(flags, options);
   if (service === "completion") return shellCompletion(command || "bash");
-  if (service === "__complete" || service === "__completeNoDesc")
+  if (service === "__complete" || service === "__completeNoDesc") {
+    const values = words.slice(1);
+    const prefix = values.pop() ?? "";
+    const { positionals, flags: completedFlags } = parseArgs(values);
+    const config =
+      options.config ??
+      (await discoveryProfile({ ...flags, ...completedFlags }, env));
     return {
-      __raw: completionCandidates(words.slice(1)).join("\n") + "\n:4\n",
+      __raw:
+        completionCandidates([...positionals, prefix], config).join("\n") +
+        "\n:4\n",
     };
+  }
   if (service === "skills" || service === "skill")
     return skillsManagement(words, flags, options);
   if (service === "config" && command === "bind")
@@ -1106,28 +1221,7 @@ export async function executeManagement(words, flags = {}, options = {}) {
     return serverBridge(flags, options);
   if (service === "auth" && command === "scopes") {
     const c = options.config ?? (await loadConfig(flags, env));
-    const token = await (options.getBotToken ?? getBotToken)(c);
-    const data = unbox(
-      await (options.fetchJSON ?? fetchJSON)(
-        new URL(
-          `/open-apis/application/v6/applications/${encodeURIComponent(c.appId)}?lang=zh_cn`,
-          c.openBaseUrl,
-        ),
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: options.signal,
-        },
-      ),
-    );
-    const app = data.app ?? data;
-    const userScopes = [
-      ...new Set(
-        (app.scopes || [])
-          .filter((s) => (s.token_types || s.tokenTypes || []).includes("user"))
-          .map((s) => s.scope)
-          .filter(Boolean),
-      ),
-    ];
+    const userScopes = await getApplicationUserScopes(c, options);
     return {
       appId: c.appId,
       brand: c.brand,

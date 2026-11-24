@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书审批 API：审批实例、审批任务管理。"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli approval --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka approval --help"
 ---
 
 # approval (v4)
@@ -15,8 +15,8 @@ metadata:
 ## API Resources
 
 ```bash
-lark-cli schema approval.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli approval <resource> <method> [flags] # 调用 API
+lark-ka schema approval.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka approval <resource> <method> [flags] # 调用 API
 ```
 
 > **重要**：使用原生 API 时，必须先运行 `schema` 查看 `--data` / `--params` 参数结构，不要猜测字段格式。

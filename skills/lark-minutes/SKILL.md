@@ -4,8 +4,8 @@ version: 1.0.0
 description: "飞书妙记：妙记相关基本功能。1.查询妙记列表（按关键词/所有者/参与者/时间范围）；2.获取妙记基础信息（标题、封面、时长 等）；3.下载妙记音视频文件；4.获取妙记相关 AI 产物（总结、待办、章节）；5.上传音视频生成妙记，也支持将本地音视频文件转成纪要、逐字稿、文字稿、撰写文字等产物；6.更新妙记标题（重命名妙记）；7.替换妙记逐字稿中的说话人。遇到这类请求时，应优先使用本 skill。飞书妙记 URL 格式: http(s)://<host>/minutes/<minute-token>"
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli minutes --help"
+    bins: ["lark-ka"]
+  cliHelp: "lark-ka minutes --help"
 ---
 
 # minutes (v1)
@@ -41,7 +41,7 @@ metadata:
 3. 如果是会议 / 日程上下文中的妙记基础信息，先通过 VC 链路拿到 `minute_token`，再调用 `minutes minutes get`。
 4. 用户意图不明确时，默认先给基础元信息，帮助确认是否命中目标妙记。
 
-> 使用 `lark-cli schema minutes.minutes.get` 可查看完整返回值结构。核心字段包含：`title`（标题）、`cover`（封面 URL）、`duration`（时长，毫秒）、`owner_id`（所有者 ID）、`url`（妙记链接）。
+> 使用 `lark-ka schema minutes.minutes.get` 可查看完整返回值结构。核心字段包含：`title`（标题）、`cover`（封面 URL）、`duration`（时长，毫秒）、`owner_id`（所有者 ID）、`url`（妙记链接）。
 
 ### 3. 下载妙记音视频文件
 
@@ -62,7 +62,7 @@ metadata:
 
 ```bash
 # 通过 minute_token 获取纪要产物（逐字稿、总结、待办、章节）
-lark-cli vc +notes --minute-tokens <minute_token>
+lark-ka vc +notes --minute-tokens <minute_token>
 ```
 
 > **跨 skill 路由**：逐字稿、AI 总结、待办、章节等纪要内容由 [lark-vc](../lark-vc/SKILL.md) 的 `+notes` 命令提供
@@ -72,9 +72,9 @@ lark-cli vc +notes --minute-tokens <minute_token>
 1. 当用户需要通过上传本地音视频文件来生成妙记时使用。
 2. 当用户说"把音视频文件转成纪要""把录音转成逐字稿/文字稿/撰写文字""把 mp4/mp3 转成总结/待办/章节"时，也先走这个入口。
 3. **处理流程**：
-   - **上传音视频获取 `file_token`**：使用 [`lark-cli drive +upload`](../lark-drive/references/lark-drive-upload.md) 上传本地文件到云空间（云盘/云存储）并获取 `file_token`。
-   - **生成妙记**：获取到 `file_token` 后，调用 [`lark-cli minutes +upload`](references/lark-minutes-upload.md) 将文件转换为妙记并获取 `minute_url` 链接。
-   - **继续获取纪要 / 逐字稿（按需）**：如果用户目标不是只要妙记链接，而是要纪要、逐字稿、总结、待办或章节，则从 `minute_url` 中提取 `minute_token`，再调用 [`lark-cli vc +notes --minute-tokens`](../lark-vc/references/lark-vc-notes.md) 获取对应产物。
+   - **上传音视频获取 `file_token`**：使用 [`lark-ka drive +upload`](../lark-drive/references/lark-drive-upload.md) 上传本地文件到云空间（云盘/云存储）并获取 `file_token`。
+   - **生成妙记**：获取到 `file_token` 后，调用 [`lark-ka minutes +upload`](references/lark-minutes-upload.md) 将文件转换为妙记并获取 `minute_url` 链接。
+   - **继续获取纪要 / 逐字稿（按需）**：如果用户目标不是只要妙记链接，而是要纪要、逐字稿、总结、待办或章节，则从 `minute_url` 中提取 `minute_token`，再调用 [`lark-ka vc +notes --minute-tokens`](../lark-vc/references/lark-vc-notes.md) 获取对应产物。
 
 > **注意**：必须先获取飞书云空间（云盘/云存储）的 `file_token` 才能进行转换。
 >
@@ -109,7 +109,7 @@ Minutes (妙记) ← minute_token 标识
 
 ## Shortcuts（推荐优先使用）
 
-Shortcut 是对常用操作的高级封装（`lark-cli minutes +<verb> [flags]`）。有 Shortcut 的操作优先使用。
+Shortcut 是对常用操作的高级封装（`lark-ka minutes +<verb> [flags]`）。有 Shortcut 的操作优先使用。
 
 | Shortcut                                           | 说明                                                              |
 | -------------------------------------------------- | --------------------------------------------------------------- |
@@ -130,8 +130,8 @@ Shortcut 是对常用操作的高级封装（`lark-cli minutes +<verb> [flags]`�
 ## API Resources
 
 ```bash
-lark-cli schema minutes.<resource>.<method>   # 调用 API 前必须先查看参数结构
-lark-cli minutes <resource> <method> [flags] # 调用 API
+lark-ka schema minutes.<resource>.<method>   # 调用 API 前必须先查看参数结构
+lark-ka minutes <resource> <method> [flags] # 调用 API
 ```
 
 > **重要**：使用原生 API 时，必须先运行 `schema` 查看 `--data` / `--params` 参数结构，不要猜测字段格式。

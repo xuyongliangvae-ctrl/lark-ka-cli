@@ -55,6 +55,88 @@ test("refresh endpoint supports independent full URL, path, and exchange endpoin
   );
 });
 
+test("a named missing profile cannot send environment credentials to a default host", async (t) => {
+  await isolated(t);
+  const env = { ...process.env, LARKSUITE_CLI_APP_ID: "cli_fixture" };
+  await assert.rejects(
+    loadConfig({ profile: "private" }, env),
+    /Profile private does not exist/,
+  );
+  const explicit = await loadConfig(
+    { profile: "private" },
+    {
+      ...env,
+      LARKSUITE_CLI_BRAND: "https://configured.example.invalid",
+    },
+  );
+  assert.equal(explicit.openBaseUrl, "https://configured.example.invalid");
+  assert.equal(explicit.profileName, "private");
+});
+
+test("config init with a private API host uses only the configured deployment", async (t) => {
+  await isolated(t);
+  await assert.rejects(
+    configure({ name: "cnooc", "app-id": "cli_example" }, async () => ""),
+    /OpenAPI base URL/,
+  );
+  await configure(
+    {
+      name: "customer-b",
+      "app-id": "cli_example",
+      "open-base-url": "https://api.customer-b.example.invalid",
+    },
+    async () => "",
+  );
+  const config = await loadConfig({ profile: "customer-b" });
+  assert.equal(config.brand, "custom");
+  assert.equal(config.openBaseUrl, "https://api.customer-b.example.invalid");
+  assert.equal(config.accountsBaseUrl, undefined);
+  assert.equal(config.mcpUrl, undefined);
+  assert.throws(() => authURL(config, "authorize"), /not configured/);
+});
+
+test("existing cnooc profiles resolve 7.54 search routes and explicit settings survive reload", async (t) => {
+  await isolated(t);
+  const input = async () => "";
+  await configure(
+    {
+      name: "cnooc",
+      brand: "custom",
+      "app-id": "cli_example",
+      "open-base-url": "https://tenant.example.invalid",
+    },
+    input,
+  );
+  const oldProfile = await loadConfig({ profile: "cnooc" });
+  assert.equal(oldProfile.documentSearchApi, "suite");
+  assert.equal(oldProfile.capabilities.contactSearch, "v1");
+  await configure(
+    {
+      name: "cnooc",
+      "document-search-api": "v2",
+      "contact-search-version": "v3",
+    },
+    input,
+  );
+  const overridden = await loadConfig({ profile: "cnooc" });
+  assert.equal(overridden.documentSearchApi, "v2");
+  assert.equal(overridden.capabilities.contactSearch, "v3");
+  assert.equal(oldProfile.storageKey, overridden.storageKey);
+  await assert.rejects(
+    configure({ name: "cnooc", "document-search-api": "unknown" }, input),
+    /documentSearchApi must be/,
+  );
+  assert.equal(
+    (await loadConfig({ profile: "cnooc" })).documentSearchApi,
+    "v2",
+  );
+  assert.equal(
+    endpoints("cnooc", { name: "other-name" }).documentSearchApi,
+    "suite",
+  );
+  assert.equal(endpoints("feishu", { name: "cnooc" }).documentSearchApi, "v2");
+});
+
 test("tenant token requests actually use the independently configured endpoint", async (t) => {
   await isolated(t);
   const requests = [];

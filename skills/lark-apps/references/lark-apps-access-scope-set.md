@@ -8,17 +8,17 @@
 
 ```bash
 # 指定可见 + 允许申请（targets 支持 user / department / chat 三种类型）
-lark-cli apps +access-scope-set --app-id app_xxx \
+lark-ka apps +access-scope-set --app-id app_xxx \
   --scope specific \
   --targets '[{"type":"user","id":"ou_xxx"},{"type":"department","id":"od_xxx"},{"type":"chat","id":"oc_xxx"}]' \
   --apply-enabled \
   --approver ou_yyy
 
 # 互联网公开 + 免登
-lark-cli apps +access-scope-set --app-id app_xxx --scope public --require-login=false
+lark-ka apps +access-scope-set --app-id app_xxx --scope public --require-login=false
 
 # 企业全员
-lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
+lark-ka apps +access-scope-set --app-id app_xxx --scope tenant
 ```
 
 ## 参数
@@ -69,7 +69,7 @@ lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
 ### 场景 1：用户说"把应用 X 开放给全员"
 
 ```bash
-lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
+lark-ka apps +access-scope-set --app-id app_xxx --scope tenant
 ```
 
 > 应用 `{app_id}` 可用范围已设为企业全员。
@@ -77,17 +77,17 @@ lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
 ### 场景 2：用户说"把应用 X 设为互联网公开 + 免登"
 
 ```bash
-lark-cli apps +access-scope-set --app-id app_xxx --scope public --require-login=false
+lark-ka apps +access-scope-set --app-id app_xxx --scope public --require-login=false
 ```
 
 > 应用 `{app_id}` 可用范围已设为互联网公开（免登）。
 
 ### 场景 3：用户说"只让 Alice 和 Bob 访问应用 X"
 
-先用 `lark-cli contact +search-user --query Alice` 拿到 ou_id，再调：
+先用 `lark-ka contact +search-user --query Alice` 拿到 ou_id，再调：
 
 ```bash
-lark-cli apps +access-scope-set --app-id app_xxx \
+lark-ka apps +access-scope-set --app-id app_xxx \
   --scope specific \
   --targets '[{"type":"user","id":"ou_alice"},{"type":"user","id":"ou_bob"}]'
 ```
@@ -96,10 +96,10 @@ lark-cli apps +access-scope-set --app-id app_xxx \
 
 ### 场景 4：用户说"开放给「项目讨论群」"
 
-把群名转 chat_id：用 `lark-cli im +chat-search --query "项目讨论群"`，再调：
+把群名转 chat_id：用 `lark-ka im +chat-search --query "项目讨论群"`，再调：
 
 ```bash
-lark-cli apps +access-scope-set --app-id app_xxx \
+lark-ka apps +access-scope-set --app-id app_xxx \
   --scope specific \
   --targets '[{"type":"chat","id":"oc_xxx"}]'
 ```
@@ -117,8 +117,8 @@ lark-cli apps +access-scope-set --app-id app_xxx \
 | 场景 | 命令 |
 |---|---|
 | 拿 app_id | 从用户提供的妙搭应用链接 `https://miaoda.feishu.cn/app/app_xxx` 的 `/app/` 后面提取，或让用户直接给 `app_xxx` 字符串（详见 `../SKILL.md`） |
-| 把人名转 ou_id | `lark-cli contact +search-user --query <name>` |
-| 把群名转 chat_id | `lark-cli im +chat-search --query <群名>` |
+| 把人名转 ou_id | `lark-ka contact +search-user --query <name>` |
+| 把群名转 chat_id | `lark-ka im +chat-search --query <群名>` |
 
 ## 参考
 

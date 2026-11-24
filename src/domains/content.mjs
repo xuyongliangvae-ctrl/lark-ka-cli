@@ -14,6 +14,7 @@ import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { CliError } from "../errors.mjs";
+import { documentSearchApi, isHaiNengProfile } from "../config.mjs";
 
 const enc = (value) => encodeURIComponent(String(value));
 const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
@@ -206,6 +207,142 @@ async function pages(ctx, method, url, options = {}, key = "items") {
     seen.add(token);
   }
   return { ...last, [key]: all };
+}
+
+const SUITE_DOC_SEARCH = "/open-apis/suite/docs-api/search/object";
+const SUITE_TYPES = new Set([
+  "doc",
+  "sheet",
+  "slides",
+  "bitable",
+  "mindnote",
+  "file",
+]);
+const SEARCH_FLAGS = new Set([
+  "query",
+  "page-size",
+  "page-token",
+  "page-all",
+  "page-limit",
+  "profile",
+  "as",
+  "dry-run",
+  "format",
+  "json",
+  "jq",
+  "quiet",
+  "verbose",
+  "debug",
+  "no-color",
+]);
+
+function searchInteger(value, flag, max) {
+  if (!/^(0|[1-9]\d*)$/.test(String(value)) || Number(value) > max)
+    throw err(`--${flag} must be an integer between 0 and ${max}`);
+  return Number(value);
+}
+
+async function suiteSearchFilters(ctx, service, f) {
+  const allowed =
+    service === "docs"
+      ? ["filter"]
+      : ["mine", "creator-ids", "chat-ids", "doc-types"];
+  for (const key of Object.keys(f)) {
+    if (!SEARCH_FLAGS.has(key) && !allowed.includes(key))
+      throw err(
+        `--${key} is not supported by ${service} +search with the suite API`,
+      );
+  }
+  const filters = {};
+  if (service === "docs") {
+    const parsed = await json(ctx, f.filter, "--filter");
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      throw err("--filter must be a JSON object");
+    for (const [key, values] of Object.entries(parsed)) {
+      if (!["owner_ids", "chat_ids", "docs_types"].includes(key))
+        throw err(
+          `Unsupported suite search filter ${key}; use owner_ids, chat_ids or docs_types`,
+        );
+      filters[key] = values;
+    }
+  } else {
+    if (bool(f, "mine") && has(f, "creator-ids"))
+      throw err("--mine and --creator-ids are mutually exclusive");
+    for (const [flag, key] of [
+      ["creator-ids", "owner_ids"],
+      ["doc-types", "docs_types"],
+      ["chat-ids", "chat_ids"],
+    ]) {
+      if (has(f, flag)) {
+        if (typeof f[flag] !== "string")
+          throw err(`--${flag} must be a comma-separated list`);
+        filters[key] = f[flag].split(",").map((value) => value.trim());
+      }
+    }
+    if (bool(f, "mine")) {
+      const owner = ctx.config?.userOpenId ?? ctx.session?.user?.open_id;
+      if (!owner)
+        throw err("--mine requires a known logged-in user open_id", "auth");
+      filters.owner_ids = [owner];
+    }
+  }
+  for (const [key, values] of Object.entries(filters)) {
+    if (
+      !Array.isArray(values) ||
+      !values.length ||
+      !values.every((v) => typeof v === "string" && v.trim())
+    )
+      throw err(`${key} must be a nonempty list of strings`);
+  }
+  if (filters.docs_types) {
+    filters.docs_types = filters.docs_types.map((v) => v.toLowerCase());
+    if (!filters.docs_types.every((type) => SUITE_TYPES.has(type)))
+      throw err(
+        "Suite document types: doc (both document generations), sheet, slides, bitable, mindnote, file",
+      );
+  }
+  return filters;
+}
+
+async function suiteSearch(ctx, service, f) {
+  if (ctx.identity !== "user")
+    throw err("Suite document search requires --as user", "auth");
+  if (typeof f.query !== "string" || !f.query.trim())
+    throw err("Suite document search requires a nonempty --query");
+  const filters = await suiteSearchFilters(ctx, service, f);
+  const size = searchInteger(f["page-size"] ?? 15, "page-size", 50);
+  const all = bool(f, "page-all");
+  const limit = searchInteger(f["page-limit"] ?? 10, "page-limit", 10000);
+  let offset = searchInteger(f["page-token"] ?? 0, "page-token", 199);
+  if (all && size === 0)
+    throw err("--page-all requires a positive --page-size");
+  if (offset === 199 && size > 0)
+    throw err("Suite document search requires offset + count < 200");
+
+  const entities = [];
+  for (let page = 1; ; page++) {
+    // The legacy endpoint rejects requests where offset + count reaches 200.
+    const count = Math.min(size, 199 - offset);
+    const body = { search_key: f.query, count, offset, ...filters };
+    if (ctx.dryRun)
+      return dry(ctx, [step("POST", SUITE_DOC_SEARCH, undefined, body)]);
+    const result = await ctx.request("POST", SUITE_DOC_SEARCH, { body });
+    const rows = result.docs_entities ?? [];
+    if (!Array.isArray(rows) || rows.length > count)
+      throw err("Invalid docs_entities page returned by suite search", "api");
+    entities.push(...rows);
+    const output = { ...result, docs_entities: entities };
+    if (!result.has_more || size === 0) return output;
+    if (!rows.length)
+      throw err(
+        "Suite document search returned has_more without advancing the offset",
+        "api",
+      );
+    offset += rows.length;
+    if (offset >= 199) return { ...output, truncated: true };
+    if (!all || (limit && page >= limit))
+      return { ...output, page_token: String(offset) };
+  }
 }
 
 async function uploadBytes(ctx, buffer, name, fields = {}, media = false) {
@@ -1237,6 +1374,20 @@ function nativePreview(token, blocks, f = {}, parent = token) {
 }
 
 function docBackend(ctx, f) {
+  const config = ctx.config;
+  if (
+    isHaiNengProfile(config) &&
+    (config.docsBackend === "native" ||
+      (config.docsBackend === undefined &&
+        config.capabilities?.docsAi !== true))
+  ) {
+    if (f["api-version"] === "v2")
+      throw err(
+        "HaiNeng's native Docx backend requires --api-version v1; v2 requires a configured docs_ai service",
+        "unsupported",
+      );
+    return "native";
+  }
   if (ctx.config?.brand === "gjgw" && ctx.config?.docsBackend !== "docs-ai")
     return "native";
   if (f["api-version"] === "v2") return "ai";
@@ -3469,6 +3620,12 @@ async function syncDrive(ctx, command, f) {
 
 export async function executeContent(ctx, service, command, flags = {}) {
   const active = { ...ctx, flags: { ...(ctx.flags ?? {}), ...flags } };
+  if (
+    command === "+search" &&
+    (service === "docs" || service === "drive") &&
+    documentSearchApi(active.config) === "suite"
+  )
+    return suiteSearch(active, service, flags);
   if (service === "docs") return docs(active, command, flags);
   if (service === "drive") return drive(active, command, flags);
   if (service === "wiki") return wiki(active, command, flags);
