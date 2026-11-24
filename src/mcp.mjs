@@ -1,19 +1,9 @@
 import readline from "node:readline";
 import { shortcuts } from "./metadata.mjs";
 import { CliError, toErrorEnvelope } from "./errors.mjs";
-import { STREAM_DONE } from "./events.mjs";
 import { VERSION } from "./version.mjs";
+export const STREAM_DONE = Symbol.for("lark-ka.stream-done");
 const curated = {
-  lark_im_send: ["im", "+messages-send"],
-  lark_im_reply: ["im", "+messages-reply"],
-  lark_im_search: ["im", "+messages-search"],
-  lark_im_mget: ["im", "+messages-mget"],
-  lark_im_resources_download: ["im", "+messages-resources-download"],
-  lark_chat_messages_list: ["im", "+chat-messages-list"],
-  lark_chat_search: ["im", "+chat-search"],
-  lark_chat_list: ["im", "+chat-list"],
-  lark_contact_get_user: ["contact", "+get-user"],
-  lark_contact_search_user: ["contact", "+search-user"],
   lark_docs_search: ["docs", "+search"],
   lark_docs_fetch: ["docs", "+fetch"],
   lark_docs_create: ["docs", "+create"],

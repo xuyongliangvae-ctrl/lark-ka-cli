@@ -388,7 +388,7 @@ test("native deletes, permission writes and workflow updates require explicit co
   }
 });
 
-test("the existing SaaS Base shortcuts still preview v3 requests", async (t) => {
+test("retained Base shortcuts keep the documented v1 routes for a public profile", async (t) => {
   const run = await cliRunner(t);
   run([
     "config",
@@ -418,7 +418,7 @@ test("the existing SaaS Base shortcuts still preview v3 requests", async (t) => 
   assert.deepEqual(create.data.requests, [
     {
       method: "POST",
-      path: "/open-apis/base/v3/bases",
+      path: "/open-apis/bitable/v1/apps",
       params: {},
       data: { name: "Fixture Base" },
       identity: "user",
@@ -427,7 +427,7 @@ test("the existing SaaS Base shortcuts still preview v3 requests", async (t) => 
   assert.deepEqual(get.data.requests, [
     {
       method: "GET",
-      path: "/open-apis/base/v3/bases/" + ids.app_token,
+      path: "/open-apis/bitable/v1/apps/" + ids.app_token,
       params: {},
       identity: "user",
     },

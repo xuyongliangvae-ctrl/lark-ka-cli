@@ -16,7 +16,6 @@ import {
   withLock,
   PACKAGE_ROOT,
   validURL,
-  isHaiNengProfile,
 } from "./config.mjs";
 import {
   getBotToken,
@@ -31,7 +30,11 @@ import { fetchJSON } from "./http.mjs";
 import { resolveInput } from "./io.mjs";
 import { shortcuts, apiSpecs, findAPI } from "./metadata.mjs";
 import { CONFIG_PARAMETERS } from "./config-options.mjs";
-import { isHaiNengBaseShortcut } from "./domains/tables.mjs";
+import {
+  documentedCommands,
+  supportedCommand,
+  isSupportedGroup,
+} from "./command-surface.mjs";
 import { parseArgs } from "./args.mjs";
 
 const has = (o, k) => Object.hasOwn(o, k);
@@ -670,7 +673,6 @@ const MANAGEMENT = {
   ],
   profile: ["add", "list", "use", "rename", "remove"],
   skills: ["list", "read"],
-  event: ["list", "schema", "consume", "status", "stop"],
   mcp: ["serve"],
   completion: ["bash", "zsh", "fish", "powershell"],
   api: [],
@@ -691,18 +693,24 @@ export async function discoveryProfile(flags = {}, env = process.env) {
 }
 
 export function availableShortcuts(config) {
-  return isHaiNengProfile(config)
-    ? shortcuts.filter(
-        (spec) =>
-          spec.service !== "base" || isHaiNengBaseShortcut(spec.command),
-      )
-    : shortcuts;
+  return shortcuts;
 }
 
 function commandTree(visibleShortcuts) {
   const tree = new Map(
     Object.entries(MANAGEMENT).map(([key, value]) => [key, new Set(value)]),
   );
+  for (const command of documentedCommands) {
+    const parts = command.split(" ");
+    let parent = "";
+    for (const part of parts) {
+      if (parent) {
+        if (!tree.has(parent)) tree.set(parent, new Set());
+        tree.get(parent).add(part);
+      } else if (!tree.has(part)) tree.set(part, new Set());
+      parent = parent ? `${parent}/${part}` : part;
+    }
+  }
   for (const spec of visibleShortcuts) {
     if (!tree.has(spec.service)) tree.set(spec.service, new Set());
     tree.get(spec.service).add(spec.command);
@@ -730,6 +738,8 @@ export function completionCandidates(words, config) {
   const tree = commandTree(visibleShortcuts);
   const parts = [...words];
   const prefix = parts.pop() || "";
+  if (parts.length && !supportedCommand(parts) && !isSupportedGroup(parts))
+    return [];
   const key = parts.join("/");
   const entries = parts.length
     ? tree.get(key) || []
@@ -738,13 +748,6 @@ export function completionCandidates(words, config) {
     const spec = visibleShortcuts.find(
       (x) => x.service === parts[0] && x.command === parts[1],
     );
-    if (
-      parts[0] === "base" &&
-      parts[1]?.startsWith("+") &&
-      isHaiNengProfile(config) &&
-      !spec
-    )
-      return [];
     const nativeBase = parts[0] === "base" && findAPI(parts);
     return [
       ...new Set([
@@ -927,7 +930,7 @@ export async function enforcePolicy(
         ? ["show", "list"].includes(words[1])
           ? "read"
           : "write"
-        : ["doctor", "schema", "skills", "skill"].includes(words[0])
+        : ["doctor", "schema", "skills"].includes(words[0])
           ? "read"
           : words[0] === "update"
             ? "write"
@@ -1191,8 +1194,7 @@ export async function executeManagement(words, flags = {}, options = {}) {
         "\n:4\n",
     };
   }
-  if (service === "skills" || service === "skill")
-    return skillsManagement(words, flags, options);
+  if (service === "skills") return skillsManagement(words, flags, options);
   if (service === "config" && command === "bind")
     return bindConfig(flags, options);
   if (

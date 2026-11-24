@@ -102,6 +102,8 @@ const samples = {
   data: "{}",
   style: "{}",
   json: "{}",
+  properties: "{}",
+  "position-col": "1",
   dsl: '{"dimensions":[]}',
   questions: "[]",
   "record-ids": '["recFixture"]',
@@ -127,59 +129,28 @@ const samples = {
   version: "1",
 };
 const overrides = {
-  "base +form-questions-delete": { "question-ids": '["qFixture"]' },
-  "base +form-submit": { json: '{"fields":{"Title":"fixture"}}' },
-  "base +view-create": { json: '{"name":"Fixture","type":"grid"}' },
+  "sheets +chart-create": {
+    properties:
+      '{"position":{"row":0,"col":"A"},"size":{"width":100,"height":100}}',
+  },
+  "sheets +chart-update": {
+    properties:
+      '{"position":{"row":0,"col":"A"},"size":{"width":100,"height":100}}',
+  },
+  "sheets +cond-format-create": {
+    properties: '{"rule_type":"duplicateValues","ranges":["A1:A2"],"style":{}}',
+  },
+  "sheets +cond-format-update": {
+    properties: '{"rule_type":"duplicateValues","ranges":["A1:A2"],"style":{}}',
+  },
   "docs +whiteboard-update": {
     "whiteboard-token": "BoardFixture",
     source: '{"nodes":[{"type":"text"}]}',
   },
   "drive +task_result": { scenario: "import", ticket: "FixtureTicket" },
-  "calendar +freebusy": { "user-id": "ou_fixture" },
-  "calendar +room-find": {
-    slot: "2026-01-01T08:00:00+08:00~2026-01-01T09:00:00+08:00",
-  },
-  "calendar +update": { summary: "Updated" },
-  "im +chat-search": { query: "Fixture" },
-  "im +chat-update": { name: "Fixture" },
-  "im +feed-group-list-item": { "feed-group-id": "123" },
-  "im +feed-group-query-item": { "feed-group-id": "123", "feed-id": "1" },
-  "im +feed-shortcut-create": { "chat-id": "oc_fixture" },
-  "im +feed-shortcut-remove": { "chat-id": "oc_fixture" },
-  "im +flag-cancel": { "message-id": "om_fixture" },
-  "im +flag-create": { "message-id": "om_fixture" },
-  "im +threads-messages-list": { thread: "omt_fixture" },
-  "mail +draft-create": {
-    to: "person@example.invalid",
-    subject: "Fixture",
-    body: "Fixture",
-  },
-  "mail +draft-edit": { "draft-id": "DraftFixture", "set-subject": "Fixture" },
-  "mail +send": {
-    to: "person@example.invalid",
-    subject: "Fixture",
-    body: "Fixture",
-  },
-  "mail +share-to-chat": {
-    "message-id": "om_fixture",
-    "chat-id": "oc_fixture",
-  },
-  "mail +template-update": { "template-id": "TemplateFixture", name: "Title" },
   "markdown +create": { content: "Fixture", name: "Fixture.md" },
   "markdown +overwrite": { content: "Fixture" },
   "markdown +patch": { pattern: "fixture", replacement: "changed" },
-  "minutes +download": { "minute-tokens": "obcnfixture" },
-  "okr +progress-create": {
-    "target-id": "123456",
-    content:
-      '{"blocks":[{"block_element_type":"paragraph","paragraph":{"elements":[{"text_run":{"text":"fixture"}}]}}]}',
-  },
-  "okr +progress-update": {
-    content:
-      '{"blocks":[{"block_element_type":"paragraph","paragraph":{"elements":[{"text_run":{"text":"fixture"}}]}}]}',
-  },
-  "okr +progress-list": { "target-id": "123456" },
-  "okr +upload-image": { file: "fixture.png", "target-id": "123456" },
   "sheets +batch-set-style": {
     data: '[{"ranges":["sheet01!A1"],"style":{"bold":true}}]',
   },
@@ -187,6 +158,8 @@ const overrides = {
     operations:
       '[{"shortcut":"+cells-set","input":{"sheet_id":"sheet01","range":"A1","cells":[[{"value":1}]]}}]',
   },
+  "sheets +float-image-create": { "image-token": "imgFixture" },
+  "sheets +float-image-update": { "image-token": "imgFixture" },
   "sheets +cells-set": { cells: '[[{"value":1}]]' },
   "sheets +cells-set-image": { range: "A1", image: "fixture.png" },
   "sheets +cells-set-style": { "font-size": 12 },
@@ -204,21 +177,6 @@ const overrides = {
     parts:
       '[{"action":"block_replace","block_id":"shape","replacement":"<p>Fixture</p>"}]',
   },
-  "task +assign": { add: "ou_fixture" },
-  "task +followers": { add: "ou_fixture" },
-  "task +create": { summary: "Fixture" },
-  "task +reminder": { set: "15m" },
-  "task +update": { summary: "Fixture" },
-  "task +search": { query: "Fixture" },
-  "task +tasklist-search": { query: "Fixture" },
-  "wiki +move": {
-    "target-space-id": "123",
-    "obj-type": "docx",
-    "obj-token": "DocFixture",
-  },
-  "wiki +node-copy": { "target-space-id": "123" },
-  "wiki +node-create": { "space-id": "123", title: "Fixture" },
-  "wiki +node-get": { token: "NodeFixture" },
   "drive +search": { query: "fixture" },
   "docs +search": { query: "fixture" },
   "docs +create": {
@@ -237,24 +195,15 @@ const overrides = {
     content: '[{"text_run":{"text":"hello"}}]',
   },
   "drive +inspect": { url: "https://docs.example.invalid/docx/DocFixture" },
-  "event +subscribe": { "event-types": "vc.meeting.meeting_ended_v1" },
   "base +record-batch-create": {
     json: '{"records":[{"fields":{"Title":"fixture"}}]}',
   },
   "base +record-search": {
     json: '{"field_names":["Title"],"keyword":"fixture","search_fields":["Title"]}',
   },
-  "base +field-create": { json: '{"name":"Title","type":"text"}' },
   "base +record-batch-update": {
     json: '{"records":[{"record_id":"recFixture","fields":{"Title":"fixture"}}]}',
   },
-  "contact +search-user": { query: "fixture" },
-  "im +messages-send": { "chat-id": "oc_fixture", text: "Fixture" },
-  "im +messages-reply": { text: "Fixture" },
-  "im +chat-messages-list": { "chat-id": "oc_fixture" },
-  "mail +lint-html": { body: "<p>Fixture</p>" },
-  "vc +notes": { "meeting-ids": "123456" },
-  "vc +recording": { "meeting-ids": "123456" },
   "whiteboard +update": {
     "whiteboard-token": "BoardFixture",
     source: '{"nodes":[{"type":"text"}]}',
@@ -271,6 +220,11 @@ function sample(flag) {
 // V1 checks supplied flags strictly. Give each operation just its resource identifiers.
 const bitableProbeIds = {
   "+base-get": [],
+  "+base-create": [],
+  "+base-copy": [],
+  "+table-create": [],
+  "+record-batch-update": ["table-id"],
+  "+record-delete": ["table-id", "record-id"],
   "+dashboard-list": [],
   "+table-list": [],
   "+table-get": ["table-id"],
@@ -349,13 +303,9 @@ const variants = {
     { scenario: "wiki_move", "task-id": "123" },
   ],
   "drive +upload": [{ file: "large-fixture.bin" }],
-  "task +assign": [{ add: undefined, remove: "ou_fixture" }],
-  "task +followers": [{ add: undefined, remove: "ou_fixture" }],
-  "mail +send": [{ "confirm-send": true }],
   "drive +preview": [{ "list-only": true }],
-  "okr +progress-create": [{ "target-type": "key_result" }],
-  "wiki +node-create": [{ "space-id": "my_library" }],
 };
+
 function routeOf(req) {
   if (typeof req !== "object" || !req) return null;
   const value = req.path ?? req.url;

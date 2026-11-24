@@ -2,40 +2,10 @@
   "node": ">=22",
   "implementation": "native-nodejs",
   "goRuntimeRequired": false,
-  "shortcutCount": 248,
-  "metadataAPICount": 298,
+  "shortcutCount": 177,
+  "metadataAPICount": 90,
   "missing": [],
   "commands": [
-    {
-      "service": "apps",
-      "command": "+access-scope-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+access-scope-set",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+html-publish",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+update",
-      "implementation": "native-node"
-    },
     {
       "service": "base",
       "command": "+base-copy",
@@ -125,60 +95,6 @@
       "service": "base",
       "command": "+view-list",
       "implementation": "native-node"
-    },
-    {
-      "service": "calendar",
-      "command": "+agenda",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+freebusy",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+room-find",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+rsvp",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+suggestion",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "contact",
-      "command": "+get-user",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "contact",
-      "command": "+search-user",
-      "implementation": "native-node",
-      "notes": "implemented"
     },
     {
       "service": "docs",
@@ -391,246 +307,6 @@
       "notes": "implemented"
     },
     {
-      "service": "event",
-      "command": "+subscribe",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+chat-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+chat-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+chat-messages-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+chat-search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+chat-update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+feed-group-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+feed-group-list-item",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+feed-group-query-item",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+feed-shortcut-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+feed-shortcut-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+feed-shortcut-remove",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+flag-cancel",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+flag-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+flag-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+messages-mget",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+messages-reply",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+messages-resources-download",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+messages-search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+messages-send",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "im",
-      "command": "+threads-messages-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+decline-receipt",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+draft-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+draft-edit",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+draft-send",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+forward",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+lint-html",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+message",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+messages",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+reply",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+reply-all",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+send",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+send-receipt",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+share-to-chat",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+signature",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+template-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+template-update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+thread",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+triage",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "mail",
-      "command": "+watch",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
       "service": "markdown",
       "command": "+create",
       "implementation": "native-node",
@@ -659,84 +335,6 @@
       "command": "+patch",
       "implementation": "native-node",
       "notes": "implemented-re2-subset"
-    },
-    {
-      "service": "minutes",
-      "command": "+download",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+speaker-replace",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+upload",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+cycle-detail",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+cycle-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-delete",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-get",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+upload-image",
-      "implementation": "native-node",
-      "notes": "implemented"
     },
     {
       "service": "sheets",
@@ -780,6 +378,11 @@
     },
     {
       "service": "sheets",
+      "command": "+cells-merge",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+cells-replace",
       "implementation": "native-node"
     },
@@ -805,7 +408,52 @@
     },
     {
       "service": "sheets",
+      "command": "+cells-unmerge",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+chart-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+chart-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+chart-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+chart-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+cols-resize",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cond-format-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cond-format-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cond-format-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cond-format-update",
       "implementation": "native-node"
     },
     {
@@ -890,12 +538,32 @@
     },
     {
       "service": "sheets",
+      "command": "+dim-group",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-hide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+dim-insert",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
       "command": "+dim-move",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-ungroup",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-unhide",
       "implementation": "native-node"
     },
     {
@@ -935,12 +603,57 @@
     },
     {
       "service": "sheets",
+      "command": "+filter-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+filter-update",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
+      "command": "+filter-view-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+find",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-update",
       "implementation": "native-node"
     },
     {
@@ -1005,6 +718,26 @@
     },
     {
       "service": "sheets",
+      "command": "+pivot-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+pivot-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+pivot-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+pivot-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+range-copy",
       "implementation": "native-node"
     },
@@ -1065,6 +798,11 @@
     },
     {
       "service": "sheets",
+      "command": "+sheet-hide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+sheet-info",
       "implementation": "native-node"
     },
@@ -1081,6 +819,31 @@
     {
       "service": "sheets",
       "command": "+sheet-set-tab-color",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-unhide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-update",
       "implementation": "native-node"
     },
     {
@@ -1162,150 +925,6 @@
       "notes": "implemented"
     },
     {
-      "service": "task",
-      "command": "+assign",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+comment",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+complete",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+followers",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+get-my-tasks",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+get-related-tasks",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+reminder",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+reopen",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+set-ancestor",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+subscribe-event",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+tasklist-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+tasklist-members",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+tasklist-search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+tasklist-task-add",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "task",
-      "command": "+upload-attachment",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "vc",
-      "command": "+meeting-events",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "vc",
-      "command": "+meeting-join",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "vc",
-      "command": "+meeting-leave",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "vc",
-      "command": "+notes",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "vc",
-      "command": "+recording",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "vc",
-      "command": "+search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
       "service": "whiteboard",
       "command": "+query",
       "implementation": "native-node",
@@ -1316,78 +935,6 @@
       "command": "+update",
       "implementation": "native-node",
       "notes": "raw-nodes-mermaid-plantuml"
-    },
-    {
-      "service": "wiki",
-      "command": "+delete-space",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+member-add",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+member-list",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+member-remove",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+move",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+node-copy",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+node-create",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+node-delete",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+node-get",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+node-list",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+space-create",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
-    },
-    {
-      "service": "wiki",
-      "command": "+space-list",
-      "implementation": "native-node",
-      "notes": "implemented-async-tasks-returned-for-followup"
     }
   ],
   "contentLimitations": [

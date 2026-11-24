@@ -63,9 +63,11 @@ test("HaiNeng help and both schema lists hide unavailable Base shortcuts", async
     baseData.shortcuts.every((shortcut) => shortcut.startsWith("base.")),
   );
   assert.equal(publicHelp.code, 0, publicHelp.err);
-  assert.ok(publicHelp.out.includes(unsupported));
+  assert.ok(!publicHelp.out.includes(unsupported));
   assert.ok(
-    JSON.parse(publicSchema.out).data.shortcuts.includes(`base.${unsupported}`),
+    !JSON.parse(publicSchema.out).data.shortcuts.includes(
+      `base.${unsupported}`,
+    ),
   );
 });
 
@@ -82,9 +84,9 @@ test("HaiNeng completion carries the explicit profile and filters command flags"
   assert.equal(privateList.code, 0, privateList.err);
   assert.ok(privateList.out.includes(supported));
   assert.ok(!privateList.out.includes(unsupported));
-  assert.ok(publicList.out.includes(unsupported));
+  assert.ok(!publicList.out.includes(unsupported));
   assert.ok(!hiddenFlags.out.includes("--help"));
-  assert.ok(publicFlags.out.includes("--help"));
+  assert.ok(!publicFlags.out.includes("--help"));
 });
 
 test("HaiNeng rejects unavailable Base shortcuts before credential lookup", async (t) => {
@@ -97,9 +99,13 @@ test("HaiNeng rejects unavailable Base shortcuts before credential lookup", asyn
     const r = await run(["--profile", "cnooc", ...words]);
     assert.notEqual(r.code, 0);
     const result = JSON.parse(r.err);
-    assert.match(result.error.message, /unavailable on HaiNeng Work/);
-    assert.match(result.error.hint, /lark-ka base --help/);
-    assert.match(result.error.hint, /lark-ka base app get/);
+    assert.equal(result.error.type, "validation");
+    if (words[0] === "schema")
+      assert.match(result.error.message, /Unknown schema/);
+    else {
+      assert.match(result.error.message, /not included in this CLI/);
+      assert.match(result.error.hint, /lark-ka --help/);
+    }
   }
 });
 

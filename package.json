@@ -1,6 +1,6 @@
 {
   "name": "@lark-ka/hn-work-cli",
-  "version": "7.54.3",
+  "version": "7.54.4",
   "description": "Native Node.js CLI for Feishu/Lark and private deployments",
   "repository": {
     "type": "git",
@@ -25,10 +25,7 @@
     "config",
     "docs",
     "README.md",
-    "LICENSE",
-    "!src/domains/base-v3.mjs",
-    "!data/base-v3-shortcuts.json",
-    "!skills/lark-base/references"
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
@@ -39,7 +36,6 @@
     "format:check": "prettier --check \"src/**/*.mjs\" \"bin/*.mjs\" \"scripts/*.mjs\" \"test/*.mjs\" package.json \"config/*.json\" README.md docs/*.md"
   },
   "dependencies": {
-    "@larksuiteoapi/node-sdk": "1.76.0",
     "qrcode": "^1.5.4",
     "yaml": "2.9.1"
   },

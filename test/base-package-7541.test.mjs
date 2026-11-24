@@ -17,7 +17,7 @@ test("the package only registers its own command", async () => {
   assert.deepEqual(lock.packages[""].bin, manifest.bin);
 });
 
-test("the HaiNeng release excludes the source-only Base v3 catalog and runtime", async () => {
+test("the release removes the Base v3 catalog and runtime", async () => {
   const [manifest] = JSON.parse(
     execFileSync("npm", ["pack", "--dry-run", "--ignore-scripts", "--json"], {
       cwd: root,
@@ -36,16 +36,16 @@ test("the HaiNeng release excludes the source-only Base v3 catalog and runtime",
     ),
   );
 
-  const load = async (relativePath) =>
-    JSON.parse(await readFile(new URL(relativePath, import.meta.url), "utf8"));
-  const sourceOnly = await load("../data/base-v3-shortcuts.json");
-  const published = await load("../data/shortcuts.json");
-  const publishedBase = new Set(
-    published
-      .filter(({ service }) => service === "base")
-      .map(({ command }) => command),
+  const published = JSON.parse(
+    await readFile(new URL("../data/shortcuts.json", import.meta.url), "utf8"),
   );
-  assert.equal(publishedBase.size, 18);
-  for (const { command } of sourceOnly)
-    assert.ok(!publishedBase.has(command), command);
+  const publishedBase = published.filter(({ service }) => service === "base");
+  assert.equal(publishedBase.length, 18);
+  for (const file of [
+    "../data/base-v3-shortcuts.json",
+    "../src/domains/base-v3.mjs",
+  ])
+    await assert.rejects(readFile(new URL(file, import.meta.url)), {
+      code: "ENOENT",
+    });
 });

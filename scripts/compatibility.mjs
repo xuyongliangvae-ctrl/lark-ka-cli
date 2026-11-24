@@ -1,23 +1,15 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { packagedShortcuts, apiSpecs } from "../src/metadata.mjs";
-import { commands as im } from "../src/domains/im.mjs";
-import { commandSpecs as collaboration } from "../src/domains/collaboration.mjs";
 import {
   CONTENT_COVERAGE as content,
   CONTENT_LIMITATIONS,
 } from "../src/domains/content.mjs";
 import { commandSpecs as tables } from "../src/domains/tables.mjs";
-import { commandSpecs as apps } from "../src/domains/apps.mjs";
 const coverage = {
   ...content,
   base: tables.base,
   sheets: tables.sheets,
-  im: Object.fromEntries(im.map((c) => [c, "implemented"])),
-  apps: apps.apps,
-  event: { "+subscribe": "implemented" },
 };
-for (const spec of Object.values(collaboration))
-  (coverage[spec.service] ||= {})[spec.command] = "implemented";
 const commands = packagedShortcuts.map((spec) => ({
   service: spec.service,
   command: spec.command,

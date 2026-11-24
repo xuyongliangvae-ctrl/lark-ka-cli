@@ -11,7 +11,6 @@ import {
   withLock,
   redactConfig,
   PACKAGE_ROOT,
-  isHaiNengProfile,
 } from "./config.mjs";
 import {
   authLogin,
@@ -29,21 +28,17 @@ import {
   findAPI,
   executeAPI,
 } from "./metadata.mjs";
-import { executeIM } from "./domains/im.mjs";
-import { serveMCP } from "./mcp.mjs";
-import {
-  consumeEvents,
-  eventStatus,
-  eventStop,
-  STREAM_DONE,
-} from "./events.mjs";
+import { serveMCP, STREAM_DONE } from "./mcp.mjs";
 import {
   executeManagement,
   enforcePolicy,
   availableShortcuts,
   discoveryProfile,
 } from "./management.mjs";
-import { isHaiNengBaseShortcut } from "./domains/tables.mjs";
+import {
+  assertSupportedCommand,
+  isSupportedGroup,
+} from "./command-surface.mjs";
 import { resolveInput } from "./io.mjs";
 import { VERSION } from "./version.mjs";
 export { VERSION };
@@ -72,31 +67,15 @@ const top = [
   "skills",
   "update",
   "completion",
-  "event",
   "mcp",
 ];
-function assertAvailableBaseShortcut(service, command, config) {
-  if (
-    service === "base" &&
-    command?.startsWith("+") &&
-    isHaiNengProfile(config) &&
-    !isHaiNengBaseShortcut(command)
-  )
-    throw new CliError(
-      "validation",
-      `Base shortcut ${command} is unavailable on HaiNeng Work`,
-      {
-        hint: "Use lark-ka base --help for supported shortcuts and native Base commands such as lark-ka base app get.",
-      },
-    );
-}
 
 export function help(words = [], config) {
+  assertSupportedCommand(words, { allowGroup: true });
   const visibleShortcuts = availableShortcuts(config);
   if (!words.length)
     return `lark-ka ${VERSION} — native Node.js Feishu/Lark CLI\n\nUsage: lark-ka <command> [subcommand] [flags]\n\nCommands: ${[...top, ...new Set(visibleShortcuts.map((s) => s.service))].join(", ")}\n\n${visibleShortcuts.length} shortcut definitions; ${apiSpecs().length} metadata API methods.\nUse lark-ka <service> --help or lark-ka schema <service.resource.method>.\nGlobal flags: --profile NAME --as user|bot --format json|pretty|table|csv|ndjson --dry-run\n`;
   const [service, command] = words;
-  assertAvailableBaseShortcut(service, command, config);
   if (service === "config") return configHelp();
   if (service === "auth")
     return 'auth login [--scope "approved scopes"] [--json] [--no-open] [--redirect-uri URL]\nWithout --scope, request the Profile’s approved user scopes or discover them from the application.\nauth status [--verify] [--connector] | auth whoami --as user --json | logout | scopes | check --scope SCOPES | list\n';
@@ -105,8 +84,7 @@ export function help(words = [], config) {
   );
   if (spec)
     return `${service} ${command} — ${spec.description}\n${spec.flags.map((f) => `  --${f.name}${f.required ? " (required)" : ""}${f.default !== undefined ? ` [default: ${f.default}]` : ""}  ${f.description}`).join("\n")}\n`;
-  if (command && findAPI(words))
-    return JSON.stringify(findAPI(words), null, 2) + "\n";
+  if (findAPI(words)) return JSON.stringify(findAPI(words), null, 2) + "\n";
   const list = visibleShortcuts.filter((s) => s.service === service),
     api = metadata.services.find((s) => s.name === service);
   if (list.length || api)
@@ -118,7 +96,7 @@ export function help(words = [], config) {
         ),
       ].join("\n") + "\n"
     );
-  return `${service}: ${service === "mcp" ? "serve" : service === "profile" ? "add | list | use | rename | remove" : service === "event" ? "list | schema | consume | status | stop" : service === "skills" ? "list | read | install" : service === "schema" ? "[service.resource.method]" : service === "api" ? "<GET|POST|PUT|PATCH|DELETE> /open-apis/... --params JSON --data JSON" : "--help"}\n`;
+  return `${service}: ${service === "mcp" ? "serve" : service === "profile" ? "add | list | use | rename | remove" : service === "skills" ? "list | read" : service === "schema" ? "[service.resource.method]" : service === "api" ? "<GET|POST|PUT|PATCH|DELETE> /open-apis/... --params JSON --data JSON" : "--help"}\n`;
 }
 async function configCommand(action, args, flags) {
   if (action === "init") return configure(flags, resolveInput);
@@ -244,6 +222,7 @@ async function skillsCommand(action, args, flags) {
   });
 }
 export async function execute(words, flags = {}, options = {}) {
+  assertSupportedCommand(words);
   if (["__complete", "__completeNoDesc"].includes(words[0]))
     return executeManagement(words, flags, options);
   const creating =
@@ -263,7 +242,6 @@ export async function execute(words, flags = {}, options = {}) {
     (discovery
       ? await discoveryProfile(policyFlags, policyEnv)
       : await loadConfig(policyFlags, policyEnv, { optional: true }));
-  assertAvailableBaseShortcut(words[0], words[1], config);
   await enforcePolicy(words, flags, config, options);
   const managed = await executeManagement(words, flags, options);
   if (managed !== undefined) return managed;
@@ -275,14 +253,12 @@ async function executeInternal(words, flags, options, profileConfig) {
     return { ok: true, data: await configCommand(command, args, flags) };
   if (service === "profile")
     return { ok: true, data: await profileCommand(command, args, flags) };
-  if (service === "skills" || service === "skill") {
+  if (service === "skills") {
     const data = await skillsCommand(command, args, flags);
     return data.__raw ? data : { ok: true, data };
   }
   if (service === "schema") {
     const key = words.slice(1).join(".");
-    const [targetService, targetCommand] = key.split(".");
-    assertAvailableBaseShortcut(targetService, targetCommand, profileConfig);
     const visibleShortcuts = availableShortcuts(profileConfig);
     if (!key || key === "base")
       return {
@@ -325,15 +301,6 @@ async function executeInternal(words, flags, options, profileConfig) {
       };
     throw new CliError("validation", "Unsupported shell");
   }
-  if (service === "event" && ["list", "schema"].includes(command))
-    return {
-      ok: true,
-      data: {
-        events: JSON.parse(
-          await readFile(path.join(PACKAGE_ROOT, "data/events.json"), "utf8"),
-        ).filter((e) => !args[0] || e.key === args[0]),
-      },
-    };
   if (service === "mcp" && command === "serve")
     return serveMCP(execute, {
       profile: flags.profile,
@@ -366,7 +333,7 @@ async function executeInternal(words, flags, options, profileConfig) {
       if ((flags.recommend || flags.domain) && !flags.scope) {
         const domains = flags.domain
           ? String(flags.domain).split(",")
-          : ["contact", "calendar", "task", "drive"];
+          : ["drive", "base", "sheets", "slides"];
         const selected = apiSpecs().filter(
           (s) => domains.includes("all") || domains.includes(s.service),
         );
@@ -514,24 +481,6 @@ async function executeInternal(words, flags, options, profileConfig) {
       { query, body },
       flags,
     );
-  } else if (service === "event") {
-    if (command === "consume")
-      result = await consumeEvents(ctx, args[0] || flags.event, flags);
-    else if (command === "status") result = await eventStatus(ctx);
-    else if (command === "stop") result = await eventStop(ctx);
-    else if (command === "list" || command === "schema")
-      result = {
-        events: JSON.parse(
-          await readFile(path.join(PACKAGE_ROOT, "data/events.json"), "utf8"),
-        ).filter((e) => !args[0] || e.key === args[0]),
-      };
-    else if (command === "+subscribe")
-      result = await consumeEvents(
-        ctx,
-        args[0] || flags.event || flags["event-types"] || flags["event-type"],
-        { ...flags, rawSubscription: true },
-      );
-    else throw new CliError("validation", `Unknown event command ${command}`);
   } else {
     const api = findAPI(words);
     if (api) {
@@ -579,8 +528,7 @@ async function executeInternal(words, flags, options, profileConfig) {
               `--${f.name} must be ${f.enum.join(", ")}`,
             );
         }
-      result = await executeIM(ctx, service, command, flags);
-      for (const file of ["collaboration", "content", "tables", "apps"])
+      for (const file of ["content", "tables"])
         if (result === undefined) {
           const module = await import(`./domains/${file}.mjs`);
           const handler =
@@ -609,18 +557,5 @@ async function executeInternal(words, flags, options, profileConfig) {
 }
 
 export function isCommandGroup(words) {
-  if (words.length === 1)
-    return [
-      "auth",
-      "config",
-      "profile",
-      "mcp",
-      "event",
-      ...new Set(shortcuts.map((s) => s.service)),
-    ].includes(words[0]);
-  return apiSpecs().some(
-    (s) =>
-      words.join(" ") === `${s.service} ${s.resource}` ||
-      words.join(" ") === `${s.service} ${s.resource.replaceAll(".", " ")}`,
-  );
+  return isSupportedGroup(words);
 }

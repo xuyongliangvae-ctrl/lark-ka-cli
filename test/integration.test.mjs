@@ -59,7 +59,7 @@ test("version/help/schema run without configuration or a Go binary", async () =>
   assert.equal(version.stdout.trim(), `lark-ka ${packageVersion} (Node.js)`);
   const help = await run(["--help"], env);
   assert.match(help.stdout, /metadata API/);
-  const schema = await run(["schema", "calendar.calendars.list"], env);
+  const schema = await run(["schema", "drive.files.list"], env);
   assert.equal(schema.code, 0, schema.stderr);
   assert.equal(JSON.parse(schema.stdout).ok, true);
 });
@@ -140,12 +140,11 @@ test("dry-run performs no authentication or network request and preserves JSON b
   };
   const result = await run(
     [
-      "im",
-      "+messages-send",
-      "--chat-id",
-      "oc_test",
-      "--text",
-      "hello\n中文",
+      "drive",
+      "files",
+      "create_folder",
+      "--data",
+      JSON.stringify({ name: "hello\n中文", folder_token: "root" }),
       "--dry-run",
     ],
     env,
@@ -154,7 +153,11 @@ test("dry-run performs no authentication or network request and preserves JSON b
   const data = JSON.parse(result.stdout).data;
   assert.equal(data.dry_run, true);
   assert.equal(data.requests[0].method, "POST");
-  assert.equal(JSON.parse(data.requests[0].data.content).text, "hello\n中文");
+  assert.equal(
+    data.requests[0].path,
+    "/open-apis/drive/v1/files/create_folder",
+  );
+  assert.equal(data.requests[0].data.name, "hello\n中文");
 });
 test("MCP handshake and curated schemas are pure JSON and do not need auth", async () => {
   const env = {
@@ -187,7 +190,18 @@ test("MCP handshake and curated schemas are pure JSON and do not need auth", asy
     replies.find((x) => x.id === 1).result.protocolVersion,
     "2025-11-25",
   );
-  assert.equal(replies.find((x) => x.id === 2).result.tools.length, 14);
+  assert.deepEqual(
+    replies
+      .find((x) => x.id === 2)
+      .result.tools.map((tool) => tool.name)
+      .sort(),
+    [
+      "lark_docs_create",
+      "lark_docs_fetch",
+      "lark_docs_search",
+      "lark_docs_update",
+    ],
+  );
 });
 test("OAuth code login validates state, exchanges code, stores session, status verifies user", async (t) => {
   let configBase;
@@ -344,7 +358,7 @@ test("Drive file version IDs pass to the RPC without activating global --version
   assert.match(gated.stderr, /sidecar/);
 });
 
-test("7.54 CLI accepts the calendar, native Docx and whiteboard flags consumed by its handlers", async () => {
+test("7.54 CLI accepts native Docx and whiteboard flags consumed by retained handlers", async () => {
   const env = {
     LARK_KA_CONFIG_DIR: await mkdtemp(
       path.join(os.tmpdir(), "lark-shortcut-flags-"),
@@ -368,26 +382,7 @@ test("7.54 CLI accepts the calendar, native Docx and whiteboard flags consumed b
     env,
   );
   assert.equal(init.code, 0, init.stderr);
-  const start = "2026-03-19T14:00:00+08:00",
-    end = "2026-03-19T15:00:00+08:00";
   const checks = [
-    [
-      ["calendar", "+room-find", "--slot", `${start}~${end}`],
-      "/open-apis/calendar/v4/freebusy/room_find",
-    ],
-    [
-      [
-        "calendar",
-        "+suggestion",
-        "--start",
-        start,
-        "--end",
-        end,
-        "--duration-minutes",
-        "40",
-      ],
-      "/open-apis/calendar/v4/freebusy/suggestion",
-    ],
     [
       [
         "docs",
@@ -424,21 +419,12 @@ test("7.54 CLI accepts the calendar, native Docx and whiteboard flags consumed b
       ],
       "/open-apis/board/v1/whiteboards/BOARD/nodes/plantuml",
     ],
-    ...["+assign", "+followers"].map((action) => [
-      ["task", action, "--task-id", "task123", "--remove", "ou_member"],
-      "/open-apis/task/v2/tasks/task123/remove_members",
-    ]),
-    [
-      ["task", "+reminder", "--task-id", "task123", "--remove"],
-      "/open-apis/task/v2/tasks/task123",
-    ],
   ];
   for (const [args, expectedPath] of checks) {
     const r = await run([...args, "--as", "user", "--dry-run"], env);
     assert.equal(r.code, 0, r.stderr);
     const req = JSON.parse(r.stdout).data.requests[0];
     assert.equal(req.path, expectedPath);
-    if (args[1] === "+suggestion") assert.equal(req.data.duration_minutes, 40);
     if (args[1] === "+update") assert.equal(req.data.syntax_type, 2);
   }
 });

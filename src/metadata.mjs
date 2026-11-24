@@ -12,17 +12,7 @@ metadata.services.push(bitableV1);
 export const packagedShortcuts = JSON.parse(
   await readFile(new URL("../data/shortcuts.json", import.meta.url), "utf8"),
 );
-const sourceBaseV3 = await readFile(
-  new URL("../data/base-v3-shortcuts.json", import.meta.url),
-  "utf8",
-).catch((error) => {
-  if (error.code !== "ENOENT") throw error;
-  return "[]";
-});
-export const shortcuts = [
-  ...packagedShortcuts,
-  ...JSON.parse(sourceBaseV3),
-].sort((a, b) =>
+export const shortcuts = [...packagedShortcuts].sort((a, b) =>
   `${a.service} ${a.command}`.localeCompare(`${b.service} ${b.command}`),
 );
 // The generated catalog describes the upstream CLI. Help and schema share
@@ -46,20 +36,6 @@ for (const spec of shortcuts) {
       else if (!["mine", "creator-ids", "chat-ids"].includes(f.name))
         f.description += " (Search v2 only)";
     }
-  } else if (spec.service === "contact" && spec.command === "+search-user") {
-    spec.description +=
-      " (HaiNeng Work 7.54 uses search/v1/user with --query and optional --page-token)";
-    for (const f of spec.flags) {
-      if (f.name === "page-size")
-        f.description = "default 20; v1: 1–200, v3: 1–30";
-      else if (f.name !== "query") f.description += " (contact v3 only)";
-    }
-    spec.flags.push({
-      name: "page-token",
-      type: "string",
-      description:
-        "contact v1 continuation token returned by the previous page",
-    });
   } else if (
     spec.service === "base" &&
     spec.command === "+record-batch-create"
@@ -197,6 +173,7 @@ export async function executeAPI(ctx, spec, flags) {
 
 export const knownFlags = new Set([
   ...CONFIG_FLAGS,
+  ...shortcuts.flatMap((spec) => spec.flags.map((flag) => flag.name)),
   ...Object.values(bitableV1.resources).flatMap(({ methods }) =>
     Object.values(methods).flatMap((spec) =>
       Object.keys(spec.parameters).map((name) => name.replaceAll("_", "-")),

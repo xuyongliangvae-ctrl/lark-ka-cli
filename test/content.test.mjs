@@ -162,59 +162,6 @@ test("wiki document fetch resolves the target token before reading", async () =>
   );
 });
 
-test("wiki list pagination aggregates pages and preserves final cursor", async () => {
-  const ctx = context(async (method, url, opts) =>
-    opts.query.page_token
-      ? { items: [{ space_id: "2" }], has_more: false }
-      : { items: [{ space_id: "1" }], has_more: true, page_token: "next" },
-  );
-  const result = await executeContent(ctx, "wiki", "+space-list", {
-    "page-all": true,
-    "page-limit": 5,
-  });
-  assert.deepEqual(
-    result.items.map((x) => x.space_id),
-    ["1", "2"],
-  );
-  assert.equal(ctx.calls.length, 2);
-});
-
-test("wiki pagination rejects a repeated token", async () => {
-  const ctx = context(async () => ({
-    items: [],
-    has_more: true,
-    page_token: "same",
-  }));
-  await assert.rejects(
-    executeContent(ctx, "wiki", "+space-list", { "page-all": true }),
-    /repeated page token/,
-  );
-});
-
-test("wiki node create resolves my_library before posting", async () => {
-  const ctx = context(async (method, url) =>
-    url.endsWith("/my_library")
-      ? { space: { space_id: "123" } }
-      : { node: { node_token: "node" } },
-  );
-  await executeContent(ctx, "wiki", "+node-create", {
-    "space-id": "my_library",
-    title: "New",
-  });
-  assert.equal(ctx.calls[1].url, "/open-apis/wiki/v2/spaces/123/nodes");
-  assert.equal(ctx.calls[1].body.obj_type, "docx");
-});
-
-test("wiki node create dry-run records resolution as well as mutation", async () => {
-  const ctx = context(undefined, { dryRun: true });
-  const result = await executeContent(ctx, "wiki", "+node-create", {
-    "space-id": "my_library",
-    title: "New",
-  });
-  assert.equal(result.requests.length, 2);
-  assert.equal(ctx.calls.length, 0);
-});
-
 test("markdown create preserves bytes and uses multipart upload", async (t) => {
   const dir = await workspace(t);
   await writeFile(path.join(dir, "report.md"), "# Title\n正文");

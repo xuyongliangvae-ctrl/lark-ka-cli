@@ -117,7 +117,7 @@ test("Base creation and idempotent record writes use the appropriate dry-run rou
     );
   for (const [profile, brand, route] of [
     ["cnooc", "custom", createPath],
-    ["public", "feishu", "/open-apis/base/v3/bases"],
+    ["public", "feishu", "/open-apis/bitable/v1/apps"],
   ]) {
     run(
       "config",
