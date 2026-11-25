@@ -128,11 +128,11 @@ test("Base table creation follows created ID and modifies its default first fiel
   );
 });
 
-test("all 42 backward Sheets shortcuts execute real REST dry-run plans", async () => {
+test("all 41 backward Sheets shortcuts execute real REST dry-run plans", async () => {
   const legacy = Object.entries(commandSpecs.sheets).filter(([, spec]) =>
     spec.source?.includes("/backward/"),
   );
-  assert.equal(legacy.length, 42);
+  assert.equal(legacy.length, 41);
   for (const [command] of legacy) {
     const ctx = context({ dryRun: true });
     const flags = {
@@ -181,60 +181,6 @@ test("all 42 backward Sheets shortcuts execute real REST dry-run plans", async (
   }
 });
 
-test("condition formats and filters call native Sheets v2 APIs", async () => {
-  const cases = [
-    [
-      "+cond-format-create",
-      {
-        "spreadsheet-token": "ss",
-        "sheet-id": "s1",
-        "rule-type": "cellIs",
-        ranges: "[]",
-        properties: "{}",
-      },
-      "/condition_formats/batch_create",
-    ],
-    [
-      "+cond-format-list",
-      { "spreadsheet-token": "ss", "sheet-id": "s1" },
-      "/condition_formats",
-    ],
-    [
-      "+filter-create",
-      { "spreadsheet-token": "ss", "sheet-id": "s1", range: "s1!A1:B2" },
-      "/sheets/s1/filter",
-    ],
-    [
-      "+filter-update",
-      {
-        "spreadsheet-token": "ss",
-        "sheet-id": "s1",
-        range: "s1!A1:B2",
-        properties: "{}",
-      },
-      "/sheets/s1/filter",
-    ],
-    [
-      "+filter-delete",
-      { "spreadsheet-token": "ss", "sheet-id": "s1", yes: true },
-      "/sheets/s1/filter",
-    ],
-    [
-      "+filter-list",
-      { "spreadsheet-token": "ss", "sheet-id": "s1" },
-      "/sheets/s1/filter",
-    ],
-  ];
-  for (const [command, flags, suffix] of cases) {
-    const c = context({ dryRun: true });
-    await executeTables(c, "sheets", command, flags);
-    assert.ok(
-      c.requests.some((r) => r.path.endsWith(suffix)),
-      `${command} must call ${suffix}`,
-    );
-  }
-});
-
 test("workbook create and export use legacy Sheets and Drive tasks", async () => {
   const create = context({ dryRun: true });
   await executeTables(create, "sheets", "+workbook-create", { title: "T" });
@@ -242,7 +188,7 @@ test("workbook create and export use legacy Sheets and Drive tasks", async () =>
     create.requests.some((r) => r.path.endsWith("/sheets/v3/spreadsheets")),
   );
   const exp = context({ dryRun: true });
-  await executeTables(exp, "sheets", "+export", {
+  await executeTables(exp, "sheets", "+workbook-export", {
     "spreadsheet-token": "ss",
     "file-extension": "xlsx",
   });

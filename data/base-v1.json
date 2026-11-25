@@ -4161,35 +4161,6 @@
             "base:workflow:read"
           ],
           "risk": "read"
-        },
-        "update": {
-          "httpMethod": "PUT",
-          "path": "/open-apis/bitable/v1/apps/{app_token}/workflows/{workflow_id}",
-          "description": "开启或关闭自动化流程。",
-          "parameters": {
-            "app_token": {
-              "type": "string",
-              "required": true,
-              "location": "path"
-            },
-            "workflow_id": {
-              "type": "string",
-              "required": true,
-              "location": "path"
-            }
-          },
-          "requestBody": {
-            "status": {
-              "type": "string",
-              "required": true
-            }
-          },
-          "requestBodyRequired": true,
-          "id": "base.app.workflow.update",
-          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-workflow/update",
-          "authTypes": ["bot", "user"],
-          "scopes": ["base:workflow:write", "bitable:app"],
-          "risk": "high-risk-write"
         }
       }
     }

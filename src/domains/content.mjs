@@ -2597,22 +2597,6 @@ function unifiedDiff(before, after, target, context = 3) {
   ].join("\n");
 }
 
-async function slidesUpload(ctx, command, f) {
-  if (command !== "+media-upload") return undefined;
-  const ref = await resolveRef(ctx, required(f, "presentation"), "slides");
-  const filename = await safeLocal(ctx, required(f, "file"));
-  const bytes = await readFile(filename);
-  if (bytes.length > 20 * 1024 * 1024)
-    throw err("Slides image uploads must not exceed 20 MiB");
-  const fields = { parent_type: "slide_file", parent_node: ref.token };
-  if (ctx.dryRun)
-    return dry(ctx, [
-      ...(ref.resolveRequest ? [ref.resolveRequest] : []),
-      ...uploadPreview(path.basename(filename), bytes.length, fields, true),
-    ]);
-  return uploadBytes(ctx, bytes, path.basename(filename), fields, true);
-}
-
 async function board(ctx, command, f) {
   if (command !== "+query") return undefined;
   const token = required(f, "whiteboard-token");
@@ -2978,7 +2962,6 @@ export async function executeContent(ctx, service, command, flags = {}) {
   if (service === "docs") return docs(active, command, flags);
   if (service === "drive") return drive(active, command, flags);
   if (service === "markdown") return markdown(active, command, flags);
-  if (service === "slides") return slidesUpload(active, command, flags);
   if (service === "whiteboard") return board(active, command, flags);
   return undefined;
 }
@@ -3044,9 +3027,6 @@ export const CONTENT_COVERAGE = {
     "+overwrite": "implemented",
     "+patch": "implemented-re2-subset",
     "+diff": "implemented-unified-diff",
-  },
-  slides: {
-    "+media-upload": "implemented",
   },
   whiteboard: {
     "+query": "image-raw-or-preserved-source-only",

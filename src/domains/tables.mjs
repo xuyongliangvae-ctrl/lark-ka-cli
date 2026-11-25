@@ -1288,7 +1288,6 @@ async function withLegacySheetId(ctx, f) {
   return next;
 }
 const SHEETS_ALIASES = {
-  "+workbook-info": async (ctx, f) => ["+info", f],
   "+workbook-create": async (ctx, f) => {
     const next = { ...f };
     if (next.values !== undefined && next.data === undefined)
@@ -1296,73 +1295,7 @@ const SHEETS_ALIASES = {
     delete next.values;
     return ["+create", next];
   },
-  "+export": async (ctx, f) => ["+workbook-export", f],
-  "+sheet-info": async (ctx, f) => ["+info", f],
-  "+sheet-copy": async (ctx, f) => [
-    "+copy-sheet",
-    await withLegacySheetId(ctx, f),
-  ],
-  "+sheet-create": async (ctx, f) => ["+create-sheet", f],
-  "+sheet-delete": async (ctx, f) => [
-    "+delete-sheet",
-    await withLegacySheetId(ctx, f),
-  ],
-  "+sheet-hide": async (ctx, f) => [
-    "+update-sheet",
-    { ...(await withLegacySheetId(ctx, f)), hidden: true },
-  ],
-  "+sheet-unhide": async (ctx, f) => [
-    "+update-sheet",
-    { ...(await withLegacySheetId(ctx, f)), hidden: false },
-  ],
-  "+sheet-move": async (ctx, f) => [
-    "+update-sheet",
-    await withLegacySheetId(ctx, f),
-  ],
-  "+sheet-rename": async (ctx, f) => [
-    "+update-sheet",
-    await withLegacySheetId(ctx, f),
-  ],
-  "+cells-merge": async (ctx, f) => [
-    "+merge-cells",
-    has(f, "merge-type") ? f : { ...f, "merge-type": "MERGE_ALL" },
-  ],
-  "+cells-unmerge": async (ctx, f) => ["+unmerge-cells", f],
-  "+cells-replace": async (ctx, f) => [
-    "+replace",
-    withFlagName(f, "regex", "search-by-regex"),
-  ],
-  "+cells-search": async (ctx, f) => [
-    "+find",
-    withInvertedCase(withFlagName(f, "regex", "search-by-regex")),
-  ],
-  "+cells-set-image": async (ctx, f) => ["+write-image", f],
-  "+dropdown-delete": async (ctx, f) => ["+delete-dropdown", f],
-  "+dropdown-get": async (ctx, f) => ["+get-dropdown", f],
-  "+dropdown-set": async (ctx, f) => ["+set-dropdown", f],
-  "+dropdown-update": async (ctx, f) => ["+update-dropdown", f],
-  "+filter-view-create": async (ctx, f) => {
-    const next = { ...f };
-    if (next["view-name"] && !next["filter-view-name"])
-      next["filter-view-name"] = next["view-name"];
-    delete next["view-name"];
-    delete next["properties"];
-    return ["+create-filter-view", next];
-  },
-  "+filter-view-list": async (ctx, f) => ["+list-filter-views", f],
 };
-function withFlagName(f, from, to) {
-  if (!has(f, from)) return { ...f };
-  const next = { ...f, [to]: f[from] };
-  delete next[from];
-  return next;
-}
-function withInvertedCase(f) {
-  if (!has(f, "match-case")) return f;
-  const next = { ...f, "ignore-case": !yes(f["match-case"]) };
-  delete next["match-case"];
-  return next;
-}
 
 async function grantCurrentUser(ctx, token, type) {
   const user = ctx.config?.userOpenId ?? ctx.user?.open_id;
@@ -1760,60 +1693,6 @@ async function executeLegacySheets(ctx, command, original) {
       fail(`${name} must be valid JSON`);
     }
   };
-  if (command === "+cond-format-create") {
-    const sheetId = await legacySheetId(ctx, f);
-    const body = clean({
-      sheet_id: sheetId,
-      condition_formats: [
-        {
-          rule_type: f["rule-type"],
-          ranges: jsonArg(f.ranges, "--ranges"),
-          properties: jsonArg(f.properties, "--properties"),
-        },
-      ],
-    });
-    return req(
-      ctx,
-      "POST",
-      `${v2}/condition_formats/batch_create`,
-      undefined,
-      body,
-    );
-  }
-  if (command === "+cond-format-list") {
-    const sheetId = await legacySheetId(ctx, f);
-    return req(
-      ctx,
-      "GET",
-      `${v2}/condition_formats`,
-      clean({ sheet_id: sheetId, rule_id: f["rule-id"] }),
-    );
-  }
-  if (command === "+filter-create" || command === "+filter-update") {
-    const sheetId = await legacySheetId(ctx, f);
-    const body = clean({
-      range: f.range,
-      properties: f.properties
-        ? jsonArg(f.properties, "--properties")
-        : undefined,
-    });
-    return req(
-      ctx,
-      command === "+filter-create" ? "POST" : "PUT",
-      `${v2}/sheets/${enc(sheetId)}/filter`,
-      undefined,
-      body,
-    );
-  }
-  if (command === "+filter-list") {
-    const sheetId = await legacySheetId(ctx, f);
-    return req(ctx, "GET", `${v2}/sheets/${enc(sheetId)}/filter`);
-  }
-  if (command === "+filter-delete") {
-    const sheetId = await legacySheetId(ctx, f);
-    if (!f.yes) fail("Pass --yes to confirm deleting the filter");
-    return req(ctx, "DELETE", `${v2}/sheets/${enc(sheetId)}/filter`);
-  }
   if (command === "+info") {
     const spreadsheet = await req(ctx, "GET", v3);
     const sheets = await req(ctx, "GET", `${v3}/sheets/query`);

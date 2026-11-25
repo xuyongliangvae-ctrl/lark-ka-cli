@@ -28,10 +28,10 @@ const canonicalAPI = (spec) =>
   `${spec.service} ${spec.resource} ${spec.method}`;
 
 test("the document command list exactly matches all published business commands", () => {
-  assert.equal(documentedCommands.length, 303);
-  assert.equal(new Set(documentedCommands).size, 303);
-  assert.equal(shortcuts.length, 177);
-  assert.equal(apiSpecs().length, 89);
+  assert.equal(documentedCommands.length, 225);
+  assert.equal(new Set(documentedCommands).size, 225);
+  assert.equal(shortcuts.length, 120);
+  assert.equal(apiSpecs().length, 68);
   for (const spec of shortcuts)
     for (const flag of spec.flags)
       assert.ok(
@@ -284,6 +284,6 @@ test("the npm archive physically excludes removed implementations, data and skil
   );
   assert.match(
     child.stdout,
-    /177 shortcut definitions; 89 metadata API methods/,
+    /120 shortcut definitions; 68 metadata API methods/,
   );
 });

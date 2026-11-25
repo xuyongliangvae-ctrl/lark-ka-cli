@@ -222,14 +222,6 @@ const cases = [
     { view_name: "Renamed view" },
   ],
   ["app.workflow", "list", "GET", workflows],
-  [
-    "app.workflow",
-    "update",
-    "PUT",
-    workflows + "/{workflow_id}",
-    {},
-    { status: "Disable" },
-  ],
 ];
 
 async function cliRunner(t) {
@@ -285,10 +277,10 @@ function nativeArgs(resource, command, params, body) {
   ];
 }
 
-test("all 45 HaiNeng native Base commands preview their documented HTTP requests", async (t) => {
+test("all 44 HaiNeng native Base commands preview their documented HTTP requests", async (t) => {
   const run = await cliRunner(t);
   initializeCnooc(run);
-  assert.equal(cases.length, 45);
+  assert.equal(cases.length, 44);
 
   for (const [resource, command, method, suffix, query = {}, body] of cases) {
     const params = { ...pathParams(suffix), ...query };
@@ -364,8 +356,7 @@ test("native deletes, permission writes and workflow updates require explicit co
     if (
       method !== "DELETE" &&
       command !== "batch_delete" &&
-      !(resource.startsWith("app.role") && method !== "GET") &&
-      !(resource === "app.workflow" && command === "update")
+      !(resource.startsWith("app.role") && method !== "GET")
     )
       continue;
     const output = run(
