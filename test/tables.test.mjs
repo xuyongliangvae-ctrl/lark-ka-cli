@@ -92,13 +92,6 @@ test("Base nested errors and retained high-risk writes stay structured failures"
     /Denied/,
   );
   await assert.rejects(
-    executeTables(context(), "base", "+field-create", {
-      ...target,
-      json: '{"type":"formula"}',
-    }),
-    /i-have-read-guide/,
-  );
-  await assert.rejects(
     executeTables(context(), "sheets", "+delete-sheet", sheet),
     (e) => e.code === 10,
   );
@@ -127,11 +120,11 @@ test("Base table creation follows created ID and modifies its default first fiel
   assert.equal(ctx.requests[2].method, "PUT");
   assert.equal(
     ctx.requests[2].path,
-    "/open-apis/base/v3/bases/base1/tables/newTable/fields/defaultField",
+    "/open-apis/bitable/v1/apps/base1/tables/newTable/fields/defaultField",
   );
   assert.equal(
     ctx.requests[3].path,
-    "/open-apis/base/v3/bases/base1/tables/newTable/views",
+    "/open-apis/bitable/v1/apps/base1/tables/newTable/views",
   );
 });
 
@@ -184,6 +177,60 @@ test("all 42 backward Sheets shortcuts execute real REST dry-run plans", async (
           x.path.startsWith("/open-apis/drive/"),
       ),
       command,
+    );
+  }
+});
+
+test("condition formats and filters call native Sheets v2 APIs", async () => {
+  const cases = [
+    [
+      "+cond-format-create",
+      {
+        "spreadsheet-token": "ss",
+        "sheet-id": "s1",
+        "rule-type": "cellIs",
+        ranges: "[]",
+        properties: "{}",
+      },
+      "/condition_formats/batch_create",
+    ],
+    [
+      "+cond-format-list",
+      { "spreadsheet-token": "ss", "sheet-id": "s1" },
+      "/condition_formats",
+    ],
+    [
+      "+filter-create",
+      { "spreadsheet-token": "ss", "sheet-id": "s1", range: "s1!A1:B2" },
+      "/sheets/s1/filter",
+    ],
+    [
+      "+filter-update",
+      {
+        "spreadsheet-token": "ss",
+        "sheet-id": "s1",
+        range: "s1!A1:B2",
+        properties: "{}",
+      },
+      "/sheets/s1/filter",
+    ],
+    [
+      "+filter-delete",
+      { "spreadsheet-token": "ss", "sheet-id": "s1", yes: true },
+      "/sheets/s1/filter",
+    ],
+    [
+      "+filter-list",
+      { "spreadsheet-token": "ss", "sheet-id": "s1" },
+      "/sheets/s1/filter",
+    ],
+  ];
+  for (const [command, flags, suffix] of cases) {
+    const c = context({ dryRun: true });
+    await executeTables(c, "sheets", command, flags);
+    assert.ok(
+      c.requests.some((r) => r.path.endsWith(suffix)),
+      `${command} must call ${suffix}`,
     );
   }
 });

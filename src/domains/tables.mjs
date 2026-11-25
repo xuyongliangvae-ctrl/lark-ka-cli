@@ -290,10 +290,11 @@ const bitableV1Flags = {
   "base-create": ["name", "folder-token", "time-zone"],
   "base-copy": ["name", "folder-token", "time-zone", "without-content"],
   "base-get": [],
-  "table-create": ["name", "fields", "view"],
+  "table-create": ["table-id", "name", "fields", "view"],
   "table-get": ["table-id"],
   "table-list": bitablePagingFlags,
   "field-get": ["table-id", "field-id"],
+  "field-create": ["table-id", "json", "i-have-read-guide"],
   "field-list": [...bitablePagingFlags, "table-id"],
   "view-get": ["table-id", "view-id"],
   "view-list": [...bitablePagingFlags, "table-id"],
@@ -552,6 +553,27 @@ async function bitableTableCreate(ctx, url, f) {
       },
     );
   const result = { table };
+  if (fields.length && !Array.isArray(table?.field_id_list)) {
+    const fieldsUrl = url + "/" + enc(tableId) + "/fields";
+    const existing = ctx.dryRun
+      ? { fields: [{ field_id: "<default_field_id>" }] }
+      : await req(ctx, "GET", fieldsUrl, { page_size: 100 });
+    const defaultField = (existing.fields ?? existing.items ?? [])[0];
+    if (defaultField?.field_id) {
+      const first = fields[0];
+      result.updated_field = await req(
+        ctx,
+        "PUT",
+        fieldsUrl + "/" + enc(defaultField.field_id),
+        undefined,
+        clean({
+          field_name: first.field_name,
+          type: first.type,
+          property: first.property,
+        }),
+      );
+    }
+  }
   if (views.length) {
     result.views = [];
     try {
@@ -1069,6 +1091,14 @@ async function executeBitableV1(ctx, action, f) {
       const fields = await bitableSchemaItems(ctx, collection + "/fields");
       const views = await bitableSchemaItems(ctx, collection + "/views");
       return { table: metadata, fields, views };
+    }
+    if (action === "field-create") {
+      const body = await json(ctx, f.json, "json");
+      if (body?.type === "formula" && !f["i-have-read-guide"])
+        fail(
+          "Creating formula fields requires --i-have-read-guide after reviewing the field schema",
+        );
+      return req(ctx, "POST", collection + "/fields", undefined, body);
     }
     if (action === "field-get" || action === "view-get") {
       const kind = action === "field-get" ? "field" : "view";
@@ -1723,6 +1753,67 @@ async function executeLegacySheets(ctx, command, original) {
   const token = sheetToken(f);
   const v2 = `/open-apis/sheets/v2/spreadsheets/${enc(token)}`;
   const v3 = `/open-apis/sheets/v3/spreadsheets/${enc(token)}`;
+  const jsonArg = (raw, name) => {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      fail(`${name} must be valid JSON`);
+    }
+  };
+  if (command === "+cond-format-create") {
+    const sheetId = await legacySheetId(ctx, f);
+    const body = clean({
+      sheet_id: sheetId,
+      condition_formats: [
+        {
+          rule_type: f["rule-type"],
+          ranges: jsonArg(f.ranges, "--ranges"),
+          properties: jsonArg(f.properties, "--properties"),
+        },
+      ],
+    });
+    return req(
+      ctx,
+      "POST",
+      `${v2}/condition_formats/batch_create`,
+      undefined,
+      body,
+    );
+  }
+  if (command === "+cond-format-list") {
+    const sheetId = await legacySheetId(ctx, f);
+    return req(
+      ctx,
+      "GET",
+      `${v2}/condition_formats`,
+      clean({ sheet_id: sheetId, rule_id: f["rule-id"] }),
+    );
+  }
+  if (command === "+filter-create" || command === "+filter-update") {
+    const sheetId = await legacySheetId(ctx, f);
+    const body = clean({
+      range: f.range,
+      properties: f.properties
+        ? jsonArg(f.properties, "--properties")
+        : undefined,
+    });
+    return req(
+      ctx,
+      command === "+filter-create" ? "POST" : "PUT",
+      `${v2}/sheets/${enc(sheetId)}/filter`,
+      undefined,
+      body,
+    );
+  }
+  if (command === "+filter-list") {
+    const sheetId = await legacySheetId(ctx, f);
+    return req(ctx, "GET", `${v2}/sheets/${enc(sheetId)}/filter`);
+  }
+  if (command === "+filter-delete") {
+    const sheetId = await legacySheetId(ctx, f);
+    if (!f.yes) fail("Pass --yes to confirm deleting the filter");
+    return req(ctx, "DELETE", `${v2}/sheets/${enc(sheetId)}/filter`);
+  }
   if (command === "+info") {
     const spreadsheet = await req(ctx, "GET", v3);
     const sheets = await req(ctx, "GET", `${v3}/sheets/query`);

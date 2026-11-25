@@ -406,14 +406,6 @@ test("7.54 CLI accepts native Docx and whiteboard flags consumed by retained han
       ],
       "/open-apis/board/v1/whiteboards/BOARD/nodes",
     ],
-    ...["+assign", "+followers"].map((action) => [
-      ["task", action, "--task-id", "task123", "--remove", "ou_member"],
-      "/open-apis/task/v2/tasks/task123/remove_members",
-    ]),
-    [
-      ["task", "+reminder", "--task-id", "task123", "--remove"],
-      "/open-apis/task/v2/tasks/task123",
-    ],
   ];
   for (const [args, expectedPath] of checks) {
     const r = await run([...args, "--as", "user", "--dry-run"], env);

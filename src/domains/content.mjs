@@ -2985,6 +2985,14 @@ export async function executeContent(ctx, service, command, flags = {}) {
 
 // Capabilities are intentionally explicit: recognizing a command is not a
 // claim that every advanced format or locator in the Go implementation exists.
+export const CONTENT_REMOVED = new Set([
+  "docs +media-preview",
+  "docs +whiteboard-update",
+  "slides +create",
+  "slides +replace-slide",
+  "whiteboard +update",
+]);
+
 export const CONTENT_COVERAGE = {
   docs: {
     "+create": "native-xml-markdown-text-tables-or-docs-ai-or-mcp",

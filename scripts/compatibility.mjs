@@ -3,6 +3,7 @@ import { packagedShortcuts, apiSpecs } from "../src/metadata.mjs";
 import {
   CONTENT_COVERAGE as content,
   CONTENT_LIMITATIONS,
+  CONTENT_REMOVED,
 } from "../src/domains/content.mjs";
 import { commandSpecs as tables } from "../src/domains/tables.mjs";
 const coverage = {
@@ -15,7 +16,9 @@ const commands = packagedShortcuts.map((spec) => ({
   command: spec.command,
   implementation: coverage[spec.service]?.[spec.command]
     ? "native-node"
-    : "missing",
+    : CONTENT_REMOVED.has(`${spec.service} ${spec.command}`)
+      ? "removed"
+      : "missing",
   notes:
     typeof coverage[spec.service]?.[spec.command] === "string"
       ? coverage[spec.service][spec.command]

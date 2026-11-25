@@ -155,7 +155,6 @@
     "base app.table.form patch",
     "base app.table.form.field list",
     "base app.table.form.field patch",
-    "base app.dashboard copy",
     "base app.dashboard list",
     "base app.role create",
     "base app.role delete",
