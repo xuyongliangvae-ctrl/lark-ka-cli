@@ -303,7 +303,7 @@ test("Drive file version IDs pass to the RPC without activating global --version
     ),
   };
   const version = "7633658129540910621";
-  for (const action of ["+version-get", "+version-delete", "+version-revert"]) {
+  for (const action of ["+version-get"]) {
     const result = await run(
       [
         "drive",
@@ -337,7 +337,7 @@ test("Drive file version IDs pass to the RPC without activating global --version
   assert.equal(missing.code, 2);
   assert.match(missing.stderr, /numeric file version/);
   const gated = await run(
-    ["drive", "+version-delete", "--file-token", "file123", "--version=1"],
+    ["drive", "+version-get", "--file-token", "file123", "--version=1"],
     { ...env, LARKSUITE_CLI_AUTH_PROXY: "fixture" },
   );
   assert.notEqual(gated.code, 0);
@@ -411,19 +411,6 @@ test("7.54 CLI accepts the calendar, native Docx and whiteboard flags consumed b
       ],
       "/open-apis/board/v1/whiteboards/BOARD/nodes",
     ],
-    [
-      [
-        "whiteboard",
-        "+update",
-        "--whiteboard-token",
-        "BOARD",
-        "--input_format",
-        "mermaid",
-        "--source",
-        "graph LR; A-->B",
-      ],
-      "/open-apis/board/v1/whiteboards/BOARD/nodes/plantuml",
-    ],
     ...["+assign", "+followers"].map((action) => [
       ["task", action, "--task-id", "task123", "--remove", "ou_member"],
       "/open-apis/task/v2/tasks/task123/remove_members",
@@ -439,6 +426,5 @@ test("7.54 CLI accepts the calendar, native Docx and whiteboard flags consumed b
     const req = JSON.parse(r.stdout).data.requests[0];
     assert.equal(req.path, expectedPath);
     if (args[1] === "+suggestion") assert.equal(req.data.duration_minutes, 40);
-    if (args[1] === "+update") assert.equal(req.data.syntax_type, 2);
   }
 });

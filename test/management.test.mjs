@@ -459,40 +459,6 @@ test("hidden server bridge supports authorization and code exchange without writ
   );
 });
 
-test("auth scopes queries enabled app scopes instead of returning only a local user grant", async (t) => {
-  const { env } = await fixture(t);
-  let called;
-  const result = await executeManagement(
-    ["auth", "scopes"],
-    {},
-    {
-      env,
-      config: {
-        appId: "cli_app",
-        brand: "feishu",
-        openBaseUrl: "https://open.example.test",
-      },
-      getBotToken: async () => "bot-token",
-      fetchJSON: async (url, options) => {
-        called = { url, options };
-        return {
-          data: {
-            app: {
-              scopes: [
-                { scope: "user:read", token_types: ["user"] },
-                { scope: "bot:read", token_types: ["tenant"] },
-              ],
-            },
-          },
-        };
-      },
-    },
-  );
-  assert.deepEqual(result.userScopes, ["user:read"]);
-  assert.match(String(called.url), /application\/v6\/applications\/cli_app/);
-  assert.equal(called.options.headers.Authorization, "Bearer bot-token");
-});
-
 test("auth list selects only the configured application session", async (t) => {
   const { env } = await fixture(t);
   await writeStore(

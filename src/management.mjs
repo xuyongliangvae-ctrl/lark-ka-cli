@@ -20,7 +20,6 @@ import {
 } from "./config.mjs";
 import {
   getBotToken,
-  getApplicationUserScopes,
   currentUser,
   authURL,
   tokenRequest,
@@ -647,16 +646,7 @@ async function skillsManagement(words, flags, options) {
 }
 
 const MANAGEMENT = {
-  auth: [
-    "login",
-    "logout",
-    "status",
-    "whoami",
-    "scopes",
-    "check",
-    "list",
-    "qrcode",
-  ],
+  auth: ["login", "logout", "status", "whoami", "check", "list", "qrcode"],
   config: [
     "init",
     "bind",
@@ -1219,17 +1209,6 @@ export async function executeManagement(words, flags = {}, options = {}) {
     });
   if (service === "auth" && command === "_server-bridge")
     return serverBridge(flags, options);
-  if (service === "auth" && command === "scopes") {
-    const c = options.config ?? (await loadConfig(flags, env));
-    const userScopes = await getApplicationUserScopes(c, options);
-    return {
-      appId: c.appId,
-      brand: c.brand,
-      tokenType: "user",
-      userScopes,
-      count: userScopes.length,
-    };
-  }
   if (service === "auth" && command === "list") {
     const c =
       options.config ?? (await loadConfig(flags, env, { optional: true }));

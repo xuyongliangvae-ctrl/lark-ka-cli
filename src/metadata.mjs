@@ -29,23 +29,17 @@ export const shortcuts = [
 // these descriptions for shortcuts with a deployment-specific wire format.
 for (const spec of shortcuts) {
   if (spec.command === "+search" && ["docs", "drive"].includes(spec.service)) {
-    spec.description =
-      "Search documents with the configured API (HaiNeng Work 7.54: suite; public: Search v2)";
+    spec.description = "Search documents with the suite search API";
     const common = {
-      query: "keyword (required for suite search)",
-      "page-size": "default 15; suite: 0–50, v2: 1–20",
-      "page-token":
-        "suite: decimal offset from the last response; v2: opaque page token",
-      filter:
-        "suite: JSON object with owner_ids, chat_ids, docs_types; v2: Search v2 filters",
+      query: "keyword (required)",
+      "page-size": "default 15; suite: 0–50",
+      "page-token": "decimal offset from the last response",
+      filter: "JSON object with owner_ids, chat_ids, docs_types",
       "doc-types":
-        "suite: doc (both generations), sheet, slides, bitable, mindnote, file; v2: additional types supported",
+        "doc (both generations), sheet, slides, bitable, mindnote, file",
     };
-    for (const f of spec.flags) {
+    for (const f of spec.flags)
       if (Object.hasOwn(common, f.name)) f.description = common[f.name];
-      else if (!["mine", "creator-ids", "chat-ids"].includes(f.name))
-        f.description += " (Search v2 only)";
-    }
   } else if (spec.service === "contact" && spec.command === "+search-user") {
     spec.description +=
       " (HaiNeng Work 7.54 uses search/v1/user with --query and optional --page-token)";

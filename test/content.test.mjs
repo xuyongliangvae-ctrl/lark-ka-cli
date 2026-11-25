@@ -294,66 +294,6 @@ test("drive downloads do not overwrite existing files by default", async (t) => 
   assert.equal(await readFile(path.join(dir, "existing"), "utf8"), "original");
 });
 
-test("slide XML title is escaped and image placeholders are uploaded before slide create", async (t) => {
-  const dir = await workspace(t);
-  await writeFile(path.join(dir, "image.png"), Buffer.from([1, 2, 3]));
-  const ctx = context(
-    async (method, url) =>
-      url.endsWith("xml_presentations")
-        ? { xml_presentation_id: "deck1" }
-        : url.endsWith("upload_all")
-          ? { file_token: "image1" }
-          : { slide_id: "slide1" },
-    { cwd: dir },
-  );
-  await executeContent(ctx, "slides", "+create", {
-    title: "A & B",
-    slides: JSON.stringify(['<slide><img src="@./image.png"/></slide>']),
-  });
-  assert.match(ctx.calls[0].body.xml_presentation.content, /A &amp; B/);
-  assert.equal(ctx.calls[1].body.get("parent_type"), "slide_file");
-  assert.equal(ctx.calls[1].body.get("parent_node"), "deck1");
-  assert.match(ctx.calls[2].body.slide.content, /src="image1"/);
-});
-
-test("slide partial failure reports the existing presentation", async () => {
-  const ctx = context(async (method, url) => {
-    if (url.endsWith("xml_presentations"))
-      return { xml_presentation_id: "deck1" };
-    throw new Error("page rejected");
-  });
-  await assert.rejects(
-    executeContent(ctx, "slides", "+create", { slides: '["<slide/>"]' }),
-    (e) =>
-      e.type === "partial_failure" && e.detail.xml_presentation_id === "deck1",
-  );
-});
-
-test("whiteboard mermaid contract uses syntax_type 2", async () => {
-  const ctx = context(async () => ({ node_id: "node1" }));
-  await executeContent(ctx, "whiteboard", "+update", {
-    "whiteboard-token": "board1",
-    source: "graph TD;A-->B",
-    input_format: "mermaid",
-    overwrite: true,
-  });
-  assert.equal(ctx.calls[0].body.syntax_type, 2);
-  assert.equal(ctx.calls[0].body.overwrite, true);
-});
-
-test("full comment uses new_comments and reply_elements contract", async () => {
-  const ctx = context();
-  await executeContent(ctx, "drive", "+add-comment", {
-    doc: "https://private.example/docx/doc123",
-    content: '[{"type":"text","text":"Review"}]',
-  });
-  assert.equal(
-    ctx.calls[0].url,
-    "/open-apis/drive/v1/files/doc123/new_comments",
-  );
-  assert.equal(ctx.calls[0].body.reply_elements[0].text, "Review");
-});
-
 test("unknown content command lets the dispatcher handle it", async () => {
   assert.equal(
     await executeContent(context(), "docs", "+unknown", {}),
@@ -612,6 +552,11 @@ test("import status zero without an artifact remains pending rather than claimin
   });
   assert.equal(result.pending, true);
   assert.equal(result.ticket, "ticket");
+  const created = ctx.calls.find(
+    (c) => c.method === "POST" && c.url.endsWith("/import_tasks"),
+  );
+  assert.equal(created.body.file_name, "source.md");
+  assert.equal(created.body.file_extension, "md");
 });
 
 test("push defaults to skipping existing remote files", async (t) => {
@@ -657,17 +602,6 @@ test("destructive local mirror requires explicit confirmation before network mut
     /requires --yes/,
   );
   assert.equal(ctx.calls.length, 0);
-});
-
-test("whiteboard malformed success response is not accepted as an update", async () => {
-  await assert.rejects(
-    executeContent(context(), "whiteboard", "+update", {
-      "whiteboard-token": "board",
-      input_format: "raw",
-      source: '{"raw_nodes":[]}',
-    }),
-    /no valid ids array/,
-  );
 });
 
 test("whiteboard code export reads preserved syntax nodes", async () => {

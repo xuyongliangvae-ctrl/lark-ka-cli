@@ -119,35 +119,6 @@
     },
     "app.dashboard": {
       "methods": {
-        "copy": {
-          "httpMethod": "POST",
-          "path": "/open-apis/bitable/v1/apps/{app_token}/dashboards/{block_id}/copy",
-          "description": "基于现有仪表盘复制出新的仪表盘。",
-          "parameters": {
-            "app_token": {
-              "type": "string",
-              "required": true,
-              "location": "path"
-            },
-            "block_id": {
-              "type": "string",
-              "required": true,
-              "location": "path"
-            }
-          },
-          "requestBody": {
-            "name": {
-              "type": "string",
-              "required": true
-            }
-          },
-          "requestBodyRequired": true,
-          "id": "base.app.dashboard.copy",
-          "documentation": "https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/bitable-v1/app-dashboard/copy",
-          "authTypes": ["bot", "user"],
-          "scopes": ["base:dashboard:copy", "bitable:app"],
-          "risk": "write"
-        },
         "list": {
           "httpMethod": "GET",
           "path": "/open-apis/bitable/v1/apps/{app_token}/dashboards",

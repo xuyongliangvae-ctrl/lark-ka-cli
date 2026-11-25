@@ -99,7 +99,7 @@ export function help(words = [], config) {
   assertAvailableBaseShortcut(service, command, config);
   if (service === "config") return configHelp();
   if (service === "auth")
-    return 'auth login [--scope "approved scopes"] [--json] [--no-open] [--redirect-uri URL]\nWithout --scope, request the Profile’s approved user scopes or discover them from the application.\nauth status [--verify] [--connector] | auth whoami --as user --json | logout | scopes | check --scope SCOPES | list\n';
+    return 'auth login [--scope "approved scopes"] [--json] [--no-open] [--redirect-uri URL]\nWithout --scope, request the Profile’s approved user scopes or discover them from the application.\nauth status [--verify] [--connector] | auth whoami --as user --json | logout | check --scope SCOPES | list\n';
   const spec = visibleShortcuts.find(
     (s) => s.service === service && s.command === command,
   );
@@ -427,7 +427,7 @@ async function executeInternal(words, flags, options, profileConfig) {
         },
       };
     }
-    if (command === "check" || command === "scopes") {
+    if (command === "check") {
       const state = await authStatus(c);
       const granted = String(state.scope || "")
         .split(/[ ,]+/)
@@ -436,7 +436,7 @@ async function executeInternal(words, flags, options, profileConfig) {
         .split(/[ ,]+/)
         .filter(Boolean);
       const missing = required.filter((s) => !granted.includes(s));
-      if (command === "check" && (!state.loggedIn || missing.length))
+      if (!state.loggedIn || missing.length)
         throw new CliError("permission", "Required user scopes are missing", {
           code: 3,
           detail: { missingScopes: missing },

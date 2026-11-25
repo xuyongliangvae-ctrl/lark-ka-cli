@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { executeContent } from "../src/domains/content.mjs";
 
 const suite = "/open-apis/suite/docs-api/search/object";
-const v2 = "/open-apis/search/v2/doc_wiki/search";
 
 function context(config = { brand: "custom", profileName: "cnooc" }, respond) {
   const calls = [];
@@ -21,13 +20,10 @@ function context(config = { brand: "custom", profileName: "cnooc" }, respond) {
 }
 
 for (const service of ["docs", "drive"]) {
-  test(`${service} +search previews the UAT endpoint and retains public/custom v2`, async () => {
-    for (const [config, route] of [
-      [{ brand: "custom", profileName: "cnooc" }, suite],
-      [{ brand: "feishu" }, v2],
-      [{ brand: "custom", profileName: "another-customer" }, v2],
-      [{ brand: "cnooc", documentSearchApi: "v2" }, v2],
-      [{ brand: "custom", documentSearchApi: "suite" }, suite],
+  test(`${service} +search previews the suite search endpoint`, async () => {
+    for (const config of [
+      { brand: "custom", profileName: "cnooc" },
+      { brand: "custom", documentSearchApi: "suite" },
     ]) {
       const ctx = context(config);
       const result = await executeContent(
@@ -39,14 +35,12 @@ for (const service of ["docs", "drive"]) {
       assert.equal(ctx.calls.length, 0);
       const [req] = result.requests;
       assert.equal(req.method, "POST");
-      assert.equal(req.path, route);
-      if (route === suite)
-        assert.deepEqual(req.body, {
-          search_key: "周报",
-          count: 15,
-          offset: 0,
-        });
-      else assert.equal(req.body.query, "周报");
+      assert.equal(req.path, suite);
+      assert.deepEqual(req.body, {
+        search_key: "周报",
+        count: 15,
+        offset: 0,
+      });
     }
   });
 }
