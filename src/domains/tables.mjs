@@ -1289,6 +1289,14 @@ async function withLegacySheetId(ctx, f) {
 }
 const SHEETS_ALIASES = {
   "+workbook-info": async (ctx, f) => ["+info", f],
+  "+workbook-create": async (ctx, f) => {
+    const next = { ...f };
+    if (next.values !== undefined && next.data === undefined)
+      next.data = next.values;
+    delete next.values;
+    return ["+create", next];
+  },
+  "+export": async (ctx, f) => ["+workbook-export", f],
   "+sheet-info": async (ctx, f) => ["+info", f],
   "+sheet-copy": async (ctx, f) => [
     "+copy-sheet",
@@ -1666,6 +1674,81 @@ async function executeLegacySheets(ctx, command, original) {
           ? `${ctx.config.webBaseUrl}/sheets/${enc(token)}`
           : undefined),
     };
+  }
+  if (command === "+workbook-export") {
+    const token = sheetToken(f);
+    const ext = f["file-extension"] ?? "xlsx";
+    if (!["xlsx", "csv"].includes(ext))
+      fail("--file-extension must be xlsx or csv");
+    const sheetId =
+      f["sheet-id"] || f["sheet-name"]
+        ? await legacySheetId(ctx, f)
+        : undefined;
+    if (ext === "csv" && !sheetId)
+      fail("--sheet-id is required for csv export");
+    const body = clean({
+      token,
+      type: "sheet",
+      file_extension: ext,
+      sub_id: sheetId,
+    });
+    const created = await req(
+      ctx,
+      "POST",
+      "/open-apis/drive/v1/export_tasks",
+      undefined,
+      body,
+    );
+    if (ctx.dryRun) {
+      await req(ctx, "GET", "/open-apis/drive/v1/export_tasks/<ticket>", {
+        token,
+      });
+      if (f["output-path"])
+        await ctx.request(
+          "GET",
+          "/open-apis/drive/v1/export_tasks/file/<file_token>/download",
+          { responseType: "buffer" },
+        );
+      return { dry_run: true };
+    }
+    if (!created.ticket)
+      throw new CliError("api", "Export task returned no ticket", { code: 5 });
+    let completed;
+    for (let attempt = 0; attempt < 30; attempt++) {
+      completed = await req(
+        ctx,
+        "GET",
+        `/open-apis/drive/v1/export_tasks/${enc(created.ticket)}`,
+        { token },
+      );
+      const state = (completed.result ?? completed).job_status;
+      if (state === 0) break;
+      if (state !== undefined && state !== 1 && state !== 2)
+        throw new CliError("api", `Export failed with status ${state}`, {
+          code: 5,
+          detail: completed,
+        });
+      await delay(1000);
+    }
+    const result = completed?.result ?? completed ?? {};
+    if (result.job_status !== 0)
+      throw new CliError("api", "Export task did not finish", {
+        code: 5,
+        detail: completed,
+      });
+    if (!f["output-path"]) return { ...completed, ticket: created.ticket };
+    if (!result.file_token)
+      throw new CliError("api", "Export completed without a file_token", {
+        code: 5,
+        detail: completed,
+      });
+    const bytes = await ctx.request(
+      "GET",
+      `/open-apis/drive/v1/export_tasks/file/${enc(result.file_token)}/download`,
+      { responseType: "buffer" },
+    );
+    await writeFile(f["output-path"], Buffer.from(bytes));
+    return { ...completed, ticket: created.ticket, path: f["output-path"] };
   }
   const token = sheetToken(f);
   const v2 = `/open-apis/sheets/v2/spreadsheets/${enc(token)}`;

@@ -6201,6 +6201,50 @@
   },
   {
     "service": "sheets",
+    "command": "+export",
+    "description": "Export a spreadsheet (async task polling + optional download)",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "file-extension",
+        "description": "export format: xlsx | csv",
+        "type": "string",
+        "required": true,
+        "enum": ["xlsx", "csv"]
+      },
+      {
+        "name": "output-path",
+        "description": "local save path",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID (required for CSV)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_spreadsheet_management.go"
+  },
+  {
+    "service": "sheets",
     "command": "+filter-view-create",
     "description": "+filter-view-create (mapped to sheets +create-filter-view)",
     "risk": "write",
@@ -7865,6 +7909,87 @@
   },
   {
     "service": "sheets",
+    "command": "+workbook-create",
+    "description": "Create a spreadsheet workbook with optional header and initial values",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "title",
+        "description": "Spreadsheet title",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "Target folder token; placed at the drive root when omitted",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "headers",
+        "description": "Header row as a JSON array: [\"Col A\",\"Col B\"]",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "values",
+        "description": "Initial data as a 2D JSON array: [[\"alice\",95]]",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/workbook_create.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+workbook-export",
+    "description": "Export a spreadsheet workbook (xlsx or csv) with async polling",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "Spreadsheet URL (XOR with --spreadsheet-token)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "Spreadsheet token (XOR with --url)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "file-extension",
+        "description": "Export file format; csv mode requires --sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": ["xlsx", "csv"]
+      },
+      {
+        "name": "sheet-id",
+        "description": "Required only in csv mode: which sheet to export as CSV",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "output-path",
+        "description": "local save path for the exported file",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/workbook_export.go"
+  },
+  {
+    "service": "sheets",
     "command": "+workbook-info",
     "description": "+workbook-info (mapped to sheets +info)",
     "risk": "write",
@@ -7980,6 +8105,29 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_cell_images.go"
+  },
+  {
+    "service": "slides",
+    "command": "+media-upload",
+    "description": "Upload a local image to a slides presentation and return the file_token (use as <img src=...>)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "file",
+        "description": "local image path (max 20 MB)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "presentation",
+        "description": "xml_presentation_id, slides URL, or wiki URL that resolves to slides",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/slides/slides_media_upload.go"
   },
   {
     "service": "task",

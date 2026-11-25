@@ -2,7 +2,7 @@
   "node": ">=22",
   "implementation": "native-nodejs",
   "goRuntimeRequired": false,
-  "shortcutCount": 212,
+  "shortcutCount": 216,
   "metadataAPICount": 278,
   "missing": [],
   "commands": [
@@ -788,6 +788,11 @@
     },
     {
       "service": "sheets",
+      "command": "+export",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+filter-view-create",
       "implementation": "native-node"
     },
@@ -958,6 +963,16 @@
     },
     {
       "service": "sheets",
+      "command": "+workbook-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+workbook-export",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+workbook-info",
       "implementation": "native-node"
     },
@@ -970,6 +985,12 @@
       "service": "sheets",
       "command": "+write-image",
       "implementation": "native-node"
+    },
+    {
+      "service": "slides",
+      "command": "+media-upload",
+      "implementation": "native-node",
+      "notes": "implemented"
     },
     {
       "service": "task",

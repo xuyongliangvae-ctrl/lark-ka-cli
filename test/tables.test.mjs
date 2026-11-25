@@ -228,11 +228,11 @@ test("Base table creation follows created ID and modifies its default first fiel
   );
 });
 
-test("all 41 backward Sheets shortcuts execute real REST dry-run plans", async () => {
+test("all 42 backward Sheets shortcuts execute real REST dry-run plans", async () => {
   const legacy = Object.entries(commandSpecs.sheets).filter(([, spec]) =>
     spec.source?.includes("/backward/"),
   );
-  assert.equal(legacy.length, 41);
+  assert.equal(legacy.length, 42);
   for (const [command] of legacy) {
     const ctx = context({ dryRun: true });
     const flags = {
@@ -279,6 +279,25 @@ test("all 41 backward Sheets shortcuts execute real REST dry-run plans", async (
       command,
     );
   }
+});
+
+test("workbook create and export use legacy Sheets and Drive tasks", async () => {
+  const create = context({ dryRun: true });
+  await executeTables(create, "sheets", "+workbook-create", { title: "T" });
+  assert.ok(
+    create.requests.some((r) => r.path.endsWith("/sheets/v3/spreadsheets")),
+  );
+  const exp = context({ dryRun: true });
+  await executeTables(exp, "sheets", "+export", {
+    "spreadsheet-token": "ss",
+    "file-extension": "xlsx",
+  });
+  assert.ok(
+    exp.requests.some((r) => r.path.endsWith("/drive/v1/export_tasks")),
+  );
+  assert.ok(
+    exp.requests.some((r) => r.path.includes("/export_tasks/<ticket>")),
+  );
 });
 
 test("legacy Sheets use legacy payloads rather than silently changing API semantics", async () => {
