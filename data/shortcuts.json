@@ -33,11 +33,7 @@
         "description": "scope: specific | public | tenant",
         "type": "string",
         "required": true,
-        "enum": [
-          "specific",
-          "public",
-          "tenant"
-        ]
+        "enum": ["specific", "public", "tenant"]
       },
       {
         "name": "targets",
@@ -748,11 +744,7 @@
         "description": "reply status",
         "type": "string",
         "required": true,
-        "enum": [
-          "accept",
-          "decline",
-          "tentative"
-        ]
+        "enum": ["accept", "decline", "tentative"]
       }
     ],
     "source": "shortcuts/calendar/calendar_rsvp.go"
@@ -954,10 +946,7 @@
         "type": "string",
         "default": "v1",
         "required": false,
-        "enum": [
-          "v1",
-          "v2"
-        ]
+        "enum": ["v1", "v2"]
       }
     ],
     "source": "shortcuts/doc/docs_create.go"
@@ -974,10 +963,7 @@
         "type": "string",
         "default": "v1",
         "required": false,
-        "enum": [
-          "v1",
-          "v2"
-        ]
+        "enum": ["v1", "v2"]
       },
       {
         "name": "doc",
@@ -1201,10 +1187,7 @@
         "type": "string",
         "default": "v1",
         "required": false,
-        "enum": [
-          "v1",
-          "v2"
-        ]
+        "enum": ["v1", "v2"]
       },
       {
         "name": "doc",
@@ -1340,28 +1323,14 @@
         "description": "source document type: doc | docx | sheet | bitable | slides",
         "type": "string",
         "required": true,
-        "enum": [
-          "doc",
-          "docx",
-          "sheet",
-          "bitable",
-          "slides"
-        ]
+        "enum": ["doc", "docx", "sheet", "bitable", "slides"]
       },
       {
         "name": "file-extension",
         "description": "export format: docx | pdf | xlsx | csv | markdown | base (bitable only) | pptx (slides only)",
         "type": "string",
         "required": true,
-        "enum": [
-          "docx",
-          "pdf",
-          "xlsx",
-          "csv",
-          "markdown",
-          "base",
-          "pptx"
-        ]
+        "enum": ["docx", "pdf", "xlsx", "csv", "markdown", "base", "pptx"]
       },
       {
         "name": "sub-id",
@@ -1787,11 +1756,7 @@
         "description": "label language",
         "type": "string",
         "required": false,
-        "enum": [
-          "zh",
-          "en",
-          "ja"
-        ]
+        "enum": ["zh", "en", "ja"]
       }
     ],
     "source": "shortcuts/drive/drive_secure_label.go"
@@ -2063,10 +2028,7 @@
         "type": "string",
         "default": "private",
         "required": false,
-        "enum": [
-          "private",
-          "public"
-        ]
+        "enum": ["private", "public"]
       },
       {
         "name": "chat-mode",
@@ -2074,10 +2036,7 @@
         "type": "string",
         "default": "group",
         "required": false,
-        "enum": [
-          "group",
-          "topic"
-        ]
+        "enum": ["group", "topic"]
       },
       {
         "name": "set-bot-manager",
@@ -2101,11 +2060,7 @@
         "type": "string",
         "default": "open_id",
         "required": false,
-        "enum": [
-          "open_id",
-          "union_id",
-          "user_id"
-        ]
+        "enum": ["open_id", "union_id", "user_id"]
       },
       {
         "name": "sort-type",
@@ -2113,10 +2068,7 @@
         "type": "string",
         "default": "ByCreateTimeAsc",
         "required": false,
-        "enum": [
-          "ByCreateTimeAsc",
-          "ByActiveTimeDesc"
-        ]
+        "enum": ["ByCreateTimeAsc", "ByActiveTimeDesc"]
       },
       {
         "name": "types",
@@ -2190,10 +2142,7 @@
         "type": "string",
         "default": "desc",
         "required": false,
-        "enum": [
-          "asc",
-          "desc"
-        ]
+        "enum": ["asc", "desc"]
       },
       {
         "name": "page-size",
@@ -2266,11 +2215,7 @@
         "description": "sort field (descending)",
         "type": "string",
         "required": false,
-        "enum": [
-          "create_time_desc",
-          "update_time_desc",
-          "member_count_desc"
-        ]
+        "enum": ["create_time_desc", "update_time_desc", "member_count_desc"]
       },
       {
         "name": "page-size",
@@ -2805,10 +2750,7 @@
         "description": "resource type (image or file)",
         "type": "string",
         "required": true,
-        "enum": [
-          "image",
-          "file"
-        ]
+        "enum": ["image", "file"]
       },
       {
         "name": "output",
@@ -2852,42 +2794,28 @@
         "description": "include attachment type filter",
         "type": "string",
         "required": false,
-        "enum": [
-          "file",
-          "image",
-          "video",
-          "link"
-        ]
+        "enum": ["file", "image", "video", "link"]
       },
       {
         "name": "chat-type",
         "description": "chat type",
         "type": "string",
         "required": false,
-        "enum": [
-          "group",
-          "p2p"
-        ]
+        "enum": ["group", "p2p"]
       },
       {
         "name": "sender-type",
         "description": "sender type",
         "type": "string",
         "required": false,
-        "enum": [
-          "user",
-          "bot"
-        ]
+        "enum": ["user", "bot"]
       },
       {
         "name": "exclude-sender-type",
         "description": "exclude sender type",
         "type": "string",
         "required": false,
-        "enum": [
-          "user",
-          "bot"
-        ]
+        "enum": ["user", "bot"]
       },
       {
         "name": "is-at-me",
@@ -3080,10 +3008,7 @@
         "type": "string",
         "default": "asc",
         "required": false,
-        "enum": [
-          "asc",
-          "desc"
-        ]
+        "enum": ["asc", "desc"]
       },
       {
         "name": "page-size",
@@ -4868,10 +4793,7 @@
         "description": "target type: objective | key_result",
         "type": "string",
         "required": true,
-        "enum": [
-          "objective",
-          "key_result"
-        ]
+        "enum": ["objective", "key_result"]
       },
       {
         "name": "progress-percent",
@@ -4885,11 +4807,7 @@
         "description": "progress status: normal | overdue | done. must provided with --progress-percent",
         "type": "string",
         "required": false,
-        "enum": [
-          "normal",
-          "overdue",
-          "done"
-        ]
+        "enum": ["normal", "overdue", "done"]
       },
       {
         "name": "source-title",
@@ -4975,10 +4893,7 @@
         "description": "target type: objective | key_result",
         "type": "string",
         "required": true,
-        "enum": [
-          "objective",
-          "key_result"
-        ]
+        "enum": ["objective", "key_result"]
       },
       {
         "name": "user-id-type",
@@ -5031,11 +4946,7 @@
         "description": "progress status: normal | overdue | done",
         "type": "string",
         "required": false,
-        "enum": [
-          "normal",
-          "overdue",
-          "done"
-        ]
+        "enum": ["normal", "overdue", "done"]
       },
       {
         "name": "user-id-type",
@@ -5073,10 +4984,7 @@
         "description": "target type: objective | key_result",
         "type": "string",
         "required": true,
-        "enum": [
-          "objective",
-          "key_result"
-        ]
+        "enum": ["objective", "key_result"]
       }
     ],
     "source": "shortcuts/okr/okr_image_upload.go"
@@ -5113,10 +5021,7 @@
         "description": "ROWS or COLUMNS",
         "type": "string",
         "required": true,
-        "enum": [
-          "ROWS",
-          "COLUMNS"
-        ]
+        "enum": ["ROWS", "COLUMNS"]
       },
       {
         "name": "length",
@@ -5201,6 +5106,338 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+cells-merge",
+    "description": "+cells-merge (mapped to sheets +merge-cells)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "merge-type",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/cells-merge.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+cells-replace",
+    "description": "+cells-replace (mapped to sheets +replace)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "find",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "replacement",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-case",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-entire-cell",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "regex",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include-formulas",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/cells-replace.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+cells-search",
+    "description": "+cells-search (mapped to sheets +find)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "find",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-case",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-entire-cell",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "regex",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include-formulas",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "max-matches",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "offset",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/cells-search.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+cells-set-image",
+    "description": "+cells-set-image (mapped to sheets +write-image)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "image",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/cells-set-image.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+cells-unmerge",
+    "description": "+cells-unmerge (mapped to sheets +unmerge-cells)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/cells-unmerge.go"
   },
   {
     "service": "sheets",
@@ -5547,10 +5784,7 @@
         "description": "ROWS or COLUMNS",
         "type": "string",
         "required": true,
-        "enum": [
-          "ROWS",
-          "COLUMNS"
-        ]
+        "enum": ["ROWS", "COLUMNS"]
       },
       {
         "name": "start-index",
@@ -5746,6 +5980,326 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+dropdown-delete",
+    "description": "+dropdown-delete (mapped to sheets +delete-dropdown)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "ranges",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/dropdown-delete.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+dropdown-get",
+    "description": "+dropdown-get (mapped to sheets +get-dropdown)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/dropdown-get.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+dropdown-set",
+    "description": "+dropdown-set (mapped to sheets +set-dropdown)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "options",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "colors",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "multiple",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "highlight",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "source-range",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/dropdown-set.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+dropdown-update",
+    "description": "+dropdown-update (mapped to sheets +update-dropdown)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "ranges",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "options",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "colors",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "multiple",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "highlight",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "source-range",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/dropdown-update.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+filter-view-create",
+    "description": "+filter-view-create (mapped to sheets +create-filter-view)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "properties",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "view-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/filter-view-create.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+filter-view-list",
+    "description": "+filter-view-list (mapped to sheets +list-filter-views)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "view-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/filter-view-list.go"
   },
   {
     "service": "sheets",
@@ -6022,10 +6576,7 @@
         "description": "ROWS or COLUMNS",
         "type": "string",
         "required": true,
-        "enum": [
-          "ROWS",
-          "COLUMNS"
-        ]
+        "enum": ["ROWS", "COLUMNS"]
       },
       {
         "name": "start-index",
@@ -6046,10 +6597,7 @@
         "description": "style inheritance: BEFORE or AFTER",
         "type": "string",
         "required": false,
-        "enum": [
-          "BEFORE",
-          "AFTER"
-        ]
+        "enum": ["BEFORE", "AFTER"]
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
@@ -6220,11 +6768,7 @@
         "description": "merge method",
         "type": "string",
         "required": true,
-        "enum": [
-          "MERGE_ALL",
-          "MERGE_ROWS",
-          "MERGE_COLUMNS"
-        ]
+        "enum": ["MERGE_ALL", "MERGE_ROWS", "MERGE_COLUMNS"]
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
@@ -6261,10 +6805,7 @@
         "description": "ROWS or COLUMNS",
         "type": "string",
         "required": true,
-        "enum": [
-          "ROWS",
-          "COLUMNS"
-        ]
+        "enum": ["ROWS", "COLUMNS"]
       },
       {
         "name": "start-index",
@@ -6517,6 +7058,365 @@
   },
   {
     "service": "sheets",
+    "command": "+sheet-copy",
+    "description": "+sheet-copy (mapped to sheets +copy-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "title",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-copy.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-create",
+    "description": "+sheet-create (mapped to sheets +create-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "title",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "row-count",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "col-count",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-create.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-delete",
+    "description": "+sheet-delete (mapped to sheets +delete-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-delete.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-hide",
+    "description": "+sheet-hide (mapped to sheets +update-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-hide.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-info",
+    "description": "+sheet-info (mapped to sheets +info)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-info.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-move",
+    "description": "+sheet-move (mapped to sheets +update-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "source-index",
+        "description": "",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-move.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-rename",
+    "description": "+sheet-rename (mapped to sheets +update-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "title",
+        "description": "",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-rename.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-unhide",
+    "description": "+sheet-unhide (mapped to sheets +update-sheet)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/sheet-unhide.go"
+  },
+  {
+    "service": "sheets",
     "command": "+unmerge-cells",
     "description": "Unmerge (split) cells in a spreadsheet",
     "risk": "write",
@@ -6584,10 +7484,7 @@
         "description": "ROWS or COLUMNS",
         "type": "string",
         "required": true,
-        "enum": [
-          "ROWS",
-          "COLUMNS"
-        ]
+        "enum": ["ROWS", "COLUMNS"]
       },
       {
         "name": "start-index",
@@ -6961,15 +7858,33 @@
         "description": "user ID type for --user-ids",
         "type": "string",
         "required": false,
-        "enum": [
-          "open_id",
-          "union_id",
-          "lark_id",
-          "user_id"
-        ]
+        "enum": ["open_id", "union_id", "lark_id", "user_id"]
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+workbook-info",
+    "description": "+workbook-info (mapped to sheets +info)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/workbook-info.go"
   },
   {
     "service": "sheets",
