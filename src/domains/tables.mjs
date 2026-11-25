@@ -1255,7 +1255,105 @@ export async function executeTables(ctx, service, command, flags = {}) {
     }
     return executeBase(ctx, command, f);
   }
+  const alias = SHEETS_ALIASES[command];
+  if (alias) {
+    const [target, next] = await alias(ctx, flags);
+    return executeLegacySheets(ctx, target, next);
+  }
   return executeLegacySheets(ctx, command, flags);
+}
+
+// Sheet_ai commands are not deployed on HaiNeng. These aliases map them to the
+// verified legacy commands listed in the CLI test report (section 4).
+async function legacySheetId(ctx, f) {
+  if (f["sheet-id"]) return f["sheet-id"];
+  const name = f["sheet-name"];
+  if (!name) return undefined;
+  const token = sheetToken(f);
+  const data = await req(
+    ctx,
+    "GET",
+    `/open-apis/sheets/v3/spreadsheets/${enc(token)}/sheets/query`,
+  );
+  const hit = (data.sheets ?? []).find((s) => (s.title ?? s.name) === name);
+  if (!hit && !ctx.dryRun)
+    fail(`No sheet named ${name} in spreadsheet ${token}`);
+  return hit?.sheet_id ?? `<sheet_id_for_${name}>`;
+}
+async function withLegacySheetId(ctx, f) {
+  const next = { ...f };
+  const id = await legacySheetId(ctx, f);
+  if (id && !next["sheet-id"]) next["sheet-id"] = id;
+  delete next["sheet-name"];
+  return next;
+}
+const SHEETS_ALIASES = {
+  "+workbook-info": async (ctx, f) => ["+info", f],
+  "+sheet-info": async (ctx, f) => ["+info", f],
+  "+sheet-copy": async (ctx, f) => [
+    "+copy-sheet",
+    await withLegacySheetId(ctx, f),
+  ],
+  "+sheet-create": async (ctx, f) => ["+create-sheet", f],
+  "+sheet-delete": async (ctx, f) => [
+    "+delete-sheet",
+    await withLegacySheetId(ctx, f),
+  ],
+  "+sheet-hide": async (ctx, f) => [
+    "+update-sheet",
+    { ...(await withLegacySheetId(ctx, f)), hidden: true },
+  ],
+  "+sheet-unhide": async (ctx, f) => [
+    "+update-sheet",
+    { ...(await withLegacySheetId(ctx, f)), hidden: false },
+  ],
+  "+sheet-move": async (ctx, f) => [
+    "+update-sheet",
+    await withLegacySheetId(ctx, f),
+  ],
+  "+sheet-rename": async (ctx, f) => [
+    "+update-sheet",
+    await withLegacySheetId(ctx, f),
+  ],
+  "+cells-merge": async (ctx, f) => [
+    "+merge-cells",
+    has(f, "merge-type") ? f : { ...f, "merge-type": "MERGE_ALL" },
+  ],
+  "+cells-unmerge": async (ctx, f) => ["+unmerge-cells", f],
+  "+cells-replace": async (ctx, f) => [
+    "+replace",
+    withFlagName(f, "regex", "search-by-regex"),
+  ],
+  "+cells-search": async (ctx, f) => [
+    "+find",
+    withInvertedCase(withFlagName(f, "regex", "search-by-regex")),
+  ],
+  "+cells-set-image": async (ctx, f) => ["+write-image", f],
+  "+dropdown-delete": async (ctx, f) => ["+delete-dropdown", f],
+  "+dropdown-get": async (ctx, f) => ["+get-dropdown", f],
+  "+dropdown-set": async (ctx, f) => ["+set-dropdown", f],
+  "+dropdown-update": async (ctx, f) => ["+update-dropdown", f],
+  "+filter-view-create": async (ctx, f) => {
+    const next = { ...f };
+    if (next["view-name"] && !next["filter-view-name"])
+      next["filter-view-name"] = next["view-name"];
+    delete next["view-name"];
+    delete next["properties"];
+    return ["+create-filter-view", next];
+  },
+  "+filter-view-list": async (ctx, f) => ["+list-filter-views", f],
+};
+function withFlagName(f, from, to) {
+  if (!has(f, from)) return { ...f };
+  const next = { ...f, [to]: f[from] };
+  delete next[from];
+  return next;
+}
+function withInvertedCase(f) {
+  if (!has(f, "match-case")) return f;
+  const next = { ...f, "ignore-case": !yes(f["match-case"]) };
+  delete next["match-case"];
+  return next;
 }
 
 async function grantCurrentUser(ctx, token, type) {
