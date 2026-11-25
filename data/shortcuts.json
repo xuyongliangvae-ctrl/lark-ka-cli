@@ -1116,36 +1116,6 @@
   },
   {
     "service": "docs",
-    "command": "+media-preview",
-    "description": "Preview document media file (auto-detects extension)",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "token",
-        "description": "media file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "output",
-        "description": "local save path",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "overwrite",
-        "description": "overwrite existing output file",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/doc/doc_media_preview.go"
-  },
-  {
-    "service": "docs",
     "command": "+media-upload",
     "description": "Upload media file (image/attachment) to a document block",
     "risk": "write",
@@ -1184,7 +1154,7 @@
   {
     "service": "docs",
     "command": "+search",
-    "description": "Search Lark docs, Wiki, and spreadsheet files (Search v2: doc_wiki/search)",
+    "description": "Search documents with the suite search API",
     "risk": "read",
     "flags": [
       {
@@ -1245,162 +1215,6 @@
       }
     ],
     "source": "shortcuts/doc/docs_update.go"
-  },
-  {
-    "service": "docs",
-    "command": "+whiteboard-update",
-    "description": "",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/whiteboard/whiteboard_update.go"
-  },
-  {
-    "service": "drive",
-    "command": "+add-comment",
-    "description": "Add a comment to doc/docx/file/sheet/slides; file targets support selected extensions and full comments only",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "doc",
-        "description": "document URL/token, file URL/token, sheet/slides URL, or wiki URL that resolves to doc/docx/file/sheet/slides",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "document type: doc, docx, file, sheet, slides (required when --doc is a bare token; auto-detected for URLs)",
-        "type": "string",
-        "required": false,
-        "enum": [
-          "doc",
-          "docx",
-          "file",
-          "sheet",
-          "slides"
-        ]
-      },
-      {
-        "name": "content",
-        "description": "reply_elements JSON string",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "full-comment",
-        "description": "create a full-document comment; also the default when no location is provided",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "selection-with-ellipsis",
-        "description": "target content locator (plain text or 'start...end')",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "block-id",
-        "description": "for docx: anchor block ID; for sheet: <sheetId>!<cell> (e.g. a281f9!D6); for slides: <slide-block-type>!<xml-id> (e.g. shape!bPq)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_add_comment.go"
-  },
-  {
-    "service": "drive",
-    "command": "+apply-permission",
-    "description": "Apply to the document owner for view or edit permission on a doc/sheet/file/wiki/bitable/docx/mindnote/slides",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "token",
-        "description": "target token or document URL (docx/sheets/base/file/wiki/doc/mindnote/slides)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "target type; auto-inferred from URL when omitted",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "perm",
-        "description": "permission to request",
-        "type": "string",
-        "required": true,
-        "enum": [
-          "view",
-          "edit"
-        ]
-      },
-      {
-        "name": "remark",
-        "description": "optional note shown on the request card sent to the owner",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_apply_permission.go"
-  },
-  {
-    "service": "drive",
-    "command": "+cover",
-    "description": "List or download stable cover presets for a Drive file",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "Drive file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "spec",
-        "description": "cover preset: default | icon | grid | small | middle | big | square",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "version",
-        "description": "optional file version",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "list-only",
-        "description": "list built-in cover specs without downloading",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output",
-        "description": "local output path for downloaded cover",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "if-exists",
-        "description": "output conflict policy: error | overwrite | rename",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_cover.go"
   },
   {
     "service": "drive",
@@ -1583,44 +1397,6 @@
   },
   {
     "service": "drive",
-    "command": "+export-download",
-    "description": "Download an exported file by file_token",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "exported file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "file-name",
-        "description": "preferred output filename (optional)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output-dir",
-        "description": "local output directory (default: current directory)",
-        "type": "string",
-        "default": ".",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "overwrite",
-        "description": "overwrite existing output file",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_export_download.go"
-  },
-  {
-    "service": "drive",
     "command": "+import",
     "description": "Import a local file to Drive as a cloud document (docx, sheet, bitable, slides)",
     "risk": "write",
@@ -1648,7 +1424,7 @@
       },
       {
         "name": "name",
-        "description": "imported file name (default: local file name without extension)",
+        "description": "imported file name (default: local file name with extension)",
         "type": "string",
         "required": false,
         "enum": []
@@ -1725,57 +1501,6 @@
       }
     ],
     "source": "shortcuts/drive/drive_move.go"
-  },
-  {
-    "service": "drive",
-    "command": "+preview",
-    "description": "List or download available preview artifacts for a Drive file",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "Drive file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "preview type to download: pdf | html | text | image | source",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "version",
-        "description": "optional file version",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "list-only",
-        "description": "list preview candidates without downloading",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output",
-        "description": "local output path for downloaded preview",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "if-exists",
-        "description": "output conflict policy: error | overwrite | rename",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_preview.go"
   },
   {
     "service": "drive",
@@ -1882,7 +1607,7 @@
   {
     "service": "drive",
     "command": "+search",
-    "description": "Search Lark docs, Wiki, and spreadsheet files with flat filters (Search v2: doc_wiki/search)",
+    "description": "Search documents with the suite search API",
     "risk": "read",
     "flags": [
       {
@@ -2073,36 +1798,6 @@
   },
   {
     "service": "drive",
-    "command": "+secure-label-update",
-    "description": "Update the secure label on a Drive file or document",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "token",
-        "description": "target file token or document URL (docx/sheets/base/file/wiki/doc/mindnote/slides)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "target type; auto-inferred from URL when omitted",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "label-id",
-        "description": "secure label ID to set",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_secure_label.go"
-  },
-  {
-    "service": "drive",
     "command": "+status",
     "description": "Compare a local directory with a Drive folder by exact hash or quick modified_time",
     "risk": "read",
@@ -2177,43 +1872,6 @@
   },
   {
     "service": "drive",
-    "command": "+task_result",
-    "description": "Poll async task result for import, export, drive move/delete, wiki move, wiki delete-space, or wiki delete-node operations",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "ticket",
-        "description": "async task ticket (for import/export tasks)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "task-id",
-        "description": "async task ID (for drive task_check, wiki_move, wiki_delete_space, or wiki_delete_node tasks)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "scenario",
-        "description": "task scenario: import, export, task_check, wiki_move, wiki_delete_space, or wiki_delete_node",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "file-token",
-        "description": "source document token used for export task status lookup",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_task_result.go"
-  },
-  {
-    "service": "drive",
     "command": "+upload",
     "description": "Upload a local file to Drive",
     "risk": "write",
@@ -2258,29 +1916,6 @@
   },
   {
     "service": "drive",
-    "command": "+version-delete",
-    "description": "Delete a specific historical version of a Drive file",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "target file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "version",
-        "description": "version from drive +version-history to delete (not tag)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_version.go"
-  },
-  {
-    "service": "drive",
     "command": "+version-get",
     "description": "Download a specific version of a Drive file",
     "risk": "read",
@@ -2311,60 +1946,6 @@
         "description": "overwrite existing output file",
         "type": "bool",
         "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_version.go"
-  },
-  {
-    "service": "drive",
-    "command": "+version-history",
-    "description": "List the version history of a Drive file",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "target file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "max versions to return (1-200)",
-        "type": "int",
-        "default": "20",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "cursor",
-        "description": "pagination cursor from the previous page's next_cursor",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_version.go"
-  },
-  {
-    "service": "drive",
-    "command": "+version-revert",
-    "description": "Revert a Drive file to a specific historical version",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "target file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "version",
-        "description": "version from drive +version-history to revert to (not tag)",
-        "type": "string",
-        "required": true,
         "enum": []
       }
     ],
@@ -5623,94 +5204,6 @@
   },
   {
     "service": "sheets",
-    "command": "+batch-update",
-    "description": "Execute a batch of write shortcuts as a single atomic request (rolls back on failure by default).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_batch_update.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-batch-clear",
-    "description": "Clear content/formats across many sheet-prefixed ranges in one atomic batch (irreversible).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_batch_update.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-batch-set-style",
-    "description": "Apply one style block to many sheet-prefixed ranges in one atomic batch.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_batch_update.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-clear",
-    "description": "Clear cell content, formats, or both within a range (irreversible).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-get",
-    "description": "Read one or more cell ranges with values, formulas, and optional styles / comments / data validation.",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_read_data.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-replace",
-    "description": "Find and replace text in a spreadsheet (case / regex / whole-cell / formula-text controls).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_search_replace.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-search",
-    "description": "Find cells matching --find in a spreadsheet (case / regex / whole-cell / formula-text controls).",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_search_replace.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-set",
-    "description": "Write values / formulas / styles / comments / data validation / embed-image to a cell range.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-set-image",
-    "description": "Embed a local image into a single cell (uploads via drive, then set_cell_range with rich_text embed-image).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cells-set-style",
-    "description": "Apply style flags to every cell in a range (values / formulas untouched).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cols-resize",
-    "description": "Resize columns by pixel / standard (--type pixel needs --size; --range is column letters like \"A:E\" or \"C\"; no auto for cols).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
     "command": "+copy-sheet",
     "description": "Copy a sheet within a spreadsheet",
     "risk": "write",
@@ -6024,22 +5517,6 @@
   },
   {
     "service": "sheets",
-    "command": "+csv-get",
-    "description": "Read a range as CSV (with [row=N] line prefix by default).",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_read_data.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+csv-put",
-    "description": "Paste RFC-4180 CSV into a sheet at --start-cell (plain values only, auto-expands sheet if needed).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
-  },
-  {
-    "service": "sheets",
     "command": "+delete-dimension",
     "description": "Delete rows or columns",
     "risk": "write",
@@ -6269,141 +5746,6 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dim-delete",
-    "description": "Delete rows or columns (irreversible).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dim-freeze",
-    "description": "Freeze the first N rows or columns; --count 0 unfreezes the chosen dimension.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dim-insert",
-    "description": "Insert blank rows or columns at a given position.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dim-move",
-    "description": "Move a contiguous block of rows or columns to a new position (re-numbers neighbors).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dropdown-delete",
-    "description": "Clear dropdowns from many sheet-prefixed ranges atomically (irreversible).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_batch_update.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dropdown-get",
-    "description": "Read the dropdown / data-validation configuration on a range.",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_read_data.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dropdown-set",
-    "description": "Attach a dropdown / data-validation list to every cell in --range.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dropdown-update",
-    "description": "Install or replace one dropdown across many sheet-prefixed ranges atomically.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_batch_update.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+export",
-    "description": "Export a spreadsheet (async task polling + optional download)",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "file-extension",
-        "description": "export format: xlsx | csv",
-        "type": "string",
-        "required": true,
-        "enum": [
-          "xlsx",
-          "csv"
-        ]
-      },
-      {
-        "name": "output-path",
-        "description": "local save path",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID (required for CSV)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_spreadsheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+filter-create",
-    "description": "Create a sheet-level filter (one per sheet).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_object_crud.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+filter-delete",
-    "description": "Remove the sheet-level filter (irreversible).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_object_crud.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+filter-update",
-    "description": "Update the sheet-level filter (overwrite rules + range).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_object_crud.go"
   },
   {
     "service": "sheets",
@@ -6950,38 +6292,6 @@
   },
   {
     "service": "sheets",
-    "command": "+range-copy",
-    "description": "Copy a range to a new location (--paste-type controls what is copied).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+range-fill",
-    "description": "Autofill a target range from a source template (copy / linear / growth / date series).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+range-move",
-    "description": "Cut a range and paste it at a new location (optionally cross-sheet).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+range-sort",
-    "description": "Sort rows within a range by one or more columns.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
     "command": "+read",
     "description": "Read spreadsheet cell values",
     "risk": "read",
@@ -7105,14 +6415,6 @@
   },
   {
     "service": "sheets",
-    "command": "+rows-resize",
-    "description": "Resize rows by pixel / standard / auto (--type pixel needs --size; --range is 1-based A1 like \"2:10\" or \"5\").",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_range_operations.go"
-  },
-  {
-    "service": "sheets",
     "command": "+set-dropdown",
     "description": "Set dropdown list on a cell range",
     "risk": "write",
@@ -7212,62 +6514,6 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-copy",
-    "description": "Duplicate a sub-sheet, optionally renaming and repositioning the copy.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-create",
-    "description": "Create a new sub-sheet with an optional position and initial dimensions.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-delete",
-    "description": "Delete a sub-sheet (irreversible).",
-    "risk": "high-risk-write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-info",
-    "description": "Get a sub-sheet's layout metadata: row heights, column widths, hidden rows/cols, merges, groups, freeze.",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-move",
-    "description": "Move a sub-sheet to a new position.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-rename",
-    "description": "Rename a sub-sheet.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-set-tab-color",
-    "description": "Set or clear the tab color of a sub-sheet.",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
   },
   {
     "service": "sheets",
@@ -7727,30 +6973,6 @@
   },
   {
     "service": "sheets",
-    "command": "+workbook-create",
-    "description": "Create a new spreadsheet (optionally pre-filled with --headers and --values).",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+workbook-export",
-    "description": "Export a spreadsheet to xlsx or a single sheet to csv (async + poll + optional download).",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+workbook-info",
-    "description": "List sub-sheets of a spreadsheet with metadata (sheet_id, title, dimensions, freeze, hidden).",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/sheets/lark_sheet_workbook.go"
-  },
-  {
-    "service": "sheets",
     "command": "+write",
     "description": "Write to spreadsheet cells (overwrite mode)",
     "risk": "write",
@@ -7843,97 +7065,6 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_cell_images.go"
-  },
-  {
-    "service": "slides",
-    "command": "+create",
-    "description": "Create a Lark Slides presentation",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "title",
-        "description": "presentation title",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "slides",
-        "description": "slide content JSON array (each element is a <slide> XML string, max 10; for more pages, create first then add via xml_presentation.slide.create). <img src=\"@./local.png\"> placeholders are auto-uploaded and replaced with file_token.",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/slides/slides_create.go"
-  },
-  {
-    "service": "slides",
-    "command": "+media-upload",
-    "description": "Upload a local image to a slides presentation and return the file_token (use as <img src=...>)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "file",
-        "description": "local image path (max 20 MB)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "presentation",
-        "description": "xml_presentation_id, slides URL, or wiki URL that resolves to slides",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/slides/slides_media_upload.go"
-  },
-  {
-    "service": "slides",
-    "command": "+replace-slide",
-    "description": "Replace elements on a slide via block_replace / block_insert parts (auto-injects id + <content/> on shape elements)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "presentation",
-        "description": "xml_presentation_id, slides URL, or wiki URL that resolves to slides",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "slide-id",
-        "description": "slide page identifier (slide_id)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "parts",
-        "description": "JSON array of replace parts (each: {action: block_replace|block_insert, ...}); max 200",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "revision-id",
-        "description": "presentation revision (-1 = latest; pass a specific number for optimistic locking)",
-        "type": "int",
-        "default": "-1",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "tid",
-        "description": "transaction id for concurrent-edit locking (usually empty)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/slides/slides_replace_slide.go"
   },
   {
     "service": "task",
@@ -8879,14 +8010,6 @@
       }
     ],
     "source": "shortcuts/whiteboard/whiteboard_query.go"
-  },
-  {
-    "service": "whiteboard",
-    "command": "+update",
-    "description": "",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/whiteboard/whiteboard_update.go"
   },
   {
     "service": "wiki",

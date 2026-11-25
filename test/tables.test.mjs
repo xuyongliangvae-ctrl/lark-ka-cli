@@ -21,12 +21,6 @@ function context({ dryRun = false, response } = {}) {
       requests.push({ method, path, ...options });
       if (response)
         return response({ method, path, ...options }, requests.length);
-      if (path.includes("sheet_ai"))
-        return {
-          output: JSON.stringify({
-            sheets: [{ sheet_id: "sheet1", name: "Sheet1", index: 0 }],
-          }),
-        };
       return {
         fields: [],
         views: [],
@@ -198,7 +192,7 @@ test("Base API nested errors stay errors; formula guide and high-risk operations
     /i-have-read-guide/,
   );
   await assert.rejects(
-    executeTables(context(), "sheets", "+sheet-delete", sheet),
+    executeTables(context(), "sheets", "+delete-sheet", sheet),
     (e) => e.code === 10,
   );
   assert.equal(
@@ -234,208 +228,11 @@ test("Base table creation follows created ID and modifies its default first fiel
   );
 });
 
-test("Sheets read and write tools use correct endpoint, serialized input, and workbook selector", async () => {
-  const ctx = context();
-  await executeTables(ctx, "sheets", "+cells-get", {
-    ...sheet,
-    range: "A1:B2",
-    include: "formula,style",
-  });
-  assert.equal(
-    ctx.requests[0].path,
-    "/open-apis/sheet_ai/v2/spreadsheets/ss1/tools/invoke_read",
-  );
-  assert.equal(ctx.requests[0].body.tool_name, "get_cell_ranges");
-  const read = JSON.parse(ctx.requests[0].body.input);
-  assert.deepEqual(read.ranges, ["A1:B2"]);
-  assert.equal(read.include_styles, true);
-  assert.equal(read.value_render_option, "formula");
-  assert.equal(read.cell_limit, 1000000000);
-  await executeTables(ctx, "sheets", "+cells-set", {
-    ...sheet,
-    range: "A1",
-    cells: '[[{"value":1}]]',
-    "allow-overwrite": false,
-  });
-  assert.match(ctx.requests[1].path, /invoke_write$/);
-  assert.equal(JSON.parse(ctx.requests[1].body.input).allow_overwrite, false);
-});
-
-test("Sheets selectors, required flags, and output decoding fail explicitly", async () => {
-  await assert.rejects(
-    executeTables(context(), "sheets", "+cells-get", {
-      ...sheet,
-      url: "https://example.test/sheets/ss2",
-      range: "A1",
-    }),
-    /exactly one/,
-  );
-  await assert.rejects(
-    executeTables(context(), "sheets", "+cells-get", {
-      ...sheet,
-      "sheet-name": "Sheet1",
-      range: "A1",
-    }),
-    /mutually exclusive/,
-  );
-  await assert.rejects(
-    executeTables(context(), "sheets", "+cells-set", { ...sheet, range: "A1" }),
-    /--cells is required/,
-  );
-  await assert.rejects(
-    executeTables(
-      context({ response: () => ({ output: "broken" }) }),
-      "sheets",
-      "+workbook-info",
-      { "spreadsheet-token": "ss1" },
-    ),
-    /invalid JSON output/,
-  );
-});
-
-test("Sheets clear, fill and copy translate CLI vocabulary into tool values", async () => {
-  const ctx = context();
-  await executeTables(ctx, "sheets", "+cells-clear", {
-    ...sheet,
-    range: "A1:B2",
-    yes: true,
-  });
-  assert.equal(JSON.parse(ctx.requests[0].body.input).clear_type, "contents");
-  await executeTables(ctx, "sheets", "+range-copy", {
-    ...sheet,
-    "source-range": "A1",
-    "target-range": "B1",
-    "paste-type": "values",
-  });
-  assert.equal(JSON.parse(ctx.requests[1].body.input).paste_type, "value_only");
-  await executeTables(ctx, "sheets", "+range-fill", {
-    ...sheet,
-    "source-range": "A1",
-    "target-range": "A2:A5",
-    "series-type": "copy",
-  });
-  assert.equal(JSON.parse(ctx.requests[2].body.input).fill_type, "copyCells");
-});
-
-test("Sheets object creation handles placement selector and hoisted object fields", async () => {
-  const ctx = context();
-  await executeTables(ctx, "sheets", "+pivot-create", {
-    "spreadsheet-token": "ss1",
-    source: "'Data'!A1:D10",
-    properties: '{"rows":[]}',
-  });
-  assert.equal(ctx.requests[0].body.tool_name, "manage_pivot_table_object");
-  const pivot = JSON.parse(ctx.requests[0].body.input);
-  assert.equal(pivot.sheet_id, undefined);
-  assert.equal(pivot.properties.source, "'Data'!A1:D10");
-  await executeTables(ctx, "sheets", "+filter-view-create", {
-    ...sheet,
-    range: "A1:D10",
-    "view-name": "View",
-    properties: "{}",
-  });
-  assert.equal(
-    JSON.parse(ctx.requests[1].body.input).properties.view_name,
-    "View",
-  );
-  await executeTables(ctx, "sheets", "+cond-format-create", {
-    ...sheet,
-    "rule-type": "cellIs",
-    ranges: '["A1:B2"]',
-    properties: '{"style":{}}',
-  });
-  assert.deepEqual(JSON.parse(ctx.requests[2].body.input).properties.ranges, [
-    "A1:B2",
-  ]);
-});
-
-test("dimension move uses the v3 path with snake-case indices", async () => {
-  const ctx = context();
-  await executeTables(ctx, "sheets", "+dim-move", {
-    ...sheet,
-    "source-range": "3:5",
-    target: "10",
-  });
-  assert.equal(
-    ctx.requests[0].path,
-    "/open-apis/sheets/v3/spreadsheets/ss1/sheets/sheet1/move_dimension",
-  );
-  assert.deepEqual(ctx.requests[0].body, {
-    source: { major_dimension: "ROWS", start_index: 2, end_index: 5 },
-    destination_index: 9,
-  });
-});
-
-test("atomic batch uses per-shortcut translation instead of guessed raw operations", async () => {
-  const ctx = context();
-  await executeTables(ctx, "sheets", "+batch-update", {
-    "spreadsheet-token": "ss1",
-    yes: true,
-    operations:
-      '[{"shortcut":"+cells-set","input":{"sheet_id":"sheet1","range":"A1","cells":[[{"value":1}]]}},{"shortcut":"+sheet-rename","input":{"sheet_id":"sheet1","title":"New"}}]',
-  });
-  const input = JSON.parse(ctx.requests[0].body.input);
-  assert.equal(ctx.requests[0].body.tool_name, "batch_update");
-  assert.equal(input.operations[0].tool_name, "set_cell_range");
-  assert.equal(input.operations[1].input.operation, "rename");
-  assert.equal(input.operations[1].input.new_name, "New");
-  await assert.rejects(
-    executeTables(context(), "sheets", "+batch-update", {
-      "spreadsheet-token": "ss1",
-      yes: true,
-      operations: '[{"shortcut":"+cells-get","input":{}}]',
-    }),
-    /cannot participate/,
-  );
-});
-
-test("batch range formatting requires explicit sheet names and produces a single batch tool request", async () => {
-  const ctx = context();
-  await executeTables(ctx, "sheets", "+cells-batch-clear", {
-    "spreadsheet-token": "ss1",
-    yes: true,
-    ranges: '["\u0027Sheet 1\u0027!A1:B2","Other!D3"]',
-  });
-  const input = JSON.parse(ctx.requests[0].body.input);
-  assert.equal(input.operations.length, 2);
-  assert.equal(input.operations[0].input.sheet_name, "Sheet 1");
-  assert.equal(input.operations[1].input.range, "D3");
-});
-
-test("composite schema introspection needs no credentials or network requests", async () => {
-  const ctx = context();
-  const result = await executeTables(ctx, "sheets", "+chart-create", {
-    "print-schema": true,
-    "flag-name": "properties",
-  });
-  assert.equal(result.flag, "properties");
-  assert.equal(result.schema.type, "object");
-  assert.equal(ctx.requests.length, 0);
-});
-
-test("spreadsheet initial fill reports partial success without losing the created workbook", async () => {
-  const ctx = context({
-    response: (r) =>
-      r.path === "/open-apis/sheets/v3/spreadsheets"
-        ? { spreadsheet: { spreadsheet_token: "createdToken" } }
-        : { output: "{}" },
-  });
-  await assert.rejects(
-    executeTables(ctx, "sheets", "+workbook-create", {
-      title: "New",
-      headers: '["Name"]',
-    }),
-    (e) =>
-      e.type === "partial_success" &&
-      e.detail.spreadsheet_token === "createdToken",
-  );
-});
-
-test("all 42 backward Sheets shortcuts execute real REST dry-run plans", async () => {
+test("all 41 backward Sheets shortcuts execute real REST dry-run plans", async () => {
   const legacy = Object.entries(commandSpecs.sheets).filter(([, spec]) =>
     spec.source?.includes("/backward/"),
   );
-  assert.equal(legacy.length, 42);
+  assert.equal(legacy.length, 41);
   for (const [command] of legacy) {
     const ctx = context({ dryRun: true });
     const flags = {
@@ -521,85 +318,6 @@ test("legacy Sheets use legacy payloads rather than silently changing API semant
     ctx.requests[2].path,
     "/open-apis/sheets/v3/spreadsheets/ss1/sheets/sheet1/filter_views/view1/conditions/A",
   );
-});
-
-test("CSV row output preserves quoted newlines and reports unread data structurally", async () => {
-  const data = {
-    annotated_csv: '[row=2],Alice,"line1\nline2"\n[row=3],Bob,done',
-    col_indices: ["B", "C"],
-    actual_range: "B2:C3",
-    current_region: "B2:C10",
-    warning_message: "warning",
-  };
-  const ctx = context({ response: () => ({ output: JSON.stringify(data) }) });
-  const result = await executeTables(ctx, "sheets", "+csv-get", {
-    ...sheet,
-    range: "B2:C3",
-    "rows-json": true,
-  });
-  assert.deepEqual(result.rows[0], {
-    row_number: 2,
-    values: { B: "Alice", C: "line1\nline2" },
-  });
-  assert.equal(result.data_not_fully_read.unread_rows, 7);
-  assert.equal(result.annotated_csv, undefined);
-  const plain = await executeTables(ctx, "sheets", "+csv-get", {
-    ...sheet,
-    range: "B2:C3",
-    "include-row-prefix": false,
-  });
-  assert.ok(!plain.annotated_csv.includes("[row="));
-});
-
-test("embedded images upload bytes and carry decoded dimensions into a single cell", async (t) => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "lark-sheet-image-"));
-  t.after(() => rm(dir, { recursive: true, force: true }));
-  await writeFile(
-    path.join(dir, "tiny.png"),
-    Buffer.from(
-      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6aWQAAAAASUVORK5CYII=",
-      "base64",
-    ),
-  );
-  const ctx = context({
-    response: (r) =>
-      r.path.includes("/medias/")
-        ? { file_token: "file_image" }
-        : { output: '{"updated":true}' },
-  });
-  ctx.cwd = dir;
-  const result = await executeTables(ctx, "sheets", "+cells-set-image", {
-    ...sheet,
-    range: "A1",
-    image: "tiny.png",
-    name: "named.png",
-  });
-  assert.equal(ctx.requests[0].body.get("file_name"), "named.png");
-  const image = JSON.parse(ctx.requests[1].body.input).cells[0][0].rich_text[0];
-  assert.equal(image.image_width, 1);
-  assert.equal(image.image_height, 1);
-  assert.equal(result.file_token, "file_image");
-  assert.equal(result.set_cell_range.updated, true);
-  await assert.rejects(
-    executeTables(ctx, "sheets", "+cells-set-image", {
-      ...sheet,
-      range: "A1:B2",
-      image: "tiny.png",
-    }),
-    /exactly one cell/,
-  );
-});
-
-test("composite schema rejects missing chart properties before making a request", async () => {
-  const ctx = context();
-  await assert.rejects(
-    executeTables(ctx, "sheets", "+chart-create", {
-      ...sheet,
-      properties: "{}",
-    }),
-    /required/,
-  );
-  assert.equal(ctx.requests.length, 0);
 });
 
 test("Base record reads default to Markdown with metadata and allow explicit JSON or jq", async () => {

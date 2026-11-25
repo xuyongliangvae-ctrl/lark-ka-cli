@@ -59,14 +59,6 @@ const cases = [
   ],
   ["app", "get", "GET", app],
   ["app", "update", "PUT", app, {}, { name: "Renamed Base" }],
-  [
-    "app.dashboard",
-    "copy",
-    "POST",
-    dashboards + "/{block_id}/copy",
-    {},
-    { name: "Copied dashboard" },
-  ],
   ["app.dashboard", "list", "GET", dashboards, page],
   ["app.role", "create", "POST", roles, {}, roleData],
   ["app.role", "delete", "DELETE", role],
@@ -293,10 +285,10 @@ function nativeArgs(resource, command, params, body) {
   ];
 }
 
-test("all 46 HaiNeng native Base commands preview their documented HTTP requests", async (t) => {
+test("all 45 HaiNeng native Base commands preview their documented HTTP requests", async (t) => {
   const run = await cliRunner(t);
   initializeCnooc(run);
-  assert.equal(cases.length, 46);
+  assert.equal(cases.length, 45);
 
   for (const [resource, command, method, suffix, query = {}, body] of cases) {
     const params = { ...pathParams(suffix), ...query };

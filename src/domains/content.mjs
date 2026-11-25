@@ -1479,25 +1479,6 @@ async function callMCP(ctx, name, args) {
 }
 
 async function docs(ctx, command, f) {
-  if (command === "+whiteboard-update") return board(ctx, "+update", f);
-  if (command === "+search") {
-    const filter = await json(ctx, f.filter, "--filter");
-    const body = {
-      query: f.query ?? "",
-      page_size: number(f, "page-size", 15, 1, 20),
-      doc_filter: {},
-      wiki_filter: {},
-      ...filter,
-    };
-    if (f["page-token"]) body.page_token = f["page-token"];
-    return pages(
-      ctx,
-      "POST",
-      "/open-apis/search/v2/doc_wiki/search",
-      { body },
-      "res_units",
-    );
-  }
   const backend = docBackend(ctx, f);
   if (command === "+create") {
     const content = await input(ctx, f.content ?? f.markdown ?? "");
@@ -1916,14 +1897,7 @@ async function docs(ctx, command, f) {
       "unsupported",
     );
   }
-  if (
-    [
-      "+media-download",
-      "+media-preview",
-      "+media-upload",
-      "+media-insert",
-    ].includes(command)
-  ) {
+  if (["+media-download", "+media-upload", "+media-insert"].includes(command)) {
     return documentMedia(ctx, command, f);
   }
   return undefined;
@@ -1940,16 +1914,6 @@ async function documentMedia(ctx, command, f) {
       f,
       {},
       `${f.token}.${f.type === "whiteboard" ? "png" : "bin"}`,
-    );
-  }
-  if (command === "+media-preview") {
-    required(f, "output");
-    return download(
-      ctx,
-      `/open-apis/drive/v1/medias/${enc(required(f, "token"))}/preview_download`,
-      f,
-      { preview_type: "16" },
-      `${f.token}.bin`,
     );
   }
   const fromClipboard = bool(f, "from-clipboard");
@@ -2454,7 +2418,8 @@ async function drive(ctx, command, f) {
           file_extension: path.extname(filename).slice(1),
           file_token: "<uploaded_file_token>",
           type: f.type,
-          file_name: f.name ?? path.parse(filename).name,
+          // HaiNeng rejects docx imports whose file_name lacks an extension (1069910).
+          file_name: f.name ?? path.basename(filename),
           point: { mount_type: 1, mount_key: f["folder-token"] ?? "" },
           token: f["target-token"],
         })
@@ -2501,24 +2466,6 @@ async function drive(ctx, command, f) {
       }),
       f.output ?? f["file-token"],
     );
-  if (command === "+version-history")
-    return request(
-      ctx,
-      "GET",
-      `${files}/${enc(required(f, "file-token"))}/history`,
-      clean({
-        page_size: number(f, "limit", 20, 1, 200),
-        page_token: f.cursor,
-      }),
-    );
-  if (command === "+version-revert" || command === "+version-delete")
-    return request(
-      ctx,
-      "POST",
-      `${files}/${enc(required(f, "file-token"))}/${command === "+version-revert" ? "revert" : "version_del"}`,
-      undefined,
-      { version: required(f, "version") },
-    );
   if (command === "+secure-label-list")
     return pages(ctx, "GET", "/open-apis/drive/v2/my_secure_labels", {
       query: clean({
@@ -2527,35 +2474,6 @@ async function drive(ctx, command, f) {
         lang: f.lang,
       }),
     });
-  if (command === "+secure-label-update" || command === "+apply-permission") {
-    const ref = await resolveRef(ctx, required(f, "token"), f.type);
-    const url =
-      command === "+secure-label-update"
-        ? `/open-apis/drive/v2/files/${enc(ref.token)}/secure_label`
-        : `/open-apis/drive/v1/permissions/${enc(ref.token)}/members/apply`;
-    const body =
-      command === "+secure-label-update"
-        ? { id: required(f, "label-id") }
-        : clean({ perm: required(f, "perm"), remark: f.remark });
-    if (!ref.type) throw err("--type is required when using a raw token");
-    if (ctx.dryRun)
-      return dry(ctx, [
-        ...(ref.resolveRequest ? [ref.resolveRequest] : []),
-        step(
-          command === "+secure-label-update" ? "PATCH" : "POST",
-          url,
-          { type: ref.type },
-          body,
-        ),
-      ]);
-    return request(
-      ctx,
-      command === "+secure-label-update" ? "PATCH" : "POST",
-      url,
-      { type: ref.type },
-      body,
-    );
-  }
   if (command === "+inspect") {
     const ref = await resolveRef(ctx, required(f, "url"), f.type);
     if (!ref.type) throw err("--type is required for raw tokens");
@@ -2576,114 +2494,6 @@ async function drive(ctx, command, f) {
       body,
     );
   }
-  if (command === "+search") {
-    if (bool(f, "mine") && f["creator-ids"])
-      throw err("--mine and --creator-ids are mutually exclusive");
-    if (f["folder-tokens"] && f["space-ids"])
-      throw err("--folder-tokens and --space-ids are mutually exclusive");
-    const filter = {};
-    for (const k of ["creator-ids", "doc-types", "chat-ids", "sharer-ids"])
-      if (f[k]) filter[k.replaceAll("-", "_")] = list(f[k]);
-    if (bool(f, "mine")) {
-      const user = ctx.config?.userOpenId ?? ctx.session?.user?.open_id;
-      if (!user)
-        throw err("--mine requires a known logged-in user open_id", "auth");
-      filter.creator_ids = [user];
-    }
-    if (f["doc-types"])
-      filter.doc_types = list(f["doc-types"]).map((x) => x.toUpperCase());
-    for (const [prefix, name] of [
-      ["edited", "my_edit_time"],
-      ["commented", "my_comment_time"],
-      ["opened", "my_open_time"],
-      ["created", "create_time"],
-    ]) {
-      if (f[`${prefix}-since`] || f[`${prefix}-until`])
-        filter[name] = clean({
-          start_time: f[`${prefix}-since`]
-            ? parseTime(f[`${prefix}-since`])
-            : undefined,
-          end_time: f[`${prefix}-until`]
-            ? parseTime(f[`${prefix}-until`])
-            : undefined,
-        });
-    }
-    const body = {
-      query: f.query ?? "",
-      page_size: number(f, "page-size", 15, 1, 20),
-      doc_filter: { ...filter },
-      wiki_filter: { ...filter },
-    };
-    if (f["folder-tokens"])
-      body.doc_filter.folder_tokens = list(f["folder-tokens"]);
-    if (f["space-ids"]) body.wiki_filter.space_ids = list(f["space-ids"]);
-    for (const side of ["doc_filter", "wiki_filter"]) {
-      if (f["only-title"]) body[side].only_title = true;
-      if (f["only-comment"]) body[side].only_comment = true;
-      if (f.sort)
-        body[side].sort_type =
-          f.sort === "default" ? "DEFAULT_TYPE" : String(f.sort).toUpperCase();
-    }
-    if (f["folder-tokens"]) delete body.wiki_filter;
-    if (f["space-ids"]) delete body.doc_filter;
-    if (f["page-token"]) body.page_token = f["page-token"];
-    return pages(
-      ctx,
-      "POST",
-      "/open-apis/search/v2/doc_wiki/search",
-      { body },
-      "res_units",
-    );
-  }
-  if (command === "+add-comment") {
-    const ref = await resolveRef(ctx, required(f, "doc"), f.type);
-    if (!ref.type) throw err("--type is required with a raw document token");
-    if (f["selection-with-ellipsis"])
-      throw err(
-        "Text-located comments require the locate-doc backend; use --block-id from docs +fetch --blocks or a full-document comment",
-        "unsupported",
-      );
-    const elements = await json(ctx, required(f, "content"), "--content");
-    const body = {
-      file_type: ref.type,
-      reply_elements: Array.isArray(elements)
-        ? elements
-        : (elements.elements ?? elements.reply_elements),
-    };
-    if (!Array.isArray(body.reply_elements))
-      throw err("--content must be an array of reply elements");
-    if (f["block-id"]) {
-      if (ref.type === "sheet") {
-        const match = /^([^!]+)!([A-Z]+)([1-9]\d*)$/i.exec(f["block-id"]);
-        if (!match)
-          throw err("--block-id must be sheetId!A1 for sheet comments");
-        let col = 0;
-        for (const ch of match[2].toUpperCase())
-          col = col * 26 + ch.charCodeAt(0) - 64;
-        body.anchor = {
-          block_id: match[1],
-          sheet_col: col - 1,
-          sheet_row: Number(match[3]) - 1,
-        };
-      } else if (ref.type === "slides") {
-        const match = /^([^!]+)!(.+)$/.exec(f["block-id"]);
-        if (!match)
-          throw err(
-            "--block-id must be slide-block-type!xml-id for slide comments",
-          );
-        body.anchor = { block_id: match[2], slide_block_type: match[1] };
-      } else body.anchor = { block_id: f["block-id"] };
-    } else if (ref.type === "sheet" || ref.type === "slides")
-      throw err(`--block-id is required for ${ref.type} comments`);
-    else if (ref.type === "file") body.anchor = { block_id: "test" };
-    return request(
-      ctx,
-      "POST",
-      `/open-apis/drive/v1/files/${enc(ref.token)}/new_comments`,
-      undefined,
-      body,
-    );
-  }
   if (command === "+task_result") {
     const scenario = required(f, "scenario");
     if (scenario === "import")
@@ -2699,10 +2509,6 @@ async function drive(ctx, command, f) {
         `/open-apis/drive/v1/export_tasks/${enc(required(f, "ticket"))}`,
         { token: required(f, "file-token") },
       );
-    if (scenario === "task_check")
-      return request(ctx, "GET", `${files}/task_check`, {
-        task_id: required(f, "task-id"),
-      });
     const types = {
       wiki_move: "move",
       wiki_delete_space: "delete_space",
@@ -2716,18 +2522,6 @@ async function drive(ctx, command, f) {
       { task_type: types[scenario] },
     );
   }
-  if (command === "+export-download")
-    return download(
-      ctx,
-      `/open-apis/drive/v1/export_tasks/file/${enc(required(f, "file-token"))}/download`,
-      {
-        ...f,
-        output: path.join(
-          f["output-dir"] ?? ".",
-          f["file-name"] ?? f["file-token"],
-        ),
-      },
-    );
   if (command === "+export") {
     const body = clean({
       token: required(f, "token"),
@@ -2745,10 +2539,6 @@ async function drive(ctx, command, f) {
       step("GET", "/open-apis/drive/v1/export_tasks/<ticket>", {
         token: body.token,
       }),
-      step(
-        "GET",
-        "/open-apis/drive/v1/export_tasks/file/<file_token>/download",
-      ),
     ];
     if (ctx.dryRun) return dry(ctx, requests);
     const created = await request(
@@ -2765,108 +2555,7 @@ async function drive(ctx, command, f) {
       { token: body.token },
       created,
     );
-    const result = completed.result ?? completed;
-    if (!result.file_token) return { ...completed, ticket: created.ticket };
-    return download(
-      ctx,
-      `/open-apis/drive/v1/export_tasks/file/${enc(result.file_token)}/download`,
-      {
-        ...f,
-        output: path.join(
-          f["output-dir"] ?? ".",
-          f["file-name"] ??
-            result.file_name ??
-            `${body.token}.${body.file_extension}`,
-        ),
-      },
-    );
-  }
-  if (command === "+preview" || command === "+cover") {
-    const token = required(f, "file-token");
-    if (command === "+cover") {
-      const specs = {
-        default: { bus_type: "cover", platform: "pc" },
-        icon: { bus_type: "icon" },
-        grid: { bus_type: "grid" },
-        small: { bus_type: "small_graph", platform: "pc" },
-        middle: { bus_type: "middle" },
-        big: { bus_type: "big", platform: "mobile" },
-        square: { width: 360, height: 360, policy: "near" },
-      };
-      if (bool(f, "list-only"))
-        return {
-          file_token: token,
-          candidates: Object.keys(specs).map((spec) => ({ spec })),
-        };
-      if (!specs[f.spec ?? "default"])
-        throw err(
-          "--spec must be default, icon, grid, small, middle, big, or square",
-        );
-      return download(
-        ctx,
-        `/open-apis/drive/v1/medias/${enc(token)}/preview_download`,
-        { ...f, overwrite: f["if-exists"] === "overwrite" },
-        clean({
-          preview_type: "1",
-          ...specs[f.spec ?? "default"],
-          version: f.version,
-        }),
-        f.output ?? `${token}.png`,
-      );
-    }
-    const base = `/open-apis/drive/v1/medias/${enc(token)}`;
-    const body = clean({ version: f.version });
-    if (ctx.dryRun)
-      return dry(ctx, [
-        step("POST", `${base}/preview_result`, undefined, body),
-        ...(bool(f, "list-only")
-          ? []
-          : [
-              step(
-                "GET",
-                `${base}/preview_download`,
-                clean({
-                  preview_type: f.type ?? "<selected_preview_type>",
-                  version: f.version,
-                }),
-              ),
-            ]),
-      ]);
-    const previews = await request(
-      ctx,
-      "POST",
-      `${base}/preview_result`,
-      undefined,
-      body,
-    );
-    if (bool(f, "list-only")) return previews;
-    if (!f.type)
-      throw err(
-        "Specify --type after inspecting --list-only; available previews depend on the file",
-      );
-    const types = {
-      pdf: "0",
-      image: "1",
-      png: "1",
-      jpg: "7",
-      html: "8",
-      text: "14",
-      source: "16",
-    };
-    if (!types[f.type])
-      throw err(
-        "Supported preview types: pdf, image, png, jpg, html, text, source",
-      );
-    return download(
-      ctx,
-      `${base}/preview_download`,
-      { ...f, overwrite: f["if-exists"] === "overwrite" },
-      clean({
-        preview_type: types[f.type],
-        version: f.version ?? previews.version,
-      }),
-      f.output ?? `${token}.${f.type}`,
-    );
+    return { ...completed, ticket: created.ticket };
   }
   if (["+pull", "+push", "+sync", "+status"].includes(command))
     return syncDrive(ctx, command, f);
@@ -3084,152 +2773,8 @@ function unifiedDiff(before, after, target, context = 3) {
   ].join("\n");
 }
 
-async function slides(ctx, command, f) {
-  const base = "/open-apis/slides_ai/v1/xml_presentations";
-  if (command === "+create") {
-    const slideXML = await json(ctx, f.slides, "--slides", []);
-    if (!Array.isArray(slideXML) || slideXML.some((s) => typeof s !== "string"))
-      throw err("--slides must be an array of XML strings");
-    if (slideXML.length > 10)
-      throw err("--slides accepts at most 10 slides per create");
-    const assets = new Map();
-    for (const slide of slideXML)
-      for (const match of slide.matchAll(
-        /<img\b[^>]*\bsrc\s*=\s*(["'])@([^"']+)\1/gi,
-      )) {
-        const filename = await safeLocal(ctx, match[2]);
-        const bytes = await readFile(filename);
-        if (bytes.length > 20 * 1024 * 1024)
-          throw err("Slides image uploads must not exceed 20 MiB");
-        assets.set(match[2], { filename, bytes });
-      }
-    const body = {
-      xml_presentation: {
-        content: `<presentation width="960" height="540"><title>${xml(f.title ?? "Untitled")}</title></presentation>`,
-      },
-    };
-    if (ctx.dryRun)
-      return dry(ctx, [
-        step("POST", base, undefined, body),
-        ...[...assets.values()].flatMap((a) =>
-          uploadPreview(
-            path.basename(a.filename),
-            a.bytes.length,
-            { parent_type: "slide_file", parent_node: "<xml_presentation_id>" },
-            true,
-          ),
-        ),
-        ...slideXML.map((content) =>
-          step(
-            "POST",
-            `${base}/<xml_presentation_id>/slide`,
-            { revision_id: -1 },
-            { slide: { content } },
-          ),
-        ),
-      ]);
-    const created = await request(ctx, "POST", base, undefined, body);
-    const id = created.xml_presentation_id;
-    if (!id) throw err("Slides create returned no xml_presentation_id", "api");
-    const completed = [];
-    try {
-      for (const [placeholder, a] of assets) {
-        const uploaded = await uploadBytes(
-          ctx,
-          a.bytes,
-          path.basename(a.filename),
-          { parent_type: "slide_file", parent_node: id },
-          true,
-        );
-        if (!uploaded.file_token)
-          throw err("Slides image upload returned no file_token", "api");
-        assets.set(placeholder, { ...a, token: uploaded.file_token });
-      }
-      for (const original of slideXML) {
-        const content = original.replace(
-          /(<img\b[^>]*\bsrc\s*=\s*)(["'])@([^"']+)\2/gi,
-          (_, prefix, quote, filename) =>
-            `${prefix}${quote}${assets.get(filename).token}${quote}`,
-        );
-        completed.push(
-          await request(
-            ctx,
-            "POST",
-            `${base}/${enc(id)}/slide`,
-            { revision_id: -1 },
-            { slide: { content } },
-          ),
-        );
-      }
-    } catch (e) {
-      throw err(
-        "Presentation was created, but adding content failed. Inspect it before retrying",
-        "partial_failure",
-        {
-          xml_presentation_id: id,
-          completed_slides: completed.length,
-          cause: e.message,
-        },
-      );
-    }
-    return {
-      ...created,
-      slides: completed,
-      url: resourceURL(ctx, "slides", id),
-    };
-  }
-  if (command === "+replace-slide") {
-    const ref = await resolveRef(ctx, required(f, "presentation"), "slides");
-    const parts = await json(ctx, required(f, "parts"), "--parts");
-    if (!Array.isArray(parts) || !parts.length || parts.length > 200)
-      throw err("--parts must contain 1–200 operations");
-    for (const part of parts) {
-      if (part.action === "block_replace") {
-        if (!part.block_id || !part.replacement)
-          throw err("block_replace requires block_id and replacement");
-        if (!/^\s*<[A-Za-z]/.test(part.replacement))
-          throw err("replacement must contain XML");
-        part.replacement = part.replacement.replace(
-          /^(\s*<[\w:-]+)(\s[^>]*|)(>)/,
-          (whole, name, attrs, end) =>
-            `${name}${attrs.replace(/\s+id\s*=\s*(["']).*?\1/, "")} id="${xml(part.block_id)}"${end}`,
-        );
-      } else if (part.action === "block_insert") {
-        if (!part.insertion) throw err("block_insert requires insertion");
-      } else throw err("Supported slide actions: block_replace, block_insert");
-    }
-    const query = clean({
-      slide_id: required(f, "slide-id"),
-      revision_id: number(f, "revision-id", -1, -1),
-      tid: f.tid,
-    });
-    const url = `${base}/${enc(ref.token)}/slide/replace`;
-    if (ctx.dryRun)
-      return dry(ctx, [
-        ...(ref.resolveRequest ? [ref.resolveRequest] : []),
-        step("POST", url, query, { parts }),
-      ]);
-    return request(ctx, "POST", url, query, { parts });
-  }
-  if (command === "+media-upload") {
-    const ref = await resolveRef(ctx, required(f, "presentation"), "slides");
-    const filename = await safeLocal(ctx, required(f, "file"));
-    const bytes = await readFile(filename);
-    if (bytes.length > 20 * 1024 * 1024)
-      throw err("Slides image uploads must not exceed 20 MiB");
-    const fields = { parent_type: "slide_file", parent_node: ref.token };
-    if (ctx.dryRun)
-      return dry(ctx, [
-        ...(ref.resolveRequest ? [ref.resolveRequest] : []),
-        ...uploadPreview(path.basename(filename), bytes.length, fields, true),
-      ]);
-    return uploadBytes(ctx, bytes, path.basename(filename), fields, true);
-  }
-  return undefined;
-}
-
 async function board(ctx, command, f) {
-  if (!["+update", "+query"].includes(command)) return undefined;
+  if (command !== "+query") return undefined;
   const token = required(f, "whiteboard-token");
   const base = `/open-apis/board/v1/whiteboards/${enc(token)}`;
   if (command === "+query") {
@@ -3283,42 +2828,6 @@ async function board(ctx, command, f) {
         )
       : { code: content, syntax_type: syntax };
   }
-  const source = await input(ctx, required(f, "source"));
-  const format = f.input_format ?? "raw";
-  if (f["idempotent-token"] && f["idempotent-token"].length < 10)
-    throw err("--idempotent-token must be at least 10 characters");
-  const query = clean({ client_token: f["idempotent-token"] });
-  if (format === "raw") {
-    const data = await json(ctx, source, "--source");
-    const nodes = Array.isArray(data)
-      ? data
-      : (data.raw_nodes ?? data.nodes ?? data.data?.result?.nodes);
-    if (!Array.isArray(nodes))
-      throw err("Raw whiteboard source must contain a nodes/raw_nodes array");
-    const result = await request(ctx, "POST", `${base}/nodes`, query, {
-      nodes,
-      overwrite: bool(f, "overwrite"),
-    });
-    if (ctx.dryRun) return result;
-    if (
-      !Array.isArray(result.ids) ||
-      result.ids.some((id) => typeof id !== "string")
-    )
-      throw err("Whiteboard update returned no valid ids array", "api");
-    return { created_node_ids: result.ids.join(",") };
-  }
-  if (!["mermaid", "plantuml"].includes(format))
-    throw err("--input_format must be raw, mermaid, or plantuml");
-  const result = await request(ctx, "POST", `${base}/nodes/plantuml`, query, {
-    plant_uml_code: source,
-    syntax_type: format === "mermaid" ? 2 : 1,
-    parse_mode: 1,
-    overwrite: bool(f, "overwrite"),
-  });
-  if (ctx.dryRun) return result;
-  if (!result.node_id)
-    throw err("Whiteboard code update returned no node_id", "api");
-  return { created_node_id: result.node_id };
 }
 
 async function syncDrive(ctx, command, f) {
@@ -3630,7 +3139,6 @@ export async function executeContent(ctx, service, command, flags = {}) {
   if (service === "drive") return drive(active, command, flags);
   if (service === "wiki") return wiki(active, command, flags);
   if (service === "markdown") return markdown(active, command, flags);
-  if (service === "slides") return slides(active, command, flags);
   if (service === "whiteboard") return board(active, command, flags);
   return undefined;
 }
@@ -3645,9 +3153,7 @@ export const CONTENT_COVERAGE = {
     "+search": "implemented",
     "+media-upload": "implemented",
     "+media-download": "implemented",
-    "+media-preview": "implemented",
     "+media-insert": "implemented-with-selection-clipboard-and-rollback",
-    "+whiteboard-update": "raw-nodes-mermaid-plantuml",
   },
   drive: Object.fromEntries(
     [
@@ -3707,13 +3213,7 @@ export const CONTENT_COVERAGE = {
     "+patch": "implemented-re2-subset",
     "+diff": "implemented-unified-diff",
   },
-  slides: {
-    "+create": "implemented-with-local-image-upload",
-    "+replace-slide": "implemented",
-    "+media-upload": "implemented",
-  },
   whiteboard: {
-    "+update": "raw-nodes-mermaid-plantuml",
     "+query": "image-raw-or-preserved-source-only",
   },
 };

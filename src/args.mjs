@@ -141,14 +141,7 @@ function numericToken(token) {
   return /^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(token);
 }
 
-const fileVersionCommands = new Set([
-  "+download",
-  "+version-get",
-  "+version-delete",
-  "+version-revert",
-  "+preview",
-  "+cover",
-]);
+const fileVersionCommands = new Set(["+download", "+version-get"]);
 function usesFileVersion(words) {
   return words[0] === "drive" && fileVersionCommands.has(words[1]);
 }
