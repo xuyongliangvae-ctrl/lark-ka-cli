@@ -7,36 +7,6 @@
   "missing": [],
   "commands": [
     {
-      "service": "apps",
-      "command": "+access-scope-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+access-scope-set",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+html-publish",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "apps",
-      "command": "+update",
-      "implementation": "native-node"
-    },
-    {
       "service": "base",
       "command": "+base-copy",
       "implementation": "native-node"
@@ -125,60 +95,6 @@
       "service": "base",
       "command": "+view-list",
       "implementation": "native-node"
-    },
-    {
-      "service": "calendar",
-      "command": "+agenda",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+freebusy",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+room-find",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+rsvp",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+suggestion",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "calendar",
-      "command": "+update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "contact",
-      "command": "+get-user",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "contact",
-      "command": "+search-user",
-      "implementation": "native-node",
-      "notes": "implemented"
     },
     {
       "service": "docs",
@@ -589,84 +505,6 @@
       "notes": "implemented-re2-subset"
     },
     {
-      "service": "minutes",
-      "command": "+download",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+speaker-replace",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "minutes",
-      "command": "+upload",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+cycle-detail",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+cycle-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-delete",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-get",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+progress-update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "okr",
-      "command": "+upload-image",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
       "service": "sheets",
       "command": "+add-dimension",
       "implementation": "native-node"
@@ -683,6 +521,31 @@
     },
     {
       "service": "sheets",
+      "command": "+batch-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-batch-clear",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-batch-set-style",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-clear",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-get",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+cells-merge",
       "implementation": "native-node"
     },
@@ -694,6 +557,31 @@
     {
       "service": "sheets",
       "command": "+cells-search",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-set",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-set-image",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cells-merge",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+chart-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+cols-resize",
       "implementation": "native-node"
     },
     {
@@ -803,7 +691,47 @@
     },
     {
       "service": "sheets",
+      "command": "+filter-view-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+find",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-update",
       "implementation": "native-node"
     },
     {
@@ -924,6 +852,31 @@
     {
       "service": "sheets",
       "command": "+sheet-unhide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-unhide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sparkline-update",
       "implementation": "native-node"
     },
     {

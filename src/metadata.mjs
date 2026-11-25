@@ -12,17 +12,7 @@ metadata.services.push(bitableV1);
 export const packagedShortcuts = JSON.parse(
   await readFile(new URL("../data/shortcuts.json", import.meta.url), "utf8"),
 );
-const sourceBaseV3 = await readFile(
-  new URL("../data/base-v3-shortcuts.json", import.meta.url),
-  "utf8",
-).catch((error) => {
-  if (error.code !== "ENOENT") throw error;
-  return "[]";
-});
-export const shortcuts = [
-  ...packagedShortcuts,
-  ...JSON.parse(sourceBaseV3),
-].sort((a, b) =>
+export const shortcuts = [...packagedShortcuts].sort((a, b) =>
   `${a.service} ${a.command}`.localeCompare(`${b.service} ${b.command}`),
 );
 // The generated catalog describes the upstream CLI. Help and schema share
@@ -191,6 +181,7 @@ export async function executeAPI(ctx, spec, flags) {
 
 export const knownFlags = new Set([
   ...CONFIG_FLAGS,
+  ...shortcuts.flatMap((spec) => spec.flags.map((flag) => flag.name)),
   ...Object.values(bitableV1.resources).flatMap(({ methods }) =>
     Object.values(methods).flatMap((spec) =>
       Object.keys(spec.parameters).map((name) => name.replaceAll("_", "-")),

@@ -576,7 +576,7 @@ test("policy rules enforce allow/deny, risk and actual identity with OR semantic
   await mkdir(env.LARK_KA_CONFIG_DIR, { recursive: true });
   await writeFile(
     path.join(env.LARK_KA_CONFIG_DIR, "policy.yml"),
-    'rules:\n  - name: documents\n    allow: ["docs/**"]\n    max_risk: read\n    identities: [user]\n  - name: messaging\n    allow: ["im/**"]\n    deny: ["im/+messages-send"]\n    max_risk: write\n',
+    'rules:\n  - name: documents\n    allow: ["docs/**"]\n    max_risk: read\n    identities: [user]\n  - name: drive\n    allow: ["drive/**"]\n    deny: ["drive/+delete"]\n    max_risk: write\n',
   );
   await enforcePolicy(["docs", "+fetch"], {}, { defaultAs: "user" }, { env });
   await assert.rejects(
@@ -588,7 +588,7 @@ test("policy rules enforce allow/deny, risk and actual identity with OR semantic
     /denied/,
   );
   await assert.rejects(
-    enforcePolicy(["im", "+messages-send"], {}, {}, { env }),
+    enforcePolicy(["drive", "+delete"], {}, {}, { env }),
     /denied/,
   );
   await enforcePolicy(["config", "policy", "show"], {}, {}, { env });

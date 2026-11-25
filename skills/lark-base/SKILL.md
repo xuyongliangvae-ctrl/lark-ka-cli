@@ -10,11 +10,11 @@ metadata:
 
 # 海能 Work 多维表格
 
-本指南适用于 `lark-ka 7.54.1` 的海能 Work 配置。多维表格通过员工身份调用 Bitable v1。用 `lark-ka --profile cnooc auth status --connector` 核对当前身份和授权。以下命令中的标识均需替换为实际值。
+本指南适用于当前包的海能 Work 配置。多维表格通过员工身份调用 Bitable v1。用 `lark-ka --profile cnooc auth status --connector` 核对当前身份和授权。以下命令中的标识均需替换为实际值。
 
 ## 定位 Base 和数据表
 
-普通 `/base/{token}` 链接中的路径标识是 Base 标识，快捷命令传 `--base-token`，原生命令在 `--params` 中传 `app_token`。链接查询参数里的 `table` 和 `view` 分别定位数据表和视图。Wiki 链接先用 `lark-ka --profile cnooc wiki +node-get` 解析，当节点类型为 `bitable` 时取 `obj_token`。只有标题时，用 `lark-ka --profile cnooc drive +search --query '表名' --doc-types bitable --as user` 查找，再核对标题和归属。
+普通 `/base/{token}` 链接中的路径标识是 Base 标识，快捷命令传 `--base-token`，原生命令在 `--params` 中传 `app_token`。链接查询参数里的 `table` 和 `view` 分别定位数据表和视图。Wiki 链接先用 `lark-ka --profile cnooc drive +inspect --url <链接>` 解析，确认底层类型为 `bitable` 后使用真实资源 token。只有标题时，用 `lark-ka --profile cnooc drive +search --query '表名' --doc-types bitable --as user` 查找，再核对标题和归属。
 
 ~~~bash
 lark-ka --profile cnooc base +base-get --as user --base-token base_example

@@ -26,21 +26,6 @@ lark-ka drive +upload --file ./report.pdf --name "季度总结.pdf"
 # 覆盖已存在文件（原地覆盖，保留 file_token）
 lark-ka drive +upload --file ./report.pdf --file-token boxcn_existing_file
 
-# 原生命令（高级/分片上传）：预上传 + 完成上传
-lark-ka drive files upload_prepare --data '{
-  "file_name": "report.pdf",
-  "parent_type": "explorer",
-  "parent_node": "fldbc_xxx",
-  "size": 1048576,
-  "file_token": "boxcn_existing_file"
-}'
-lark-ka drive files upload_finish --data '{
-  "upload_id": "<UPLOAD_ID>",
-  "block_num": 1
-}'
-
-# 查看完整参数定义
-lark-ka schema drive.files.upload_prepare
 ```
 
 > [!IMPORTANT]
@@ -81,16 +66,6 @@ Shortcut 参数：
 | `--folder-token` | 否 | 目标文件夹 token；与 `--wiki-token` 互斥；省略时默认为 Drive 根目录；显式传空字符串会报错 |
 | `--wiki-token` | 否 | 目标 wiki 节点 token；与 `--folder-token` 互斥；会映射为 `parent_type=wiki`、`parent_node=<wiki_token>`；显式传空字符串会报错 |
 | `--name` | 否 | 上传后的文件名；默认使用本地文件名 |
-
-参数（预上传 `--data` JSON body）：
-
-| 字段 | 必填 | 说明 |
-|------|------|------|
-| `file_name` | 是 | 文件名 |
-| `parent_type` | 是 | 父节点类型；上传到文件夹 / 根目录时用 `"explorer"`，上传到 wiki 节点时用 `"wiki"` |
-| `parent_node` | 是 | 父节点 token；`explorer` 时传文件夹 token（根目录可为空字符串），`wiki` 时传 wiki node token |
-| `size` | 是 | 文件大小（字节） |
-| `file_token` | 否 | 已存在文件 token；传入后覆盖该文件内容 |
 
 > [!CAUTION]
 > 这是**写入操作** —— 执行前必须确认用户意图。

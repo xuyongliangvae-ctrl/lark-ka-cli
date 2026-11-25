@@ -17,6 +17,9 @@ function context({ dryRun = false, response } = {}) {
       webBaseUrl: "https://docs.example.test",
     },
     identity: "user",
+    async paginate(method, path, options = {}) {
+      return this.request(method, path, options);
+    },
     async request(method, path, options = {}) {
       requests.push({ method, path, ...options });
       if (response)
@@ -32,156 +35,60 @@ function context({ dryRun = false, response } = {}) {
     },
   };
 }
-const target = {
-  "base-token": "base1",
-  "table-id": "tbl1",
-  "field-id": "fld1",
-  "record-id": "rec1",
-  "view-id": "vew1",
-  "form-id": "form1",
-  "dashboard-id": "dash1",
-  "block-id": "block1",
-  "workflow-id": "wkf1",
-  "role-id": "role1",
-};
+const target = { "base-token": "base1", "table-id": "tbl1" };
 const sheet = { "spreadsheet-token": "ss1", "sheet-id": "sheet1" };
 
-test("all 85 Base source shortcuts resolve to actual dry-run requests", async () => {
-  assert.equal(Object.keys(commandSpecs.base).length, 85);
-  for (const command of Object.keys(commandSpecs.base)) {
-    const ctx = context({ dryRun: true });
-    const flags = {
+test("all 18 retained Base shortcuts resolve to Bitable v1 dry-run requests", async () => {
+  const cases = {
+    "+base-create": { name: "Demo" },
+    "+base-copy": { "base-token": "base1", name: "Copy" },
+    "+base-get": { "base-token": "base1" },
+    "+table-create": { "base-token": "base1", name: "Data" },
+    "+table-get": target,
+    "+table-list": { "base-token": "base1" },
+    "+field-get": { ...target, "field-id": "fld1" },
+    "+field-list": target,
+    "+record-batch-create": {
       ...target,
-      name: "Demo",
-      type: "table",
-      json: '{"name":"Demo","type":"text"}',
-      dsl: '{"dimensions":[]}',
-      keyword: "Alice",
-      "search-field": "Name",
-      "record-ids": "rec1",
-      "share-token": "share1",
-      questions: "[]",
-      "question-ids": '["q1"]',
-      "data-config": "{}",
-      file: "./sample.png",
-      "file-token": "file1",
-      output: "./sample.png",
-    };
-    if (["+record-get", "+record-delete", "+record-search"].includes(command))
-      delete flags.json;
-    if (command === "+form-submit") flags.json = '{"fields":{"Title":"Demo"}}';
+      json: '{"records":[{"fields":{"Name":"Alice"}}]}',
+    },
+    "+record-batch-update": {
+      ...target,
+      json: '{"records":[{"record_id":"rec1","fields":{"Name":"Alice"}}]}',
+    },
+    "+record-delete": { ...target, "record-id": "rec1" },
+    "+record-get": { ...target, "record-id": "rec1" },
+    "+record-list": target,
+    "+record-search": { ...target, keyword: "Alice", "search-field": "Name" },
+    "+view-get": { ...target, "view-id": "vew1" },
+    "+view-list": target,
+    "+form-get": { ...target, "form-id": "vewForm1" },
+    "+dashboard-list": { "base-token": "base1" },
+  };
+  assert.deepEqual(
+    Object.keys(commandSpecs.base).sort(),
+    Object.keys(cases).sort(),
+  );
+  for (const [command, flags] of Object.entries(cases)) {
+    const ctx = context({ dryRun: true });
     const result = await executeTables(ctx, "base", command, flags);
     assert.notEqual(result, undefined, command);
     assert.ok(ctx.requests.length > 0, command);
     assert.ok(
-      ctx.requests.every(
-        (r) =>
-          r.path.startsWith("/open-apis/base/v3/") ||
-          r.path.startsWith("/open-apis/drive/v1/medias/"),
+      ctx.requests.every((request) =>
+        request.path.startsWith("/open-apis/bitable/v1/"),
       ),
       command,
     );
   }
 });
 
-test("Base list and record batch operations use v3 paths and source defaults", async () => {
-  const ctx = context();
-  await executeTables(ctx, "base", "+table-list", target);
-  assert.deepEqual(ctx.requests[0], {
-    method: "GET",
-    path: "/open-apis/base/v3/bases/base1/tables",
-    query: { offset: 0, limit: 50 },
-  });
-  await executeTables(ctx, "base", "+record-batch-create", {
-    ...target,
-    json: '{"records":[{"fields":{"Name":"Alice"}}]}',
-  });
-  assert.equal(
-    ctx.requests[1].path,
-    "/open-apis/base/v3/bases/base1/tables/tbl1/records/batch_create",
-  );
-  assert.deepEqual(ctx.requests[1].body.records[0].fields, { Name: "Alice" });
-});
-
-test("record selections validate duplicate IDs and distinguish projected fields", async () => {
-  const ctx = context();
-  await executeTables(ctx, "base", "+record-get", {
-    ...target,
-    "record-id": ["rec1", "rec2"],
-    "field-id": ["Name", "Status"],
-  });
-  assert.deepEqual(ctx.requests[0].body, {
-    record_id_list: ["rec1", "rec2"],
-    select_fields: ["Name", "Status"],
-  });
-  await assert.rejects(
-    executeTables(ctx, "base", "+record-get", {
-      ...target,
-      "record-id": ["same", "same"],
-    }),
-    /distinct/,
-  );
-  await assert.rejects(
-    executeTables(ctx, "base", "+record-get", {
-      ...target,
-      json: '{"record_id_list":["rec2"]}',
-    }),
-    /mutually exclusive/,
-  );
-});
-
-test("record search, form submissions, and computed dashboard data retain exact API shape", async () => {
-  const ctx = context();
-  await executeTables(ctx, "base", "+record-search", {
-    ...target,
-    keyword: "Alice",
-    "search-field": "Name",
-    "filter-json": '{"logic":"and","conditions":[]}',
-  });
-  assert.equal(ctx.requests[0].body.limit, 10);
-  assert.equal(ctx.requests[0].body.filter.logic, "and");
-  await executeTables(ctx, "base", "+form-submit", {
-    "share-token": "share",
-    json: '{"fields":{"Name":"Alice"}}',
-  });
-  assert.deepEqual(ctx.requests[1].body, {
-    share_token: "share",
-    content: { Name: "Alice" },
-  });
-  await executeTables(ctx, "base", "+dashboard-block-get-data", target);
-  assert.equal(
-    ctx.requests[2].path,
-    "/open-apis/base/v3/bases/base1/dashboards/blocks/block1/data",
-  );
-});
-
-test("workflow list paginates via POST body and detects repeated page tokens", async () => {
-  const ctx = context({
-    response: (_, i) => ({
-      items: [{ workflow_id: `wkf${i}` }],
-      has_more: i === 1,
-      page_token: "next",
-    }),
-  });
-  const result = await executeTables(ctx, "base", "+workflow-list", target);
-  assert.equal(result.items.length, 2);
-  assert.equal(ctx.requests[0].method, "POST");
-  assert.equal(ctx.requests[1].body.page_token, "next");
-  const bad = context({
-    response: () => ({ items: [], has_more: true, page_token: "same" }),
-  });
-  await assert.rejects(
-    executeTables(bad, "base", "+workflow-list", target),
-    /repeated page token/,
-  );
-});
-
-test("Base API nested errors stay errors; formula guide and high-risk operations are checked", async () => {
+test("Base nested errors and retained high-risk writes stay structured failures", async () => {
   const nested = context({
     response: () => ({ code: 123, msg: "Denied", data: {} }),
   });
   await assert.rejects(
-    executeTables(nested, "base", "+base-get", target),
+    executeTables(nested, "base", "+base-get", { "base-token": "base1" }),
     /Denied/,
   );
   await assert.rejects(
@@ -340,30 +247,37 @@ test("legacy Sheets use legacy payloads rather than silently changing API semant
 });
 
 test("Base record reads default to Markdown with metadata and allow explicit JSON or jq", async () => {
-  const data = {
-    fields: ["Name", "Note"],
-    record_id_list: ["rec1"],
-    data: [["Alice", "one|two\nthree"]],
-    has_more: false,
-    ignored_fields: ["Hidden"],
-  };
-  const ctx = context({ response: () => data });
+  const records = [
+    { record_id: "rec1", fields: { Name: "Alice", Note: "one|two\nthree" } },
+  ];
+  const ctx = context({
+    response: (request) =>
+      request.path.endsWith("batch_get")
+        ? { records }
+        : { items: records, has_more: false, ignored_fields: ["Hidden"] },
+  });
   const table = await executeTables(ctx, "base", "+record-list", target);
   assert.match(table.__raw, /\| _record_id \| Name \| Note \|/);
   assert.ok(table.__raw.includes("one\\|two<br>three"));
   assert.match(table.__raw, /Meta: count=1; has_more=false; ignored_fields=1/);
-  const detail = await executeTables(ctx, "base", "+record-get", target);
+  const detail = await executeTables(ctx, "base", "+record-get", {
+    ...target,
+    "record-id": "rec1",
+  });
   assert.ok(detail.__raw.includes("- `_record_id`: rec1"));
   const raw = await executeTables(ctx, "base", "+record-list", {
     ...target,
     format: "json",
   });
-  assert.deepEqual(raw, data);
+  assert.deepEqual(raw.fields, ["Name", "Note"]);
+  assert.deepEqual(raw.record_id_list, ["rec1"]);
+  assert.deepEqual(raw.data, [["Alice", "one|two\nthree"]]);
+  assert.deepEqual(raw.items, records);
   const query = await executeTables(ctx, "base", "+record-list", {
     ...target,
     jq: ".data",
   });
-  assert.deepEqual(query, data);
+  assert.deepEqual(query, raw);
   await assert.rejects(
     executeTables(ctx, "base", "+record-list", {
       ...target,
@@ -377,7 +291,9 @@ test("Base record reads default to Markdown with metadata and allow explicit JSO
 test("bot-created Base grants the configured employee access without hiding permission failures", async () => {
   const ctx = context({
     response: (r) =>
-      r.path === "/open-apis/base/v3/bases" ? { base_token: "newBase" } : {},
+      r.path === "/open-apis/bitable/v1/apps"
+        ? { app: { app_token: "newBase" } }
+        : {},
   });
   ctx.identity = "bot";
   ctx.config.userOpenId = "ou_owner";
@@ -398,7 +314,7 @@ test("bot-created Base grants the configured employee access without hiding perm
     response: (r) => {
       if (r.path.includes("/permissions/"))
         throw new Error("permission denied");
-      return { base_token: "created" };
+      return { app: { app_token: "created" } };
     },
   });
   denied.identity = "bot";
@@ -408,7 +324,9 @@ test("bot-created Base grants the configured employee access without hiding perm
   });
   assert.equal(partial.created, true);
   assert.equal(partial.permission_grant.status, "failed");
-  const noUser = context({ response: () => ({ base_token: "created" }) });
+  const noUser = context({
+    response: () => ({ app: { app_token: "created" } }),
+  });
   noUser.identity = "bot";
   assert.equal(
     (await executeTables(noUser, "base", "+base-create", { name: "New" }))

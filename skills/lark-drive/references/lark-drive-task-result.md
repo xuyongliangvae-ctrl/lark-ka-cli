@@ -242,32 +242,6 @@ lark-ka drive +move --file-token <FOLDER_TOKEN> --type folder --folder-token <TA
 lark-ka drive +task_result --scenario task_check --task-id <TASK_ID>
 ```
 
-### 配合 wiki +move 使用
-
-```bash
-# 1. 把 Drive 文档迁入 Wiki（异步任务可能返回 task_id）
-lark-ka wiki +move --obj-type docx --obj-token <DOC_TOKEN> --target-space-id <TARGET_SPACE_ID>
-# 若内置轮询窗口内完成：直接返回 ready=true 和 wiki_token
-# 若轮询窗口结束仍未完成：返回 ready=false、task_id、timed_out=true 和 next_command
-
-# 2. 续跑查询 Wiki 移动结果（next_command 即下面这条）
-lark-ka drive +task_result --scenario wiki_move --task-id <TASK_ID> --as user
-```
-
-> **身份保持一致**：续跑命令的 `--as` 必须与原 `wiki +move` 调用一致；`wiki +move` 的 `next_command` 已自动带上正确的 `--as`。
-
-### 配合 wiki +delete-space 使用
-
-```bash
-# 1. 删除知识空间（高风险写操作，必须显式带 --yes；接口可能同步返回空 task_id，也可能返回异步 task_id）
-lark-ka wiki +delete-space --space-id <SPACE_ID> --yes
-# 若同步返回：直接 ready=true
-# 若轮询窗口结束仍未完成：返回 ready=false、task_id、timed_out=true 和 next_command
-
-# 2. 续跑查询 Wiki 删除结果（next_command 即下面这条）
-lark-ka drive +task_result --scenario wiki_delete_space --task-id <TASK_ID> --as user
-```
-
 ### 配合 +export 使用
 
 ```bash

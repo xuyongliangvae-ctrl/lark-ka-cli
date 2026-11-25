@@ -289,9 +289,5 @@ export async function createContext(flags = {}, options = {}) {
     });
     return { path: target, bytes: data.length };
   };
-  ctx.eventConsume = async (key, eventFlags = flags) => {
-    const { consumeEvents } = await import("./events.mjs");
-    return consumeEvents(ctx, key, eventFlags);
-  };
   return ctx;
 }
