@@ -9,7 +9,7 @@
 第一条安装 CLI。包发布后，填写实际版本及仓库地址：
 
 ```bash
-npm install -g @lark-ka/hn-work-cli@7.54.2 --registry="https://npm.customer-a.example.invalid/"
+npm install -g @lark-ka/hn-work-cli@7.54.4 --registry="https://npm.customer-a.example.invalid/"
 ```
 
 第二条保存客户的固定配置。下面所有示例地址、App ID 和 Scope 都要替换成客户提供的真实值；在后台输入框内可合并成一行：
@@ -57,10 +57,10 @@ lark-ka config init --name customer-a \
 | 运行时       | Node >=22                                              |
 | CLI 命令名称 | `lark-ka`                                              |
 | 授权命令     | `lark-ka --profile customer-a auth login --json`       |
-| 取消授权命令 | `lark-ka --profile customer-a auth logout`             |
+| 本机退出命令 | `lark-ka --profile customer-a auth logout`             |
 | 授权状态命令 | `lark-ka --profile customer-a auth status --connector` |
 | 授权成功正则 | `"loggedIn"\s*:\s*true`                                |
-| 版本检查命令 | `lark-ka --version --expect-version 7.54.2`            |
+| 版本检查命令 | `lark-ka --version --expect-version 7.54.4`            |
 
 所有授权、注销、状态及业务命令中的 `--profile` 必须与初始化时的 `--name` 一致。地址和 Scope 已保存，后续命令不用重复填写。
 
@@ -75,3 +75,5 @@ lark-ka config init --name customer-a \
 JSON 模板方式仍可选：`lark-ka config init --name customer-a --deployment @./config/cnooc.example.json`，命令行显式参数会覆盖模板对应字段。
 
 关联 Skill 可以使用包内的 `skills/` 目录，具体能力范围对照 [兼容性说明](compatibility.md) 确认。
+
+当前包的命令范围见 [完整命令清单](commands.md)。关联 Skills 仅提供保留的七个业务域和认证配置指导。源码裁剪发布为新版本后，应同步更新插件安装命令与版本检查。

@@ -1,8 +1,7 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { readFile, writeFile, stat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { CliError } from "../errors.mjs";
-import { isHaiNengProfile } from "../config.mjs";
 import { shortcuts as catalog } from "../metadata.mjs";
 import { setTimeout as delay } from "node:timers/promises";
 
@@ -1185,38 +1184,10 @@ async function executeBitableV1(ctx, action, f) {
   return { ...result, [alias]: result.items };
 }
 
-function usesBitableV1(ctx) {
-  return !hasSourceBaseV3 || isHaiNengProfile(ctx.config);
-}
-
-let baseV3Executor;
 async function executeBase(ctx, command, f) {
-  const action = command.slice(1);
-  if (usesBitableV1(ctx))
-    return isHaiNengBaseShortcut(command)
-      ? executeBitableV1(ctx, action, f)
-      : undefined;
-  const execute = await (baseV3Executor ??= import(baseV3Module.href).then(
-    ({ createBaseV3Executor }) =>
-      createBaseV3Executor({
-        has,
-        clean,
-        yes,
-        fail,
-        required,
-        enc,
-        ints,
-        list,
-        pick,
-        json,
-        req,
-        uniqueStrings,
-        safeFile,
-        upload,
-        grantCurrentUser,
-      }),
-  ));
-  return execute(ctx, action, f);
+  return isHaiNengBaseShortcut(command)
+    ? executeBitableV1(ctx, command.slice(1), f)
+    : undefined;
 }
 
 export async function executeTables(ctx, service, command, flags = {}) {
@@ -1242,8 +1213,7 @@ export async function executeTables(ctx, service, command, flags = {}) {
             : def.default;
     if (["+record-list", "+record-get", "+record-search"].includes(command)) {
       const format =
-        f.format ??
-        (f.jq || (usesBitableV1(ctx) && f.json === true) ? "json" : "markdown");
+        f.format ?? (f.jq || f.json === true ? "json" : "markdown");
       if (!["json", "markdown"].includes(format))
         fail("--format must be json or markdown");
       if (format === "markdown" && f.jq)

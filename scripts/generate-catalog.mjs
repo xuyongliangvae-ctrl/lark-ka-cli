@@ -1,6 +1,11 @@
-import { readdir, readFile, mkdir, writeFile, cp } from "node:fs/promises";
+import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { isHaiNengBaseShortcut } from "../src/domains/tables.mjs";
+import {
+  retainedCommands,
+  retainedShortcutCatalog,
+  retainedSheetDefinitions,
+  retainedKnownFlags,
+} from "./catalog-surface.mjs";
 const source = path.resolve(process.argv[2] || "../lark_-ka_-cli-main");
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -78,7 +83,8 @@ for (const file of await walk(path.join(source, "shortcuts"))) {
         value(block, "Service") ||
         (/Service:\s*appsService/.test(block) ? "apps" : undefined),
       command = value(block, "Command");
-    if (!service || !command) continue;
+    if (!service || !command || !retainedCommands.has(`${service} ${command}`))
+      continue;
     const flags = [];
     for (const fm of block.matchAll(/\{\s*Name\s*:/g)) {
       const f = blockAt(block, fm.index);
@@ -113,50 +119,42 @@ const unique = [
   `${a.service} ${a.command}`.localeCompare(`${b.service} ${b.command}`),
 );
 await mkdir("data/sheets", { recursive: true });
-const published = [],
-  sourceOnly = [];
-for (const spec of unique) {
-  const destination =
-    spec.service === "base" && !isHaiNengBaseShortcut(spec.command)
-      ? sourceOnly
-      : published;
-  destination.push(spec);
-}
+const sheetDefinitions = retainedSheetDefinitions(
+  JSON.parse(
+    await readFile(
+      path.join(source, "shortcuts/sheets/data/flag-defs.json"),
+      "utf8",
+    ),
+  ),
+);
+const published = retainedShortcutCatalog(unique, sheetDefinitions);
 await writeFile(
   "data/shortcuts.json",
   JSON.stringify(published, null, 2) + "\n",
 );
 await writeFile(
-  "data/base-v3-shortcuts.json",
-  JSON.stringify(sourceOnly, null, 2) + "\n",
+  "data/sheets/flag-defs.json",
+  JSON.stringify(sheetDefinitions, null, 2) + "\n",
 );
-for (const name of ["flag-defs.json", "flag-schemas.json"])
-  await cp(
-    path.join(source, "shortcuts/sheets/data", name),
-    path.join("data/sheets", name),
-  );
-await cp(path.join(source, "skills"), "skills", {
-  recursive: true,
-  filter: (p) =>
-    !/[\\/]scripts(?:[\\/]|$)/.test(p) && !/[\\/]assets(?:[\\/]|$)/.test(p),
-});
+const sheetSchemas = JSON.parse(
+  await readFile(
+    path.join(source, "shortcuts/sheets/data/flag-schemas.json"),
+    "utf8",
+  ),
+);
+sheetSchemas.flags = retainedSheetDefinitions(sheetSchemas.flags);
+await writeFile(
+  "data/sheets/flag-schemas.json",
+  JSON.stringify(sheetSchemas, null, 2) + "\n",
+);
+// Skills are curated with the retained command surface. Regenerating metadata
+// must not overwrite them with instructions for removed upstream commands.
 console.error(
-  `Saved ${unique.length} shortcut definitions; copied declarative skills and sheet schemas.`,
+  `Saved ${published.length} retained shortcut definitions and sheet schemas.`,
 );
 
-const known = new Set(
-  JSON.parse(await readFile("data/known-flags.json", "utf8")),
-);
-for (const file of [
-  ...(await walk(path.join(source, "cmd"))),
-  ...(await walk(path.join(source, "shortcuts"))),
-]) {
-  if (!file.endsWith(".go") || file.endsWith("_test.go")) continue;
-  const text = await readFile(file, "utf8");
-  for (const m of text.matchAll(/\bName:\s*"([a-z][a-z0-9-]*)"/g))
-    known.add(m[1]);
-}
-await writeFile(
-  "data/known-flags.json",
-  JSON.stringify([...known].sort(), null, 2) + "\n",
-);
+const metadata = JSON.parse(await readFile("data/api-metadata.json", "utf8"));
+const base = JSON.parse(await readFile("data/base-v1.json", "utf8"));
+metadata.services.push(base);
+const known = await retainedKnownFlags(published, metadata, sheetDefinitions);
+await writeFile("data/known-flags.json", JSON.stringify(known, null, 2) + "\n");

@@ -42,9 +42,9 @@ metadata:
 | 读值 + 公式 / 样式 / 批注 | `+cells-get --include value,formula,style,comment,data_validation` | `--with-styles`、`--with-merges`、`--include-merged-cells` |
 | 写纯值（整块 CSV 平铺） | `+csv-put`（定位用 `--start-cell`，单个左上角锚点格；也接受 `--range` 别名，区间自动取左上角） | — |
 | 写值 / 公式 / 样式 | `+cells-set`（定位用 `--range`） | — |
-| 查找单元格 | `+cells-search`（关键字用 `--find`） | `+cells-find`、`+find`、`--query` |
+| 查找单元格 | `+cells-search`（关键字用 `--find`） | `+cells-search`、`+find`、`--query` |
 | 查找并替换 | `+cells-replace` | — |
-| 看子表结构（合并 / 行高列宽 / 冻结 / 隐藏） | `+sheet-info` | `+sheet-get`、`+structure-get`、`+sheet-structure-get` |
+| 看子表结构（合并 / 行高列宽 / 冻结 / 隐藏） | `+sheet-info` | `+sheet-info`、`+sheet-info`、`+sheet-info` |
 | 看工作簿 / 子表清单 | `+workbook-info` | — |
 | 导出 xlsx / 单表 csv | `+workbook-export` | — |
 | 清除内容 / 格式 | `+cells-clear`（范围维度用 `--scope`，取值 content / formats / all） | `--type` |
@@ -101,7 +101,7 @@ metadata:
 
 1. **spreadsheet 定位（必填）**：`--url` 与 `--spreadsheet-token` 二选一，**必须给其中之一**。两个都不给 → 校验报错 `specify at least one of --url or --spreadsheet-token`；两个都给 → 互斥冲突。
    - **`--url` 只解析 `/sheets/` 与 `/spreadsheets/` 两种链接**（从路径里抽出 token；也可以直接把裸 token 传给 `--spreadsheet-token`）。其它形态的链接不会被解析成表格 token。
-   - ⚠️ **`/wiki/` 知识库链接不能直接当表格定位用**：wiki 链接背后可能是电子表格，也可能是文档 / 多维表格等其它类型，`--url` **不会**自动把 wiki token 解析成 spreadsheet token，直接传会失败。必须先把它解析成真实文档 token —— `lark-ka wiki +node-get --node-token "<wiki 链接或 token>"`，确认返回的 `obj_type` 为 `sheet` 后，取其 `obj_token` 作为 `--spreadsheet-token` 传入（解析细节见 [`../lark-wiki/SKILL.md`](../lark-wiki/SKILL.md)）。
+   - ⚠️ **`/wiki/` 知识库链接不能直接当表格定位用**：wiki 链接背后可能是电子表格，也可能是文档 / 多维表格等其它类型，`--url` **不会**自动把 wiki token 解析成 spreadsheet token，直接传会失败。必须先把它解析成真实文档 token —— `lark-ka drive +inspect --url "<wiki 链接>"`，确认底层资源为电子表格后，把真实 token 作为 `--spreadsheet-token` 传入。
    - **例外**：`+workbook-create` 是新建一个还不存在的表格，**不接受任何 spreadsheet / sheet 定位 flag**（只有 `--title` / `--folder-token` / `--headers` / `--values`）。
 2. **sheet 定位（公共四件套 shortcut 必填）**：`--sheet-id` 与 `--sheet-name` 二选一，**必须给其中之一**。两个都不给 → 校验报错 `specify at least one of --sheet-id or --sheet-name`。
    - ⚠️ **不确定 sheet 名时禁止直接猜 `Sheet1`**：除非用户对话明确说出 sheet 名 / id，或上下文（之前的工具调用 / URL 锚点 `?sheet=xxx`）已经出现过具体值，否则**第一步先调 `+workbook-info --url "..."`**（或 `--spreadsheet-token`）拿 `sheets[].sheet_id` / `sheets[].title` 列表再选。中文环境下子表常叫"数据" / "Sheet"（无数字）/ "工作表 1" / 业务名，猜 `Sheet1` 大概率撞 `sheet not found`，比先查多耗一次失败调用 + 重试。

@@ -66,49 +66,7 @@ lark-ka drive +inspect --url 'https://xxx.feishu.cn/wiki/wikcnXXX'
 
 返回结果包含 `type`（底层文档类型）、`token`（真实 file_token）、`title`、`url` 等字段，直接用于后续操作。
 
-**手动方式：使用 `wiki.spaces.get_node` 查询节点信息**
-
-1. **使用 `wiki.spaces.get_node` 查询节点信息**
-   ```bash
-   lark-ka wiki spaces get_node --params '{"token":"wiki_token"}'
-   ```
-
-2. **从返回结果中提取关键信息**
-   - `node.obj_type`：文档类型（docx/doc/sheet/bitable/slides/file/mindnote）
-   - `node.obj_token`：**真实的文档 token**（用于后续操作）
-   - `node.title`：文档标题
-
-3. **根据 `obj_type` 使用对应的 API**
-
-   | obj_type | 说明 | 使用的 API |
-   |----------|------|-----------|
-   | `docx` | 新版云文档 | `drive file.comments.*`、`docx.*` |
-   | `doc` | 旧版云文档 | `drive file.comments.*` |
-   | `sheet` | 电子表格 | `sheets.*` |
-   | `bitable` | 多维表格 | `bitable.*` |
-   | `slides` | 幻灯片 | `drive.*` |
-   | `file` | 文件 | `drive.*` |
-   | `mindnote` | 思维导图 | `drive.*` |
-
-#### 查询示例
-
-```bash
-# 查询 wiki 节点
-lark-ka wiki spaces get_node --params '{"token":"wiki_token"}'
-```
-
-返回结果示例：
-```json
-{
-  "node": {
-    "obj_type": "docx",
-    "obj_token": "xxxx",
-    "title": "标题",
-    "node_type": "origin",
-    "space_id": "12345678910"
-  }
-}
-```
+使用 `drive +inspect` 返回的真实资源类型和 token 继续操作。无法解析时，请提供底层文档的直接链接或真实 token。
 
 ### 资源关系
 

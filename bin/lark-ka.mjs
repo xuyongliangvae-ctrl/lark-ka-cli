@@ -5,7 +5,7 @@ import { knownFlags } from "../src/metadata.mjs";
 import { CliError, toErrorEnvelope } from "../src/errors.mjs";
 import { execute, help, VERSION, isCommandGroup } from "../src/cli.mjs";
 import { discoveryProfile } from "../src/management.mjs";
-import { STREAM_DONE } from "../src/events.mjs";
+import { STREAM_DONE } from "../src/mcp.mjs";
 if (Number(process.versions.node.split(".")[0]) < 22) {
   process.stderr.write(
     '{"ok":false,"error":{"type":"runtime","message":"Node.js >=22 is required"}}\n',

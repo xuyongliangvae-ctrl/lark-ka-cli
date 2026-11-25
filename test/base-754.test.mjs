@@ -227,15 +227,17 @@ test("7.54 page-all sends continuation in the POST query and keeps the filter on
   assert.deepEqual(data.record_id_list, ["a", "b"]);
 });
 
-test("other private tenants and Feishu SaaS keep their existing Base v3 routes", async () => {
+test("retained Base shortcuts use Bitable v1 for every deployment", async () => {
   for (const config of [
     { brand: "custom", profileName: "other" },
     { brand: "feishu", profileName: "cnooc" },
   ]) {
-    const ctx = mock({ tables: [] });
+    const ctx = mock({ items: [] });
     ctx.config = config;
-    await executeTables(ctx, "base", "+table-list", target);
-    assert.equal(ctx.requests[0].url, "/open-apis/base/v3/bases/app1/tables");
+    await executeTables(ctx, "base", "+table-list", {
+      "base-token": target["base-token"],
+    });
+    assert.equal(ctx.requests[0].url, "/open-apis/bitable/v1/apps/app1/tables");
   }
 });
 

@@ -1,6 +1,5 @@
 // Describe network dependencies outside the generated REST-method/shortcut list.
-// Only route defaults and public SDK behavior are read. Never read local profiles.
-import { readFile } from "node:fs/promises";
+// Only route defaults are read. Never read local profiles.
 import { endpoints } from "../src/config.mjs";
 
 function route(entry, method, path, context, evidence, source) {
@@ -9,12 +8,9 @@ function route(entry, method, path, context, evidence, source) {
 
 export async function infrastructureRows() {
   const auth = endpoints("cnooc");
-  const defs = JSON.parse(
-    await readFile(new URL("../data/events.json", import.meta.url), "utf8"),
-  );
+  const defs = [];
   const code = "已核对源码";
   const authMock = "本机 OAuth 模拟服务";
-  const eventMock = "本机模拟订阅与事件分发";
   const authSource = "src/config.mjs · src/auth.mjs";
   const rows = [
     route(
@@ -105,50 +101,7 @@ export async function infrastructureRows() {
       code,
       "src/management.mjs",
     ),
-    route(
-      "event consume、event +subscribe、各业务域的监听命令",
-      "POST",
-      "/callback/ws/endpoint",
-      "Node SDK 使用应用凭据发现 WSS 地址。随后连接服务端返回的地址；事件订阅和端口连通性需单独验证。",
-      "本机预览与模拟 SDK；实际发现请求由 SDK 实现",
-      "src/events.mjs · @larksuiteoapi/node-sdk WSClient.pullConnectConfig",
-    ),
   ];
-  for (const def of defs.filter((d) => d.preConsume)) {
-    for (const [key, label] of [
-      ["subscribePath", "订阅"],
-      ["unsubscribePath", "取消订阅"],
-    ]) {
-      rows.push(
-        route(
-          `event consume ${def.key}（${label}）`,
-          "POST",
-          def.preConsume[key],
-          `CLI 允许 ${def.authTypes.join("/")}；声明 Scope ${def.scopes.join(", ")}。`,
-          eventMock,
-          "data/events.json · src/events.mjs",
-        ),
-      );
-    }
-  }
-  rows.push(
-    route(
-      "event consume minutes.minute.generated_v1（补取标题）",
-      "GET",
-      "/open-apis/minutes/v1/minutes/:minute_token",
-      "收到事件后按员工身份读取妙记元数据。",
-      eventMock,
-      "src/events.mjs",
-    ),
-    route(
-      "event consume vc.note.generated_v1（补取产物）",
-      "GET",
-      "/open-apis/vc/v1/notes/:note_id",
-      "收到事件后按员工身份读取纪要和逐字稿引用。",
-      eventMock,
-      "src/events.mjs",
-    ),
-  );
   return { rows, defs };
 }
 
@@ -162,11 +115,6 @@ export const otherDependencies = [
     "设备验证页",
     "浏览器打开设备服务返回的 verification_uri_complete 或 verification_uri。",
     "具体 URL 由授权服务决定。",
-  ],
-  [
-    "事件连接和控制",
-    "SDK 连接发现服务返回的 WSS URL；`event status` 和 `event stop` 访问本机回环 GET `/status`、POST `/stop`。",
-    "本机事件测试使用替代 SDK；实际 UAT 长连接未联调。",
   ],
   [
     "通用 API、上传、下载",
@@ -194,23 +142,6 @@ export const otherDependencies = [
 // Their explicit presence here records why an all-private-profile run cannot capture them.
 export const optionalBranches = [
   ...[
-    ["apps +list", "GET", ""],
-    ["apps +create", "POST", ""],
-    ["apps +update", "PATCH", "/:app_id"],
-    ["apps +access-scope-get", "GET", "/:app_id/access-scope"],
-    ["apps +access-scope-set", "PUT", "/:app_id/access-scope"],
-    ["apps +html-publish", "POST", "/:app_id/upload_and_release_html_code"],
-  ].map(([entry, method, suffix]) =>
-    route(
-      entry,
-      method,
-      `/open-apis/spark/v1/apps${suffix}`,
-      "海能 Profile 在调用前返回不可用；代码启用条件为 feishu 品牌及员工身份。",
-      "海能模拟配置已验证门禁",
-      "src/domains/apps.mjs",
-    ),
-  ),
-  ...[
     ["docs +create", "POST", ""],
     ["docs +fetch", "POST", "/:document_id/fetch"],
     ["docs +update", "PUT", "/:document_id"],
@@ -231,21 +162,5 @@ export const optionalBranches = [
     "切换 documentSearchApi=v2 时使用；海能默认 suite 搜索。",
     "源码分支",
     "src/domains/content.mjs",
-  ),
-  route(
-    "contact +search-user",
-    "POST",
-    "/open-apis/contact/v3/users/search",
-    "切换 contactSearchVersion=v3 时使用；海能默认 v1 搜索。",
-    "本机覆盖配置预览",
-    "src/domains/collaboration.mjs",
-  ),
-  route(
-    "im +chat-search",
-    "POST",
-    "/open-apis/im/v2/chats/search",
-    "其他部署的群搜索。海能使用 GET /open-apis/im/v1/chats/search。",
-    "源码分支",
-    "src/domains/im.mjs",
   ),
 ];

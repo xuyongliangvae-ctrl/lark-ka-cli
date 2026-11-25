@@ -235,13 +235,13 @@ N. 结尾页：[结尾文案]
 
 ### Wiki 链接特殊处理（关键！）
 
-知识库链接（`/wiki/TOKEN`）不能直接当 `xml_presentation_id`。直接调用原生 API 前，先查询 wiki 节点，确认 `node.obj_type == "slides"`，再用 `node.obj_token` 作为真实 presentation ID。
+知识库链接（`/wiki/TOKEN`）不能直接当 `xml_presentation_id`。直接调用原生 API 前，先用保留的资源检查命令确认类型和真实 token。
 
 ```bash
-lark-ka wiki spaces get_node --as user --params '{"token":"wiki_token"}'
+lark-ka drive +inspect --as user --url 'https://docs.example.invalid/wiki/WIKI_TOKEN'
 ```
 
-Shortcut `+replace-slide` 和 `+media-upload` 会自动解析 `/wiki/` URL；手动调用 `xml_presentations.*` / `xml_presentation.slide.*` 时才需要自己做这一步。
+确认底层类型是幻灯片后，使用返回的真实 token 作为 presentation ID。Shortcut 对 URL 的支持以命令帮助和当前后端为准。
 
 ### 资源关系
 

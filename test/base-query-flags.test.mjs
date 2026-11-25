@@ -109,22 +109,22 @@ test("HaiNeng record search accepts inline, stdin, and file input with --json", 
   assert.equal(parseArgs(["auth", "status", "--json=false"]).flags.json, false);
 });
 
-test("public Base dry-run retains its v3 record listing shape", async (t) => {
+test("retained Base record queries use v1 filters for every profile", async (t) => {
   const { run } = await fixture(t);
-  const v3Filter = { logic: "and", conditions: [] };
-  const v3Sort = [{ field: "Name", desc: true }];
+  const filter = {
+    conjunction: "and",
+    conditions: [{ field_name: "Name", operator: "isNotEmpty", value: [] }],
+  };
+  const sort = [{ field_name: "Name", desc: true }];
   const { requests } = run([
     ...recordQuery("public", "+record-list"),
     "--filter-json",
-    JSON.stringify(v3Filter),
+    JSON.stringify(filter),
     "--sort-json",
-    JSON.stringify(v3Sort),
+    JSON.stringify(sort),
   ]);
-  assert.equal(requests[0].method, "GET");
-  assert.equal(
-    requests[0].path,
-    "/open-apis/base/v3/bases/baseFixture/tables/tblFixture/records",
-  );
-  assert.equal(requests[0].params.filter, JSON.stringify(v3Filter));
-  assert.equal(requests[0].params.sort, JSON.stringify(v3Sort));
+  assert.equal(requests[0].method, "POST");
+  assert.equal(requests[0].path, recordsPath);
+  assert.deepEqual(requests[0].data.filter, filter);
+  assert.deepEqual(requests[0].data.sort, sort);
 });
