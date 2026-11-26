@@ -1,5 +1,411 @@
 [
   {
+    "service": "base",
+    "command": "+base-copy",
+    "description": "Copy a base resource",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "new base name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "folder token for destination",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "without-content",
+        "description": "copy structure only",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "time-zone",
+        "description": "time zone, e.g. Asia/Shanghai",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_copy.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-create",
+    "description": "Create a new base resource",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "base name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "folder token for destination",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "time-zone",
+        "description": "time zone, e.g. Asia/Shanghai",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+base-get",
+    "description": "Get a base resource",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/base_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+dashboard-list",
+    "description": "List dashboards in a base",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "page-size",
+        "description": "page size, max 100",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "page-token",
+        "description": "pagination token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/dashboard_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+field-get",
+    "description": "Get a field by ID or name",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/field_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+field-list",
+    "description": "List fields in a table",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "offset",
+        "description": "pagination offset",
+        "type": "int",
+        "default": "0",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "limit",
+        "description": "pagination size, range 1-200",
+        "type": "int",
+        "default": "100",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/field_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+form-get",
+    "description": "Get a form in a Base table",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "table-id",
+        "description": "table ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "form-id",
+        "description": "form ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/base_form_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-batch-create",
+    "description": "Batch create records",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "batch create JSON object, e.g. {\"fields\":[\"Name\",\"Status\"],\"rows\":[[\"Task A\",\"Todo\"],[\"Task B\",null]]}; rows follow fields order",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_batch_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-batch-update",
+    "description": "Batch update records",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "json",
+        "description": "batch update JSON object, e.g. {\"record_id_list\":[\"rec_xxx\"],\"patch\":{\"Status\":\"Done\"}}; same patch applies to all records",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_batch_update.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-delete",
+    "description": "Delete one or more records by ID",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "record-id",
+        "description": "record ID (repeatable)",
+        "type": "string_array",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "JSON object with record_id_list, e.g. {\"record_id_list\":[\"rec_xxx\"]}",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_delete.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-get",
+    "description": "Get one or more records by ID",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "record-id",
+        "description": "record ID (repeatable)",
+        "type": "string_array",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "field-id",
+        "description": "field ID or name to project; repeat to keep only needed columns",
+        "type": "string_array",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "json",
+        "description": "JSON object with record_id_list, e.g. {\"record_id_list\":[\"rec_xxx\"]}",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-list",
+    "description": "List records in a table",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "offset",
+        "description": "pagination offset",
+        "type": "int",
+        "default": "0",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "limit",
+        "description": "pagination size, range 1-200",
+        "type": "int",
+        "default": "100",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+record-search",
+    "description": "Search records in a table",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "json",
+        "description": "record search JSON object for the full request body, e.g. {\"keyword\":\"Alice\",\"search_fields\":[\"Name\"],\"select_fields\":[\"Name\",\"Status\"],\"filter\":{\"logic\":\"and\",\"conditions\":[]},\"sort\":[{\"field\":\"Updated\",\"desc\":true}],\"limit\":50}; escape hatch for advanced cases",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "keyword",
+        "description": "keyword for record search; required unless --json is used",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "search-field",
+        "description": "field ID or name to search; repeat for multiple fields; required unless --json is used",
+        "type": "string_array",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "offset",
+        "description": "pagination offset",
+        "type": "int",
+        "default": "0",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "limit",
+        "description": "pagination size, range 1-200",
+        "type": "int",
+        "default": "10",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/record_search.go"
+  },
+  {
+    "service": "base",
+    "command": "+table-create",
+    "description": "Create a table and optional fields/views",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "name",
+        "description": "table name",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "view",
+        "description": "view JSON object/array for create",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "fields",
+        "description": "field JSON array for create, e.g. [{\"name\":\"Title\",\"type\":\"text\"},{\"name\":\"Status\",\"type\":\"select\",\"options\":[{\"name\":\"Todo\"},{\"name\":\"Done\"}]}]",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/table_create.go"
+  },
+  {
+    "service": "base",
+    "command": "+table-get",
+    "description": "Get a table by ID or name",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/table_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+table-list",
+    "description": "List tables in a base",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "offset",
+        "description": "pagination offset",
+        "type": "int",
+        "default": "0",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "limit",
+        "description": "pagination size, range 1-100",
+        "type": "int",
+        "default": "50",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/table_list.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-get",
+    "description": "Get a view by ID or name",
+    "risk": "read",
+    "flags": [],
+    "source": "shortcuts/base/view_get.go"
+  },
+  {
+    "service": "base",
+    "command": "+view-list",
+    "description": "List views in a table",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "offset",
+        "description": "pagination offset",
+        "type": "int",
+        "default": "0",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "limit",
+        "description": "pagination size, range 1-200",
+        "type": "int",
+        "default": "100",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/base/view_list.go"
+  },
+  {
     "service": "docs",
     "command": "+create",
     "description": "Create a Lark document",
@@ -11,7 +417,10 @@
         "type": "string",
         "default": "v1",
         "required": false,
-        "enum": ["v1", "v2"]
+        "enum": [
+          "v1",
+          "v2"
+        ]
       }
     ],
     "source": "shortcuts/doc/docs_create.go"
@@ -28,7 +437,10 @@
         "type": "string",
         "default": "v1",
         "required": false,
-        "enum": ["v1", "v2"]
+        "enum": [
+          "v1",
+          "v2"
+        ]
       },
       {
         "name": "doc",
@@ -167,36 +579,6 @@
   },
   {
     "service": "docs",
-    "command": "+media-preview",
-    "description": "Preview document media file (auto-detects extension)",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "token",
-        "description": "media file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "output",
-        "description": "local save path",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "rsvp-status",
-        "description": "reply status",
-        "type": "string",
-        "required": true,
-        "enum": ["accept", "decline", "tentative"]
-      }
-    ],
-    "source": "shortcuts/doc/doc_media_preview.go"
-  },
-  {
-    "service": "docs",
     "command": "+media-upload",
     "description": "Upload media file (image/attachment) to a document block",
     "risk": "write",
@@ -282,7 +664,10 @@
         "type": "string",
         "default": "v1",
         "required": false,
-        "enum": ["v1", "v2"]
+        "enum": [
+          "v1",
+          "v2"
+        ]
       },
       {
         "name": "doc",
@@ -293,14 +678,6 @@
       }
     ],
     "source": "shortcuts/doc/docs_update.go"
-  },
-  {
-    "service": "docs",
-    "command": "+whiteboard-update",
-    "description": "",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/whiteboard/whiteboard_update.go"
   },
   {
     "service": "drive",
@@ -380,6 +757,153 @@
   },
   {
     "service": "drive",
+    "command": "+download",
+    "description": "Download a file from Drive to local",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "file-token",
+        "description": "file token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "output",
+        "description": "local save path",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "overwrite",
+        "description": "overwrite existing output file",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/drive/drive_download.go"
+  },
+  {
+    "service": "drive",
+    "command": "+export",
+    "description": "Export a doc/docx/sheet/bitable/slides to a local file with limited polling",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "token",
+        "description": "source document token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "doc-type",
+        "description": "source document type: doc | docx | sheet | bitable | slides",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "doc",
+          "docx",
+          "sheet",
+          "bitable",
+          "slides"
+        ]
+      },
+      {
+        "name": "file-extension",
+        "description": "export format: docx | pdf | xlsx | csv | markdown | base (bitable only) | pptx (slides only)",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "docx",
+          "pdf",
+          "xlsx",
+          "csv",
+          "markdown",
+          "base",
+          "pptx"
+        ]
+      },
+      {
+        "name": "sub-id",
+        "description": "sub-table/sheet ID, required when exporting sheet/bitable as csv",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "file-name",
+        "description": "preferred output filename (optional)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "output-dir",
+        "description": "local output directory (default: current directory)",
+        "type": "string",
+        "default": ".",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "overwrite",
+        "description": "overwrite existing output file",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/drive/drive_export.go"
+  },
+  {
+    "service": "drive",
+    "command": "+import",
+    "description": "Import a local file to Drive as a cloud document (docx, sheet, bitable, slides)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "file",
+        "description": "local file path (e.g. .docx, .xlsx, .md, .base, .pptx; large files auto use multipart upload; .base is capped at 20MB, .pptx at 500MB)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "type",
+        "description": "target document type (docx, sheet, bitable, slides)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "target folder token (omit for root folder; API accepts empty mount_key as root)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "imported file name (default: local file name with extension)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "target-token",
+        "description": "existing token to import data into (only for type=bitable); when set, data is mounted into this bitable instead of creating a new one",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/drive/drive_import.go"
+  },
+  {
+    "service": "drive",
     "command": "+inspect",
     "description": "Inspect a Lark document URL to get its type, title, and canonical token (with wiki unwrapping)",
     "risk": "read",
@@ -440,6 +964,108 @@
       }
     ],
     "source": "shortcuts/drive/drive_move.go"
+  },
+  {
+    "service": "drive",
+    "command": "+pull",
+    "description": "One-way file-level mirror of a Drive folder onto a local directory (Drive → local)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "local-dir",
+        "description": "local root directory (relative to cwd)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "source Drive folder token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "if-exists",
+        "description": "policy when a local file already exists (skip = never touch existing files; smart = skip when local mtime is already up to date; overwrite = always replace)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "on-duplicate-remote",
+        "description": "policy when multiple remote Drive entries map to the same rel_path",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "delete-local",
+        "description": "delete local regular files absent from Drive (file-level mirror; empty directories are NOT pruned); requires --yes",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "yes",
+        "description": "confirm --delete-local before deleting local files",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/drive/drive_pull.go"
+  },
+  {
+    "service": "drive",
+    "command": "+push",
+    "description": "File-level mirror of a local directory onto a Drive folder (local → Drive; remote-only directories are not removed)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "local-dir",
+        "description": "local root directory (relative to cwd)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "target Drive folder token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "if-exists",
+        "description": "policy when a Drive file already exists at the same rel_path (skip = never touch existing remote files; smart = skip when remote modified_time already matches or is newer, otherwise fall through to overwrite semantics; overwrite = always replace)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "on-duplicate-remote",
+        "description": "policy when multiple remote Drive entries map to the same rel_path",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "delete-remote",
+        "description": "delete Drive files absent locally (file-level mirror; remote-only directories are not removed); requires --yes",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "yes",
+        "description": "confirm --delete-remote before deleting Drive files",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/drive/drive_push.go"
   },
   {
     "service": "drive",
@@ -600,174 +1226,112 @@
   },
   {
     "service": "drive",
-    "command": "+download",
-    "description": "Download a file from Drive to local",
+    "command": "+secure-label-list",
+    "description": "List secure labels available to the current user",
     "risk": "read",
     "flags": [
       {
-        "name": "file-token",
-        "description": "file token",
-        "type": "string",
-        "required": true,
+        "name": "page-size",
+        "description": "page size, 1-10",
+        "type": "int",
+        "default": "10",
+        "required": false,
         "enum": []
       },
       {
-        "name": "output",
-        "description": "local save path",
+        "name": "page-token",
+        "description": "pagination token from previous response",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
-        "name": "overwrite",
-        "description": "overwrite existing output file",
-        "type": "bool",
+        "name": "lang",
+        "description": "label language",
+        "type": "string",
         "required": false,
-        "enum": []
+        "enum": [
+          "zh",
+          "en",
+          "ja"
+        ]
       }
     ],
-    "source": "shortcuts/drive/drive_download.go"
+    "source": "shortcuts/drive/drive_secure_label.go"
   },
   {
     "service": "drive",
-    "command": "+export",
-    "description": "Export a doc/docx/sheet/bitable/slides to a local file with limited polling",
+    "command": "+status",
+    "description": "Compare a local directory with a Drive folder by exact hash or quick modified_time",
     "risk": "read",
     "flags": [
       {
-        "name": "token",
-        "description": "source document token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "doc-type",
-        "description": "source document type: doc | docx | sheet | bitable | slides",
-        "type": "string",
-        "required": true,
-        "enum": ["doc", "docx", "sheet", "bitable", "slides"]
-      },
-      {
-        "name": "file-extension",
-        "description": "export format: docx | pdf | xlsx | csv | markdown | base (bitable only) | pptx (slides only)",
-        "type": "string",
-        "required": true,
-        "enum": ["docx", "pdf", "xlsx", "csv", "markdown", "base", "pptx"]
-      },
-      {
-        "name": "sub-id",
-        "description": "sub-table/sheet ID, required when exporting sheet/bitable as csv",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "file-name",
-        "description": "preferred output filename (optional)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output-dir",
-        "description": "local output directory (default: current directory)",
-        "type": "string",
-        "default": ".",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "overwrite",
-        "description": "overwrite existing output file",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_export.go"
-  },
-  {
-    "service": "drive",
-    "command": "+export-download",
-    "description": "Download an exported file by file_token",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "exported file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "file-name",
-        "description": "preferred output filename (optional)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output-dir",
-        "description": "local output directory (default: current directory)",
-        "type": "string",
-        "default": ".",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "overwrite",
-        "description": "overwrite existing output file",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_export_download.go"
-  },
-  {
-    "service": "drive",
-    "command": "+import",
-    "description": "Import a local file to Drive as a cloud document (docx, sheet, bitable, slides)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "file",
-        "description": "local file path (e.g. .docx, .xlsx, .md, .base, .pptx; large files auto use multipart upload; .base is capped at 20MB, .pptx at 500MB)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "target document type (docx, sheet, bitable, slides)",
+        "name": "local-dir",
+        "description": "local root directory (relative to cwd)",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
         "name": "folder-token",
-        "description": "target folder token (omit for root folder; API accepts empty mount_key as root)",
+        "description": "Drive folder token",
         "type": "string",
-        "required": false,
+        "required": true,
         "enum": []
       },
       {
-        "name": "name",
-        "description": "imported file name (default: local file name with extension)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "target-token",
-        "description": "existing token to import data into (only for type=bitable); when set, data is mounted into this bitable instead of creating a new one",
-        "type": "string",
+        "name": "quick",
+        "description": "compare modified_time only and skip remote downloads for files present on both sides",
+        "type": "bool",
         "required": false,
         "enum": []
       }
     ],
-    "source": "shortcuts/drive/drive_import.go"
+    "source": "shortcuts/drive/drive_status.go"
+  },
+  {
+    "service": "drive",
+    "command": "+sync",
+    "description": "Two-way sync between a local directory and a Drive folder",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "local-dir",
+        "description": "local root directory (relative to cwd)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "Drive folder token",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "on-conflict",
+        "description": "conflict resolution when both sides modified a file",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "on-duplicate-remote",
+        "description": "policy when multiple remote Drive entries map to the same rel_path",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "quick",
+        "description": "use best-effort modified_time comparison instead of SHA-256 hash; mismatched timestamps can still trigger real sync writes",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/drive/drive_sync.go"
   },
   {
     "service": "drive",
@@ -852,382 +1416,6 @@
   },
   {
     "service": "drive",
-    "command": "+pull",
-    "description": "One-way file-level mirror of a Drive folder onto a local directory (Drive → local)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "local-dir",
-        "description": "local root directory (relative to cwd)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "source Drive folder token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "if-exists",
-        "description": "policy when a local file already exists (skip = never touch existing files; smart = skip when local mtime is already up to date; overwrite = always replace)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "on-duplicate-remote",
-        "description": "policy when multiple remote Drive entries map to the same rel_path",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "delete-local",
-        "description": "delete local regular files absent from Drive (file-level mirror; empty directories are NOT pruned); requires --yes",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "confirm --delete-local before deleting local files",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_pull.go"
-  },
-  {
-    "service": "drive",
-    "command": "+push",
-    "description": "File-level mirror of a local directory onto a Drive folder (local → Drive; remote-only directories are not removed)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "local-dir",
-        "description": "local root directory (relative to cwd)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "target Drive folder token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "if-exists",
-        "description": "policy when a Drive file already exists at the same rel_path (skip = never touch existing remote files; smart = skip when remote modified_time already matches or is newer, otherwise fall through to overwrite semantics; overwrite = always replace)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "on-duplicate-remote",
-        "description": "policy when multiple remote Drive entries map to the same rel_path",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "delete-remote",
-        "description": "delete Drive files absent locally (file-level mirror; remote-only directories are not removed); requires --yes",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "confirm --delete-remote before deleting Drive files",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_push.go"
-  },
-  {
-    "service": "drive",
-    "command": "+status",
-    "description": "Compare a local directory with a Drive folder by exact hash or quick modified_time",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "local-dir",
-        "description": "local root directory (relative to cwd)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "Drive folder token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "quick",
-        "description": "compare modified_time only and skip remote downloads for files present on both sides",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_status.go"
-  },
-  {
-    "service": "drive",
-    "command": "+sync",
-    "description": "Two-way sync between a local directory and a Drive folder",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "local-dir",
-        "description": "local root directory (relative to cwd)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "Drive folder token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "on-conflict",
-        "description": "conflict resolution when both sides modified a file",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "on-duplicate-remote",
-        "description": "policy when multiple remote Drive entries map to the same rel_path",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "quick",
-        "description": "use best-effort modified_time comparison instead of SHA-256 hash; mismatched timestamps can still trigger real sync writes",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_sync.go"
-  },
-  {
-    "service": "drive",
-    "command": "+cover",
-    "description": "List or download stable cover presets for a Drive file",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "Drive file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "spec",
-        "description": "cover preset: default | icon | grid | small | middle | big | square",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "version",
-        "description": "optional file version",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "list-only",
-        "description": "list built-in cover specs without downloading",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output",
-        "description": "local output path for downloaded cover",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "if-exists",
-        "description": "output conflict policy: error | overwrite | rename",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_cover.go"
-  },
-  {
-    "service": "drive",
-    "command": "+preview",
-    "description": "List or download available preview artifacts for a Drive file",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "Drive file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "preview type to download: pdf | html | text | image | source",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "version",
-        "description": "optional file version",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "list-only",
-        "description": "list preview candidates without downloading",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output",
-        "description": "local output path for downloaded preview",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "if-exists",
-        "description": "output conflict policy: error | overwrite | rename",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_preview.go"
-  },
-  {
-    "service": "drive",
-    "command": "+apply-permission",
-    "description": "Apply to the document owner for view or edit permission on a doc/sheet/file/wiki/bitable/docx/mindnote/slides",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "token",
-        "description": "target token or document URL (docx/sheets/base/file/wiki/doc/mindnote/slides)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "target type; auto-inferred from URL when omitted",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "perm",
-        "description": "permission to request",
-        "type": "string",
-        "required": true,
-        "enum": ["view", "edit"]
-      },
-      {
-        "name": "remark",
-        "description": "optional note shown on the request card sent to the owner",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_apply_permission.go"
-  },
-  {
-    "service": "drive",
-    "command": "+secure-label-list",
-    "description": "List secure labels available to the current user",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "page-size",
-        "description": "page size, 1-10",
-        "type": "int",
-        "default": "10",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "page-token",
-        "description": "pagination token from previous response",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "lang",
-        "description": "label language",
-        "type": "string",
-        "required": false,
-        "enum": ["zh", "en", "ja"]
-      }
-    ],
-    "source": "shortcuts/drive/drive_secure_label.go"
-  },
-  {
-    "service": "drive",
-    "command": "+secure-label-update",
-    "description": "Update the secure label on a Drive file or document",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "token",
-        "description": "target file token or document URL (docx/sheets/base/file/wiki/doc/mindnote/slides)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "type",
-        "description": "target type; auto-inferred from URL when omitted",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "label-id",
-        "description": "secure label ID to set",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_secure_label.go"
-  },
-  {
-    "service": "drive",
     "command": "+version-get",
     "description": "Download a specific version of a Drive file",
     "risk": "read",
@@ -1257,37 +1445,6 @@
         "name": "overwrite",
         "description": "overwrite existing output file",
         "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/drive/drive_version.go"
-  },
-  {
-    "service": "drive",
-    "command": "+version-history",
-    "description": "List the version history of a Drive file",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "file-token",
-        "description": "target file token",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "max versions to return (1-200)",
-        "type": "int",
-        "default": "20",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "cursor",
-        "description": "pagination cursor from the previous page's next_cursor",
-        "type": "string",
         "required": false,
         "enum": []
       }
@@ -1488,571 +1645,9 @@
     "source": "shortcuts/markdown/markdown_patch.go"
   },
   {
-    "service": "base",
-    "command": "+base-copy",
-    "description": "Copy a base resource",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "name",
-        "description": "new base name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "folder token for destination",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "without-content",
-        "description": "copy structure only",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "time-zone",
-        "description": "time zone, e.g. Asia/Shanghai",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/base_copy.go"
-  },
-  {
-    "service": "base",
-    "command": "+base-create",
-    "description": "Create a new base resource",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "name",
-        "description": "base name",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "folder token for destination",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "time-zone",
-        "description": "time zone, e.g. Asia/Shanghai",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/base_create.go"
-  },
-  {
-    "service": "base",
-    "command": "+base-get",
-    "description": "Get a base resource",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/base/base_get.go"
-  },
-  {
-    "service": "base",
-    "command": "+table-create",
-    "description": "Create a table and optional fields/views",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "name",
-        "description": "table name",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "view",
-        "description": "view JSON object/array for create",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "fields",
-        "description": "field JSON array for create, e.g. [{\"name\":\"Title\",\"type\":\"text\"},{\"name\":\"Status\",\"type\":\"select\",\"options\":[{\"name\":\"Todo\"},{\"name\":\"Done\"}]}]",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/table_create.go"
-  },
-  {
-    "service": "base",
-    "command": "+table-get",
-    "description": "Get a table by ID or name",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/base/table_get.go"
-  },
-  {
-    "service": "base",
-    "command": "+table-list",
-    "description": "List tables in a base",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "offset",
-        "description": "pagination offset",
-        "type": "int",
-        "default": "0",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "pagination size, range 1-100",
-        "type": "int",
-        "default": "50",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/table_list.go"
-  },
-  {
-    "service": "base",
-    "command": "+field-get",
-    "description": "Get a field by ID or name",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/base/field_get.go"
-  },
-  {
-    "service": "base",
-    "command": "+field-list",
-    "description": "List fields in a table",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "offset",
-        "description": "pagination offset",
-        "type": "int",
-        "default": "0",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "pagination size, range 1-200",
-        "type": "int",
-        "default": "100",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/field_list.go"
-  },
-  {
-    "service": "base",
-    "command": "+record-batch-create",
-    "description": "Batch create records",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "json",
-        "description": "batch create JSON object, e.g. {\"fields\":[\"Name\",\"Status\"],\"rows\":[[\"Task A\",\"Todo\"],[\"Task B\",null]]}; rows follow fields order",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/record_batch_create.go"
-  },
-  {
-    "service": "base",
-    "command": "+record-batch-update",
-    "description": "Batch update records",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "json",
-        "description": "batch update JSON object, e.g. {\"record_id_list\":[\"rec_xxx\"],\"patch\":{\"Status\":\"Done\"}}; same patch applies to all records",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/record_batch_update.go"
-  },
-  {
-    "service": "base",
-    "command": "+record-delete",
-    "description": "Delete one or more records by ID",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "record-id",
-        "description": "record ID (repeatable)",
-        "type": "string_array",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "json",
-        "description": "JSON object with record_id_list, e.g. {\"record_id_list\":[\"rec_xxx\"]}",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/record_delete.go"
-  },
-  {
-    "service": "base",
-    "command": "+record-get",
-    "description": "Get one or more records by ID",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "record-id",
-        "description": "record ID (repeatable)",
-        "type": "string_array",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "field-id",
-        "description": "field ID or name to project; repeat to keep only needed columns",
-        "type": "string_array",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "json",
-        "description": "JSON object with record_id_list, e.g. {\"record_id_list\":[\"rec_xxx\"]}",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/record_get.go"
-  },
-  {
-    "service": "base",
-    "command": "+record-list",
-    "description": "List records in a table",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "offset",
-        "description": "pagination offset",
-        "type": "int",
-        "default": "0",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "pagination size, range 1-200",
-        "type": "int",
-        "default": "100",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/record_list.go"
-  },
-  {
-    "service": "base",
-    "command": "+record-search",
-    "description": "Search records in a table",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "json",
-        "description": "record search JSON object for the full request body, e.g. {\"keyword\":\"Alice\",\"search_fields\":[\"Name\"],\"select_fields\":[\"Name\",\"Status\"],\"filter\":{\"logic\":\"and\",\"conditions\":[]},\"sort\":[{\"field\":\"Updated\",\"desc\":true}],\"limit\":50}; escape hatch for advanced cases",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "keyword",
-        "description": "keyword for record search; required unless --json is used",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "search-field",
-        "description": "field ID or name to search; repeat for multiple fields; required unless --json is used",
-        "type": "string_array",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "offset",
-        "description": "pagination offset",
-        "type": "int",
-        "default": "0",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "pagination size, range 1-200",
-        "type": "int",
-        "default": "10",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/record_search.go"
-  },
-  {
-    "service": "base",
-    "command": "+view-get",
-    "description": "Get a view by ID or name",
-    "risk": "read",
-    "flags": [],
-    "source": "shortcuts/base/view_get.go"
-  },
-  {
-    "service": "base",
-    "command": "+view-list",
-    "description": "List views in a table",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "offset",
-        "description": "pagination offset",
-        "type": "int",
-        "default": "0",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "limit",
-        "description": "pagination size, range 1-200",
-        "type": "int",
-        "default": "100",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/view_list.go"
-  },
-  {
-    "service": "base",
-    "command": "+form-get",
-    "description": "Get a form in a Base table",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "table-id",
-        "description": "table ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "form-id",
-        "description": "form ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/base_form_get.go"
-  },
-  {
-    "service": "base",
-    "command": "+dashboard-list",
-    "description": "List dashboards in a base",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "page-size",
-        "description": "page size, max 100",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "page-token",
-        "description": "pagination token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/base/dashboard_list.go"
-  },
-  {
     "service": "sheets",
-    "command": "+create",
-    "description": "Create a spreadsheet (optional header row and initial data)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "title",
-        "description": "spreadsheet title",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "target folder token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "headers",
-        "description": "header row JSON array",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "data",
-        "description": "initial data JSON 2D array",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_spreadsheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+info",
-    "description": "View spreadsheet metadata and sheet information",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_spreadsheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+workbook-create",
-    "description": "Spreadsheet workbook create",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "title",
-        "description": "title",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "folder-token",
-        "description": "folder-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "headers",
-        "description": "headers",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "values",
-        "description": "values",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+workbook-export",
-    "description": "Spreadsheet workbook export",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "file-extension",
-        "description": "file-extension",
-        "type": "string",
-        "required": false,
-        "default": "xlsx",
-        "enum": ["xlsx", "csv"]
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "output-path",
-        "description": "output-path",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+copy-sheet",
-    "description": "Copy a sheet within a spreadsheet",
+    "command": "+add-dimension",
+    "description": "Add rows or columns at the end of a sheet",
     "risk": "write",
     "flags": [
       {
@@ -2071,238 +1666,30 @@
       },
       {
         "name": "sheet-id",
-        "description": "source sheet ID",
+        "description": "worksheet ID",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
-        "name": "title",
-        "description": "new sheet title",
+        "name": "dimension",
+        "description": "ROWS or COLUMNS",
         "type": "string",
-        "required": false,
-        "enum": []
+        "required": true,
+        "enum": [
+          "ROWS",
+          "COLUMNS"
+        ]
       },
       {
-        "name": "index",
-        "description": "new sheet index (0-based)",
+        "name": "length",
+        "description": "number of rows/columns to add (1-5000)",
         "type": "int",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+create-sheet",
-    "description": "Create a sheet in an existing spreadsheet",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "title",
-        "description": "sheet title",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "index",
-        "description": "sheet index (0-based)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+delete-sheet",
-    "description": "Delete a sheet from a spreadsheet",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID to delete",
-        "type": "string",
         "required": true,
         "enum": []
       }
     ],
-    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+sheet-set-tab-color",
-    "description": "Spreadsheet sheet set tab color",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "color",
-        "description": "color",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+update-sheet",
-    "description": "Update sheet properties",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "title",
-        "description": "sheet title",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "index",
-        "description": "sheet index (0-based)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "hidden",
-        "description": "set true to hide or false to unhide",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "frozen-row-count",
-        "description": "freeze rows through this count (0 unfreezes)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "frozen-col-count",
-        "description": "freeze columns through this count (0 unfreezes)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "lock",
-        "description": "sheet protection mode",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "lock-info",
-        "description": "protection remark",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "user-ids",
-        "description": "extra editor IDs for protected sheet as JSON array (e.g. '[\"ou_xxx\"]')",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "user-id-type",
-        "description": "user ID type for --user-ids",
-        "type": "string",
-        "required": false,
-        "enum": ["open_id", "union_id", "lark_id", "user_id"]
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
+    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
   },
   {
     "service": "sheets",
@@ -2380,569 +1767,331 @@
   },
   {
     "service": "sheets",
-    "command": "+find",
-    "description": "Find cells in a spreadsheet",
+    "command": "+cells-get",
+    "description": "Read one or more cell ranges with values, formulas, and optional styles / comments / data validation.",
     "risk": "read",
     "flags": [
       {
         "name": "url",
-        "description": "spreadsheet URL",
+        "description": "url",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "spreadsheet-token",
-        "description": "spreadsheet token",
+        "description": "spreadsheet-token",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "find",
-        "description": "search text",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "range",
-        "description": "search range (<sheetId>!A1:D10, or A1:D10 / C2 with --sheet-id)",
+        "description": "sheet-id",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
-        "name": "ignore-case",
-        "description": "case-insensitive search",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "match-entire-cell",
-        "description": "match entire cell",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "search-by-regex",
-        "description": "regex search",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "include-formulas",
-        "description": "search formulas",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+merge-cells",
-    "description": "Merge cells in a spreadsheet",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
+        "name": "sheet-name",
+        "description": "sheet-name",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "range",
-        "description": "cell range (<sheetId>!A1:B2, or A1:B2 with --sheet-id)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID (for relative range)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "merge-type",
-        "description": "merge method",
+        "description": "range",
         "type": "string",
         "required": true,
-        "enum": ["MERGE_ALL", "MERGE_ROWS", "MERGE_COLUMNS"]
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+read",
-    "description": "Read spreadsheet cell values",
-    "risk": "read",
-    "flags": [
+        "enum": []
+      },
       {
-        "name": "view-id",
-        "description": "Filter by filter-view reference_id (returns the matching single view)",
-        "type": "string",
+        "name": "include",
+        "description": "include",
+        "type": "string_slice",
+        "required": false,
+        "enum": [
+          "value",
+          "formula",
+          "style",
+          "comment",
+          "data_validation"
+        ]
+      },
+      {
+        "name": "max-chars",
+        "description": "max-chars",
+        "type": "int",
+        "required": false,
+        "default": "200000",
+        "enum": []
+      },
+      {
+        "name": "skip-hidden",
+        "description": "skip-hidden",
+        "type": "bool",
         "required": false,
         "enum": []
       },
       {
         "name": "dry-run",
-        "description": "",
+        "description": "dry-run",
         "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "range",
-        "description": "read range (<sheetId>!A1:D10, A1:D10 with --sheet-id, or a single cell like C2)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "value-render-option",
-        "description": "render option: ToString|FormattedValue|Formula|UnformattedValue",
-        "type": "string",
         "required": false,
         "enum": []
       }
     ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
+    "source": "shortcuts/sheets/lark_sheet_read_data.go"
   },
   {
     "service": "sheets",
-    "command": "+replace",
-    "description": "Find and replace cell values in a spreadsheet",
+    "command": "+cells-replace",
+    "description": "Find and replace text in a spreadsheet (case / regex / whole-cell / formula-text controls).",
     "risk": "write",
     "flags": [
       {
         "name": "url",
-        "description": "Spreadsheet URL (XOR with `--spreadsheet-token`)",
+        "description": "url",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "spreadsheet-token",
-        "description": "Spreadsheet token (XOR with `--url`)",
+        "description": "spreadsheet-token",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "sheet-id",
-        "description": "sheet ID",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "find",
-        "description": "search text or regex pattern",
+        "description": "find",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
         "name": "replacement",
-        "description": "replacement text",
+        "description": "replacement",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
         "name": "range",
-        "description": "search range (<sheetId>!A1:D10, or A1:D10 with --sheet-id)",
+        "description": "range",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "match-case",
-        "description": "case-sensitive search",
+        "description": "match-case",
         "type": "bool",
         "required": false,
         "enum": []
       },
       {
         "name": "match-entire-cell",
-        "description": "match entire cell content",
+        "description": "match-entire-cell",
         "type": "bool",
         "required": false,
         "enum": []
       },
       {
-        "name": "search-by-regex",
-        "description": "use regex search",
+        "name": "regex",
+        "description": "regex",
         "type": "bool",
         "required": false,
         "enum": []
       },
       {
         "name": "include-formulas",
-        "description": "search in formulas",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+set-style",
-    "description": "Set cell style for a range",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "sheet-name",
-        "description": "Sheet name (XOR with `--sheet-id`)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "image-name",
-        "description": "Image name, including extension (e.g. `logo.png`)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "range",
-        "description": "cell range (<sheetId>!A1:B2, or A1:B2 with --sheet-id)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID (for relative range)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "style",
-        "description": "style JSON object (e.g. {\"font\":{\"bold\":true},\"backColor\":\"#ff0000\"})",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+unmerge-cells",
-    "description": "Unmerge (split) cells in a spreadsheet",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "float-image-id",
-        "description": "float image ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+write",
-    "description": "Write to spreadsheet cells (overwrite mode)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "Sheet name (XOR with `--sheet-id`)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "pivot-table-id",
-        "description": "Target pivot table id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "Confirm destructive write (exit code 10 without this flag); delete is irreversible",
+        "description": "include-formulas",
         "type": "bool",
         "required": false,
         "enum": []
       },
       {
         "name": "dry-run",
-        "description": "",
+        "description": "dry-run",
         "type": "bool",
         "required": false,
         "enum": []
       }
     ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
+    "source": "shortcuts/sheets/lark_sheet_search_replace.go"
   },
   {
     "service": "sheets",
-    "command": "+write-image",
-    "description": "Write an image into a spreadsheet cell",
-    "risk": "write",
+    "command": "+cells-search",
+    "description": "Find cells matching --find in a spreadsheet (case / regex / whole-cell / formula-text controls).",
+    "risk": "read",
     "flags": [
       {
         "name": "url",
-        "description": "spreadsheet URL",
+        "description": "url",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "spreadsheet-token",
-        "description": "spreadsheet token",
+        "description": "spreadsheet-token",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "sheet-id",
-        "description": "sheet ID",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "find",
+        "description": "find",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "range",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-case",
+        "description": "match-case",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-entire-cell",
+        "description": "match-entire-cell",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "regex",
+        "description": "regex",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include-formulas",
+        "description": "include-formulas",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "max-matches",
+        "description": "max-matches",
+        "type": "int",
+        "required": false,
+        "default": "5000",
+        "enum": []
+      },
+      {
+        "name": "offset",
+        "description": "offset",
+        "type": "int",
+        "required": false,
+        "default": "0",
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_search_replace.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+cells-set-image",
+    "description": "Embed a local image into a single cell (uploads via drive, then set_cell_range with rich_text embed-image).",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "range",
-        "description": "target cell (e.g. A1 or <sheetId>!A1). Start and end cell must be the same",
+        "description": "range",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
         "name": "image",
-        "description": "local image file path (supported formats: PNG, JPEG, JPG, GIF, BMP, JFIF, EXIF, TIFF, BPG, HEIC)",
+        "description": "image",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
         "name": "name",
-        "description": "image file name with extension (defaults to the basename of --image)",
+        "description": "name",
         "type": "string",
         "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_cell_images.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+add-dimension",
-    "description": "Add rows or columns at the end of a sheet",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "worksheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dimension",
-        "description": "ROWS or COLUMNS",
-        "type": "string",
-        "required": true,
-        "enum": ["ROWS", "COLUMNS"]
-      },
-      {
-        "name": "length",
-        "description": "number of rows/columns to add (1-5000)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+delete-dimension",
-    "description": "Delete rows or columns",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "worksheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dimension",
-        "description": "ROWS or COLUMNS",
-        "type": "string",
-        "required": true,
-        "enum": ["ROWS", "COLUMNS"]
-      },
-      {
-        "name": "start-index",
-        "description": "start position (1-indexed, inclusive)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "end-index",
-        "description": "end position (1-indexed, inclusive)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+dim-group",
-    "description": "Spreadsheet dim group",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "depth",
-        "description": "depth",
-        "type": "int",
-        "required": false,
-        "default": "1",
-        "enum": []
-      },
-      {
-        "name": "group-state",
-        "description": "group-state",
-        "type": "string",
-        "required": false,
-        "default": "expand",
-        "enum": ["expand", "fold"]
-      },
-      {
-        "name": "range",
-        "description": "range",
-        "type": "string",
-        "required": true,
         "enum": []
       },
       {
@@ -2953,12 +2102,12 @@
         "enum": []
       }
     ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
+    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
   },
   {
     "service": "sheets",
-    "command": "+dim-move",
-    "description": "Spreadsheet dim move",
+    "command": "+cells-set-style",
+    "description": "Apply style flags to every cell in a range (values / formulas untouched).",
     "risk": "write",
     "flags": [
       {
@@ -2987,72 +2136,6 @@
         "description": "sheet-name",
         "type": "string",
         "required": false,
-        "enum": []
-      },
-      {
-        "name": "source-range",
-        "description": "source-range",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "target",
-        "description": "target",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+dim-ungroup",
-    "description": "Spreadsheet dim ungroup",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "depth",
-        "description": "depth",
-        "type": "int",
-        "required": false,
-        "default": "1",
         "enum": []
       },
       {
@@ -3063,328 +2146,102 @@
         "enum": []
       },
       {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+insert-dimension",
-    "description": "Insert rows or columns at a specified position",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
+        "name": "background-color",
+        "description": "background-color",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
+        "name": "font-color",
+        "description": "font-color",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
-        "name": "sheet-id",
-        "description": "worksheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dimension",
-        "description": "ROWS or COLUMNS",
-        "type": "string",
-        "required": true,
-        "enum": ["ROWS", "COLUMNS"]
-      },
-      {
-        "name": "start-index",
-        "description": "start position (0-indexed)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "end-index",
-        "description": "end position (0-indexed, exclusive)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "inherit-style",
-        "description": "style inheritance: BEFORE or AFTER",
-        "type": "string",
-        "required": false,
-        "enum": ["BEFORE", "AFTER"]
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+move-dimension",
-    "description": "Move rows or columns to a new position",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "Spreadsheet URL (XOR with `--spreadsheet-token`)",
-        "type": "string",
+        "name": "font-size",
+        "description": "font-size",
+        "type": "float64",
         "required": false,
         "enum": []
       },
       {
-        "name": "spreadsheet-token",
-        "description": "Spreadsheet token (XOR with `--url`)",
+        "name": "font-style",
+        "description": "font-style",
         "type": "string",
         "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "worksheet ID",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dimension",
-        "description": "ROWS or COLUMNS",
-        "type": "string",
-        "required": true,
-        "enum": ["ROWS", "COLUMNS"]
-      },
-      {
-        "name": "start-index",
-        "description": "source start position (0-indexed)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "end-index",
-        "description": "source end position (0-indexed, inclusive)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "destination-index",
-        "description": "target position to move to (0-indexed)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+update-dimension",
-    "description": "Update row or column properties (visibility, size)",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "worksheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dimension",
-        "description": "ROWS or COLUMNS",
-        "type": "string",
-        "required": true,
-        "enum": ["ROWS", "COLUMNS"]
-      },
-      {
-        "name": "start-index",
-        "description": "start position (1-indexed, inclusive)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "end-index",
-        "description": "end position (1-indexed, inclusive)",
-        "type": "int",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "visible",
-        "description": "true to show, false to hide",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "fixed-size",
-        "description": "row height or column width in pixels",
-        "type": "int",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+cond-format-delete",
-    "description": "Spreadsheet cond format delete",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "rule-id",
-        "description": "rule-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "yes",
-        "type": "bool",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+cond-format-update",
-    "description": "Spreadsheet cond format update",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "rule-id",
-        "description": "rule-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "rule-type",
-        "description": "rule-type",
-        "type": "string",
-        "required": true,
         "enum": [
-          "duplicateValues",
-          "uniqueValues",
-          "cellIs",
-          "containsText",
-          "timePeriod",
-          "containsBlanks",
-          "notContainsBlanks",
-          "dataBar",
-          "colorScale",
-          "rank",
-          "aboveAverage",
-          "expression",
-          "iconSet"
+          "normal",
+          "italic"
         ]
       },
       {
-        "name": "ranges",
-        "description": "ranges",
+        "name": "font-weight",
+        "description": "font-weight",
         "type": "string",
-        "required": true,
+        "required": false,
+        "enum": [
+          "normal",
+          "bold"
+        ]
+      },
+      {
+        "name": "font-line",
+        "description": "font-line",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "none",
+          "underline",
+          "line-through"
+        ]
+      },
+      {
+        "name": "horizontal-alignment",
+        "description": "horizontal-alignment",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "left",
+          "center",
+          "right"
+        ]
+      },
+      {
+        "name": "vertical-alignment",
+        "description": "vertical-alignment",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "top",
+          "middle",
+          "bottom"
+        ]
+      },
+      {
+        "name": "word-wrap",
+        "description": "word-wrap",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "overflow",
+          "auto-wrap",
+          "word-clip"
+        ]
+      },
+      {
+        "name": "number-format",
+        "description": "number-format",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "border-styles",
+        "description": "border-styles",
+        "type": "string",
+        "required": false,
         "enum": []
       },
       {
@@ -3395,7 +2252,88 @@
         "enum": []
       }
     ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
+    "source": "shortcuts/sheets/lark_sheet_write_cells.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+copy-sheet",
+    "description": "Copy a sheet within a spreadsheet",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "source sheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "title",
+        "description": "new sheet title",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "new sheet index (0-based)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+create",
+    "description": "Create a spreadsheet (optional header row and initial data)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "title",
+        "description": "spreadsheet title",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "target folder token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "headers",
+        "description": "header row JSON array",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "data",
+        "description": "initial data JSON 2D array",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_spreadsheet_management.go"
   },
   {
     "service": "sheets",
@@ -3515,6 +2453,176 @@
   },
   {
     "service": "sheets",
+    "command": "+create-float-image",
+    "description": "Create a floating image on a sheet",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "float-image-token",
+        "description": "image file token (from upload API)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "anchor cell, must be a single cell (e.g. sheetId!A1:A1)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "width",
+        "description": "width in pixels (>=20)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "height",
+        "description": "height in pixels (>=20)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "offset-x",
+        "description": "horizontal offset from anchor cell's top-left (pixels, >=0)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "offset-y",
+        "description": "vertical offset from anchor cell's top-left (pixels, >=0)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "float-image-id",
+        "description": "custom 10-char alphanumeric ID (auto-generated if omitted)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+create-sheet",
+    "description": "Create a sheet in an existing spreadsheet",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "title",
+        "description": "sheet title",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "sheet index (0-based)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+delete-dimension",
+    "description": "Delete rows or columns",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "worksheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dimension",
+        "description": "ROWS or COLUMNS",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "ROWS",
+          "COLUMNS"
+        ]
+      },
+      {
+        "name": "start-index",
+        "description": "start position (1-indexed, inclusive)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "end-index",
+        "description": "end position (1-indexed, inclusive)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
+  },
+  {
+    "service": "sheets",
     "command": "+delete-dropdown",
     "description": "Delete dropdown list from cell ranges",
     "risk": "write",
@@ -3623,6 +2731,315 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_filter_views.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+delete-sheet",
+    "description": "Delete a sheet from a spreadsheet",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID to delete",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+dim-freeze",
+    "description": "Freeze the first N rows or columns; --count 0 unfreezes the chosen dimension.",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dimension",
+        "description": "dimension",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "row",
+          "column"
+        ]
+      },
+      {
+        "name": "count",
+        "description": "count",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+dropdown-delete",
+    "description": "Clear dropdowns from many sheet-prefixed ranges atomically (irreversible).",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "ranges",
+        "description": "ranges",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "yes",
+        "description": "yes",
+        "type": "bool",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_batch_update.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+filter-view-list",
+    "description": "Spreadsheet filter view list",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "view-id",
+        "description": "view-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/data/flag-defs.json"
+  },
+  {
+    "service": "sheets",
+    "command": "+find",
+    "description": "Find cells in a spreadsheet",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "find",
+        "description": "search text",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "search range (<sheetId>!A1:D10, or A1:D10 / C2 with --sheet-id)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "ignore-case",
+        "description": "case-insensitive search",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-entire-cell",
+        "description": "match entire cell",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "search-by-regex",
+        "description": "regex search",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include-formulas",
+        "description": "search formulas",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+float-image-list",
+    "description": "Spreadsheet float image list",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "float-image-id",
+        "description": "float-image-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/data/flag-defs.json"
   },
   {
     "service": "sheets",
@@ -3737,6 +3154,130 @@
   },
   {
     "service": "sheets",
+    "command": "+get-float-image",
+    "description": "Get a floating image by ID",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "float-image-id",
+        "description": "float image ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+info",
+    "description": "View spreadsheet metadata and sheet information",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_spreadsheet_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+insert-dimension",
+    "description": "Insert rows or columns at a specified position",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "worksheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dimension",
+        "description": "ROWS or COLUMNS",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "ROWS",
+          "COLUMNS"
+        ]
+      },
+      {
+        "name": "start-index",
+        "description": "start position (0-indexed)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "end-index",
+        "description": "end position (0-indexed, exclusive)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "inherit-style",
+        "description": "style inheritance: BEFORE or AFTER",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "BEFORE",
+          "AFTER"
+        ]
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
+  },
+  {
+    "service": "sheets",
     "command": "+list-filter-view-conditions",
     "description": "List all filter conditions of a filter view",
     "risk": "read",
@@ -3804,6 +3345,305 @@
   },
   {
     "service": "sheets",
+    "command": "+list-float-images",
+    "description": "List all floating images in a sheet",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "Spreadsheet URL (XOR with `--spreadsheet-token`)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "Spreadsheet token (XOR with `--url`)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+media-upload",
+    "description": "Upload a local image for use as a floating image and return the file_token",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "file",
+        "description": "local image path (files > 20MB use multipart upload automatically)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+merge-cells",
+    "description": "Merge cells in a spreadsheet",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "cell range (<sheetId>!A1:B2, or A1:B2 with --sheet-id)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID (for relative range)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "merge-type",
+        "description": "merge method",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "MERGE_ALL",
+          "MERGE_ROWS",
+          "MERGE_COLUMNS"
+        ]
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+move-dimension",
+    "description": "Move rows or columns to a new position",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "Spreadsheet URL (XOR with `--spreadsheet-token`)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "Spreadsheet token (XOR with `--url`)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "worksheet ID",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dimension",
+        "description": "ROWS or COLUMNS",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "ROWS",
+          "COLUMNS"
+        ]
+      },
+      {
+        "name": "start-index",
+        "description": "source start position (0-indexed)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "end-index",
+        "description": "source end position (0-indexed, inclusive)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "destination-index",
+        "description": "target position to move to (0-indexed)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+read",
+    "description": "Read spreadsheet cell values",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "read range (<sheetId>!A1:D10, A1:D10 with --sheet-id, or a single cell like C2)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "value-render-option",
+        "description": "render option: ToString|FormattedValue|Formula|UnformattedValue",
+        "type": "string",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+replace",
+    "description": "Find and replace cell values in a spreadsheet",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "Spreadsheet URL (XOR with `--spreadsheet-token`)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "Spreadsheet token (XOR with `--url`)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "find",
+        "description": "search text or regex pattern",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "replacement",
+        "description": "replacement text",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "search range (<sheetId>!A1:D10, or A1:D10 with --sheet-id)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-case",
+        "description": "case-sensitive search",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "match-entire-cell",
+        "description": "match entire cell content",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "search-by-regex",
+        "description": "use regex search",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include-formulas",
+        "description": "search in formulas",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
+  },
+  {
+    "service": "sheets",
     "command": "+set-dropdown",
     "description": "Set dropdown list on a cell range",
     "risk": "write",
@@ -3859,6 +3699,470 @@
       }
     ],
     "source": "shortcuts/sheets/backward/lark_sheets_dropdown.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+set-style",
+    "description": "Set cell style for a range",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "cell range (<sheetId>!A1:B2, or A1:B2 with --sheet-id)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID (for relative range)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "style",
+        "description": "style JSON object (e.g. {\"font\":{\"bold\":true},\"backColor\":\"#ff0000\"})",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_style_and_merge.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-delete",
+    "description": "Delete a sub-sheet (irreversible).",
+    "risk": "high-risk-write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "yes",
+        "description": "yes",
+        "type": "bool",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_workbook.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-hide",
+    "description": "Spreadsheet sheet hide",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/data/flag-defs.json"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-info",
+    "description": "Get a sub-sheet's layout metadata: row heights, column widths, hidden rows/cols, merges, groups, freeze.",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "include",
+        "description": "include",
+        "type": "string_slice",
+        "required": false,
+        "enum": [
+          "merges",
+          "row_heights",
+          "col_widths",
+          "hidden_rows",
+          "hidden_cols",
+          "groups",
+          "frozen"
+        ]
+      },
+      {
+        "name": "range",
+        "description": "range",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_sheet_structure.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-move",
+    "description": "Move a sub-sheet to a new position.",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "index",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "source-index",
+        "description": "source-index",
+        "type": "int",
+        "required": false,
+        "default": "-1",
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_workbook.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-rename",
+    "description": "Rename a sub-sheet.",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "title",
+        "description": "title",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_workbook.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+sheet-unhide",
+    "description": "Spreadsheet sheet unhide",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-name",
+        "description": "sheet-name",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/data/flag-defs.json"
+  },
+  {
+    "service": "sheets",
+    "command": "+unmerge-cells",
+    "description": "Unmerge (split) cells in a spreadsheet",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "float-image-id",
+        "description": "float image ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+update-dimension",
+    "description": "Update row or column properties (visibility, size)",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "worksheet ID",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "dimension",
+        "description": "ROWS or COLUMNS",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "ROWS",
+          "COLUMNS"
+        ]
+      },
+      {
+        "name": "start-index",
+        "description": "start position (1-indexed, inclusive)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "end-index",
+        "description": "end position (1-indexed, inclusive)",
+        "type": "int",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "visible",
+        "description": "true to show, false to hide",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "fixed-size",
+        "description": "row height or column width in pixels",
+        "type": "int",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_row_column_management.go"
   },
   {
     "service": "sheets",
@@ -4043,226 +4347,6 @@
   },
   {
     "service": "sheets",
-    "command": "+create-float-image",
-    "description": "Create a floating image on a sheet",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "float-image-token",
-        "description": "image file token (from upload API)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "range",
-        "description": "anchor cell, must be a single cell (e.g. sheetId!A1:A1)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "width",
-        "description": "width in pixels (>=20)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "height",
-        "description": "height in pixels (>=20)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "offset-x",
-        "description": "horizontal offset from anchor cell's top-left (pixels, >=0)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "offset-y",
-        "description": "vertical offset from anchor cell's top-left (pixels, >=0)",
-        "type": "int",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "float-image-id",
-        "description": "custom 10-char alphanumeric ID (auto-generated if omitted)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+delete-float-image",
-    "description": "Delete a floating image",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "float-image-id",
-        "description": "float image ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+get-float-image",
-    "description": "Get a floating image by ID",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "float-image-id",
-        "description": "float image ID",
-        "type": "string",
-        "required": true,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+list-float-images",
-    "description": "List all floating images in a sheet",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "Spreadsheet URL (XOR with `--spreadsheet-token`)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "Spreadsheet token (XOR with `--url`)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet ID",
-        "type": "string",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
-  },
-  {
-    "service": "sheets",
-    "command": "+media-upload",
-    "description": "Upload a local image for use as a floating image and return the file_token",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "spreadsheet URL",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "file",
-        "description": "local image path (files > 20MB use multipart upload automatically)",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/backward/lark_sheets_float_images.go"
-  },
-  {
-    "service": "sheets",
     "command": "+update-float-image",
     "description": "Update a floating image",
     "risk": "write",
@@ -4335,747 +4419,325 @@
   },
   {
     "service": "sheets",
-    "command": "+chart-create",
-    "description": "Spreadsheet chart create",
+    "command": "+update-sheet",
+    "description": "Update sheet properties",
     "risk": "write",
     "flags": [
       {
         "name": "url",
-        "description": "url",
+        "description": "spreadsheet URL",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
+        "description": "spreadsheet token",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
         "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
+        "description": "sheet ID",
         "type": "string",
         "required": true,
         "enum": []
       },
       {
-        "name": "dry-run",
-        "description": "dry-run",
+        "name": "title",
+        "description": "sheet title",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "index",
+        "description": "sheet index (0-based)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "hidden",
+        "description": "set true to hide or false to unhide",
         "type": "bool",
         "required": false,
         "enum": []
+      },
+      {
+        "name": "frozen-row-count",
+        "description": "freeze rows through this count (0 unfreezes)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "frozen-col-count",
+        "description": "freeze columns through this count (0 unfreezes)",
+        "type": "int",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "lock",
+        "description": "sheet protection mode",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "lock-info",
+        "description": "protection remark",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "user-ids",
+        "description": "extra editor IDs for protected sheet as JSON array (e.g. '[\"ou_xxx\"]')",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "user-id-type",
+        "description": "user ID type for --user-ids",
+        "type": "string",
+        "required": false,
+        "enum": [
+          "open_id",
+          "union_id",
+          "lark_id",
+          "user_id"
+        ]
       }
     ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
+    "source": "shortcuts/sheets/backward/lark_sheets_sheet_management.go"
   },
   {
     "service": "sheets",
-    "command": "+chart-delete",
-    "description": "Spreadsheet chart delete",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "chart-id",
-        "description": "chart-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "yes",
-        "type": "bool",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+chart-list",
-    "description": "Spreadsheet chart list",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "chart-id",
-        "description": "chart-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+chart-update",
-    "description": "Spreadsheet chart update",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "chart-id",
-        "description": "chart-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+pivot-create",
-    "description": "Spreadsheet pivot create",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "target-position",
-        "description": "target-position",
-        "type": "string",
-        "required": false,
-        "default": "A1",
-        "enum": []
-      },
-      {
-        "name": "target-sheet-id",
-        "description": "target-sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "target-sheet-name",
-        "description": "target-sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "source",
-        "description": "source",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "range",
-        "description": "range",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+pivot-delete",
-    "description": "Spreadsheet pivot delete",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "pivot-table-id",
-        "description": "pivot-table-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "yes",
-        "type": "bool",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+pivot-list",
-    "description": "Spreadsheet pivot list",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "pivot-table-id",
-        "description": "pivot-table-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+pivot-update",
-    "description": "Spreadsheet pivot update",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "pivot-table-id",
-        "description": "pivot-table-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+sparkline-create",
-    "description": "Spreadsheet sparkline create",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+sparkline-delete",
-    "description": "Spreadsheet sparkline delete",
-    "risk": "high-risk-write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "group-id",
-        "description": "group-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "yes",
-        "description": "yes",
-        "type": "bool",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+sparkline-list",
-    "description": "Spreadsheet sparkline list",
-    "risk": "read",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "group-id",
-        "description": "group-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "sheets",
-    "command": "+sparkline-update",
-    "description": "Spreadsheet sparkline update",
-    "risk": "write",
-    "flags": [
-      {
-        "name": "url",
-        "description": "url",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "spreadsheet-token",
-        "description": "spreadsheet-token",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-id",
-        "description": "sheet-id",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "sheet-name",
-        "description": "sheet-name",
-        "type": "string",
-        "required": false,
-        "enum": []
-      },
-      {
-        "name": "group-id",
-        "description": "group-id",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "properties",
-        "description": "properties",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "dry-run",
-        "description": "dry-run",
-        "type": "bool",
-        "required": false,
-        "enum": []
-      }
-    ],
-    "source": "shortcuts/sheets/data/flag-defs.json"
-  },
-  {
-    "service": "slides",
-    "command": "+create",
-    "description": "Create a Lark Slides presentation",
+    "command": "+workbook-create",
+    "description": "Spreadsheet workbook create",
     "risk": "write",
     "flags": [
       {
         "name": "title",
-        "description": "presentation title",
+        "description": "title",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "folder-token",
+        "description": "folder-token",
         "type": "string",
         "required": false,
         "enum": []
       },
       {
-        "name": "slides",
-        "description": "slide content JSON array (each element is a <slide> XML string, max 10; for more pages, create first then add via xml_presentation.slide.create). <img src=\"@./local.png\"> placeholders are auto-uploaded and replaced with file_token.",
+        "name": "headers",
+        "description": "headers",
         "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "values",
+        "description": "values",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
         "required": false,
         "enum": []
       }
     ],
-    "source": "shortcuts/slides/slides_create.go"
+    "source": "shortcuts/sheets/data/flag-defs.json"
   },
   {
-    "service": "slides",
-    "command": "+replace-slide",
-    "description": "Replace elements on a slide via block_replace / block_insert parts (auto-injects id + <content/> on shape elements)",
+    "service": "sheets",
+    "command": "+workbook-export",
+    "description": "Spreadsheet workbook export",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "file-extension",
+        "description": "file-extension",
+        "type": "string",
+        "required": false,
+        "default": "xlsx",
+        "enum": [
+          "xlsx",
+          "csv"
+        ]
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet-id",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "output-path",
+        "description": "output-path",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/data/flag-defs.json"
+  },
+  {
+    "service": "sheets",
+    "command": "+workbook-info",
+    "description": "List sub-sheets of a spreadsheet with metadata (sheet_id, title, dimensions, freeze, hidden).",
+    "risk": "read",
+    "flags": [
+      {
+        "name": "url",
+        "description": "url",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet-token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "dry-run",
+        "description": "dry-run",
+        "type": "bool",
+        "required": false,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/lark_sheet_workbook.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+write",
+    "description": "Write to spreadsheet cells (overwrite mode)",
     "risk": "write",
     "flags": [
       {
-        "name": "presentation",
-        "description": "xml_presentation_id, slides URL, or wiki URL that resolves to slides",
+        "name": "url",
+        "description": "spreadsheet URL",
         "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "slide-id",
-        "description": "slide page identifier (slide_id)",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "parts",
-        "description": "JSON array of replace parts (each: {action: block_replace|block_insert, ...}); max 200",
-        "type": "string",
-        "required": true,
-        "enum": []
-      },
-      {
-        "name": "revision-id",
-        "description": "presentation revision (-1 = latest; pass a specific number for optimistic locking)",
-        "type": "int",
-        "default": "-1",
         "required": false,
         "enum": []
       },
       {
-        "name": "tid",
-        "description": "transaction id for concurrent-edit locking (usually empty)",
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "write range (<sheetId>!A1:D10, A1:D10 with --sheet-id, or a single cell like C2)",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "values",
+        "description": "2D array JSON",
+        "type": "string",
+        "required": true,
+        "enum": []
+      }
+    ],
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_data.go"
+  },
+  {
+    "service": "sheets",
+    "command": "+write-image",
+    "description": "Write an image into a spreadsheet cell",
+    "risk": "write",
+    "flags": [
+      {
+        "name": "url",
+        "description": "spreadsheet URL",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "spreadsheet-token",
+        "description": "spreadsheet token",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "sheet-id",
+        "description": "sheet ID",
+        "type": "string",
+        "required": false,
+        "enum": []
+      },
+      {
+        "name": "range",
+        "description": "target cell (e.g. A1 or <sheetId>!A1). Start and end cell must be the same",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "image",
+        "description": "local image file path (supported formats: PNG, JPEG, JPG, GIF, BMP, JFIF, EXIF, TIFF, BPG, HEIC)",
+        "type": "string",
+        "required": true,
+        "enum": []
+      },
+      {
+        "name": "name",
+        "description": "image file name with extension (defaults to the basename of --image)",
         "type": "string",
         "required": false,
         "enum": []
       }
     ],
-    "source": "shortcuts/slides/slides_replace_slide.go"
+    "source": "shortcuts/sheets/backward/lark_sheets_cell_images.go"
   },
   {
     "service": "whiteboard",
@@ -5113,13 +4775,5 @@
       }
     ],
     "source": "shortcuts/whiteboard/whiteboard_query.go"
-  },
-  {
-    "service": "whiteboard",
-    "command": "+update",
-    "description": "",
-    "risk": "write",
-    "flags": [],
-    "source": "shortcuts/whiteboard/whiteboard_update.go"
   }
 ]

@@ -1287,6 +1287,119 @@ async function withLegacySheetId(ctx, f) {
   delete next["sheet-name"];
   return next;
 }
+const aliasTo = (target, convert) => async (ctx, f) => {
+  const extra = convert ? await convert(ctx, f) : {};
+  return [target, { ...f, ...extra }];
+};
+
+function withFlagName(f, from, to) {
+  if (!has(f, from)) return { ...f };
+  const next = { ...f, [to]: f[from] };
+  delete next[from];
+  return next;
+}
+
+function withInvertedCase(f) {
+  if (!has(f, "match-case")) return f;
+  const next = { ...f, "ignore-case": !yes(f["match-case"]) };
+  delete next["match-case"];
+  return next;
+}
+
+function parseA1(range) {
+  const m = /^(?:[^!]+!)?\$?([A-Za-z]+)\$?(\d+):\$?([A-Za-z]+)\$?(\d+)$/.exec(
+    String(range ?? "").trim(),
+  );
+  if (!m) return undefined;
+  const col = (s) =>
+    [...s.toUpperCase()].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) -
+    1;
+  return {
+    start_row: Number(m[2]) - 1,
+    start_col: col(m[1]),
+    end_row: Number(m[4]) - 1,
+    end_col: col(m[3]),
+  };
+}
+
+function rangeSheetId(f) {
+  const m = /^([^!]+)!/.exec(String(f.range ?? ""));
+  return m && !f["sheet-id"] ? { "sheet-id": m[1] } : {};
+}
+
+function dimRangeFlags(f) {
+  const b = parseA1(f.range);
+  if (!b) fail("--range must be an A1 range like sheet1!A1:B2");
+  const rows = b.start_row === b.end_row;
+  return {
+    ...rangeSheetId(f),
+    dimension: rows ? "ROWS" : "COLUMNS",
+    "start-index": rows ? b.start_row : b.start_col,
+    "end-index": rows ? b.end_row : b.end_col,
+  };
+}
+
+function resizeFlags(f, dimension) {
+  const b = parseA1(f.range);
+  if (!b) fail("--range must be an A1 range like sheet1!A1:B2");
+  const columns = dimension === "COLUMNS";
+  return {
+    ...rangeSheetId(f),
+    dimension,
+    "start-index": columns ? b.start_col : b.start_row,
+    "end-index": columns ? b.end_col : b.end_row,
+    "fixed-size": f.size,
+  };
+}
+
+function freezeFlags(f) {
+  const row = String(f.dimension ?? "row")
+    .toLowerCase()
+    .startsWith("row");
+  const count = Number(f.count ?? 1);
+  return row ? { "frozen-row-count": count } : { "frozen-col-count": count };
+}
+
+function styleFromFlags(f) {
+  const style = {};
+  const map = {
+    "background-color": "back_color",
+    "font-color": "fore_color",
+    "number-format": "number_format",
+    "horizontal-alignment": "horizontal_alignment",
+    "vertical-alignment": "vertical_alignment",
+  };
+  for (const [from, to] of Object.entries(map))
+    if (f[from] !== undefined) style[to] = f[from];
+  if (f["font-size"] !== undefined) style.font_size = `${f["font-size"]}px`;
+  if (f["font-weight"] === "bold") style.bold = true;
+  if (f["font-style"] === "italic") style.italic = true;
+  if (f["font-line"] === "underline") style.underline = true;
+  if (f["font-line"] === "line-through") style.strikethrough = true;
+  if (f["word-wrap"] !== undefined) style.word_wrap = yes(f["word-wrap"]);
+  if (f["border-styles"]) style.border = f["border-styles"];
+  return style;
+}
+
+function colName(index) {
+  let n = index + 1;
+  let out = "";
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    out = String.fromCharCode(65 + rem) + out;
+    n = Math.floor((n - 1) / 26);
+  }
+  return out;
+}
+
+function floatPosition(f) {
+  if (f["position-row"] === undefined || f["position-col"] === undefined)
+    return undefined;
+  return `${f["sheet-id"] ?? "sheet"}!${colName(Number(f["position-col"]))}${
+    Number(f["position-row"]) + 1
+  }`;
+}
+
 const SHEETS_ALIASES = {
   "+workbook-create": async (ctx, f) => {
     const next = { ...f };
@@ -1295,6 +1408,91 @@ const SHEETS_ALIASES = {
     delete next.values;
     return ["+create", next];
   },
+  "+workbook-info": aliasTo("+info"),
+  "+sheet-info": aliasTo("+info"),
+  "+sheet-copy": aliasTo("+copy-sheet", withLegacySheetId),
+  "+sheet-create": aliasTo("+create-sheet"),
+  "+sheet-delete": aliasTo("+delete-sheet", withLegacySheetId),
+  "+sheet-hide": aliasTo("+update-sheet", async (ctx, f) => ({
+    ...(await withLegacySheetId(ctx, f)),
+    hidden: true,
+  })),
+  "+sheet-unhide": aliasTo("+update-sheet", async (ctx, f) => ({
+    ...(await withLegacySheetId(ctx, f)),
+    hidden: false,
+  })),
+  "+sheet-move": aliasTo("+update-sheet", withLegacySheetId),
+  "+sheet-rename": aliasTo("+update-sheet", withLegacySheetId),
+  "+cells-batch-set-style": aliasTo("+batch-set-style"),
+  "+cells-get": aliasTo("+read"),
+  "+cells-merge": aliasTo("+merge-cells", (ctx, f) =>
+    has(f, "merge-type") ? {} : { "merge-type": "MERGE_ALL" },
+  ),
+  "+cells-replace": aliasTo("+replace", (ctx, f) =>
+    withFlagName(f, "regex", "search-by-regex"),
+  ),
+  "+cells-search": aliasTo("+find", (ctx, f) =>
+    withInvertedCase(withFlagName(f, "regex", "search-by-regex")),
+  ),
+  "+cells-set": aliasTo("+write", (ctx, f) =>
+    f.cells !== undefined && f.values === undefined ? { values: f.cells } : {},
+  ),
+  "+cells-set-image": aliasTo("+write-image"),
+  "+cells-set-style": aliasTo("+set-style", (ctx, f) => ({
+    style: JSON.stringify(styleFromFlags(f)),
+  })),
+  "+cells-unmerge": aliasTo("+unmerge-cells"),
+  "+dropdown-delete": aliasTo("+delete-dropdown"),
+  "+dropdown-get": aliasTo("+get-dropdown"),
+  "+dropdown-set": aliasTo("+set-dropdown", (ctx, f) => ({
+    "condition-values": f.options,
+  })),
+  "+dropdown-update": aliasTo("+update-dropdown", (ctx, f) => ({
+    "condition-values": f.options,
+  })),
+  "+filter-view-create": aliasTo("+create-filter-view", (ctx, f) =>
+    f["view-name"] && !f["filter-view-name"]
+      ? { "filter-view-name": f["view-name"] }
+      : {},
+  ),
+  "+filter-view-list": aliasTo("+list-filter-views"),
+  "+float-image-create": aliasTo("+create-float-image", (ctx, f) => {
+    const extra = {};
+    if (f["image-token"]) extra["float-image-token"] = f["image-token"];
+    const range = floatPosition(f);
+    if (range) extra.range = range;
+    if (f["size-width"]) extra.width = f["size-width"];
+    if (f["size-height"]) extra.height = f["size-height"];
+    if (f["offset-col"]) extra["offset-x"] = f["offset-col"];
+    if (f["offset-row"]) extra["offset-y"] = f["offset-row"];
+    return extra;
+  }),
+  "+float-image-update": aliasTo("+update-float-image", (ctx, f) => {
+    const extra = {};
+    if (f["image-name"]) extra["float-image-id"] = f["image-name"];
+    const range = floatPosition(f);
+    if (range) extra.range = range;
+    if (f["size-width"]) extra.width = f["size-width"];
+    if (f["size-height"]) extra.height = f["size-height"];
+    return extra;
+  }),
+  "+float-image-list": aliasTo("+list-float-images"),
+  "+cols-resize": aliasTo("+update-dimension", (ctx, f) =>
+    resizeFlags(f, "COLUMNS"),
+  ),
+  "+rows-resize": aliasTo("+update-dimension", (ctx, f) =>
+    resizeFlags(f, "ROWS"),
+  ),
+  "+dim-delete": aliasTo("+delete-dimension", (ctx, f) => dimRangeFlags(f)),
+  "+dim-hide": aliasTo("+update-dimension", (ctx, f) => ({
+    ...dimRangeFlags(f),
+    visible: false,
+  })),
+  "+dim-unhide": aliasTo("+update-dimension", (ctx, f) => ({
+    ...dimRangeFlags(f),
+    visible: true,
+  })),
+  "+dim-freeze": aliasTo("+update-sheet", (ctx, f) => freezeFlags(f)),
 };
 
 async function grantCurrentUser(ctx, token, type) {
@@ -1411,13 +1609,6 @@ function sheetToken(f) {
   if (!match) fail("--url must contain /sheets/<token>");
   return decodeURIComponent(match[1]);
 }
-function colName(index) {
-  let s = "";
-  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26))
-    s = String.fromCharCode(65 + ((n - 1) % 26)) + s;
-  return s;
-}
-
 function parseCsvRecord(text) {
   const fields = [];
   let value = "",
@@ -1693,6 +1884,60 @@ async function executeLegacySheets(ctx, command, original) {
       fail(`${name} must be valid JSON`);
     }
   };
+  if (command === "+cond-format-create") {
+    const sheetId = await legacySheetId(ctx, f);
+    const body = clean({
+      sheet_id: sheetId,
+      condition_formats: [
+        {
+          rule_type: f["rule-type"],
+          ranges: jsonArg(f.ranges, "--ranges"),
+          properties: jsonArg(f.properties, "--properties"),
+        },
+      ],
+    });
+    return req(
+      ctx,
+      "POST",
+      `${v2}/condition_formats/batch_create`,
+      undefined,
+      body,
+    );
+  }
+  if (command === "+cond-format-list") {
+    const sheetId = await legacySheetId(ctx, f);
+    return req(
+      ctx,
+      "GET",
+      `${v2}/condition_formats`,
+      clean({ sheet_id: sheetId, rule_id: f["rule-id"] }),
+    );
+  }
+  if (command === "+filter-create" || command === "+filter-update") {
+    const sheetId = await legacySheetId(ctx, f);
+    const body = clean({
+      range: f.range,
+      properties: f.properties
+        ? jsonArg(f.properties, "--properties")
+        : undefined,
+    });
+    return req(
+      ctx,
+      command === "+filter-create" ? "POST" : "PUT",
+      `${v2}/sheets/${enc(sheetId)}/filter`,
+      undefined,
+      body,
+    );
+  }
+  if (command === "+filter-list") {
+    const sheetId = await legacySheetId(ctx, f);
+    return req(ctx, "GET", `${v2}/sheets/${enc(sheetId)}/filter`);
+  }
+  if (command === "+filter-delete") {
+    const sheetId = await legacySheetId(ctx, f);
+    if (!f.yes) fail("Pass --yes to confirm deleting the filter");
+    return req(ctx, "DELETE", `${v2}/sheets/${enc(sheetId)}/filter`);
+  }
   if (command === "+info") {
     const spreadsheet = await req(ctx, "GET", v3);
     const sheets = await req(ctx, "GET", `${v3}/sheets/query`);

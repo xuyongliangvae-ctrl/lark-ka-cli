@@ -2,230 +2,10 @@
   "node": ">=22",
   "implementation": "native-nodejs",
   "goRuntimeRequired": false,
-  "shortcutCount": 120,
+  "shortcutCount": 131,
   "metadataAPICount": 68,
   "missing": [],
   "commands": [
-    {
-      "service": "docs",
-      "command": "+create",
-      "implementation": "native-node",
-      "notes": "native-xml-markdown-text-tables-or-docs-ai-or-mcp"
-    },
-    {
-      "service": "docs",
-      "command": "+fetch",
-      "implementation": "native-node",
-      "notes": "native-xml-markdown-raw-partial-or-docs-ai-or-mcp"
-    },
-    {
-      "service": "docs",
-      "command": "+media-download",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "docs",
-      "command": "+media-insert",
-      "implementation": "native-node",
-      "notes": "implemented-with-selection-clipboard-and-rollback"
-    },
-    {
-      "service": "docs",
-      "command": "+media-preview",
-      "implementation": "removed"
-    },
-    {
-      "service": "docs",
-      "command": "+media-upload",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "docs",
-      "command": "+search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "docs",
-      "command": "+update",
-      "implementation": "native-node",
-      "notes": "native-append-replace-delete-literal-edit-or-docs-ai-or-mcp"
-    },
-    {
-      "service": "docs",
-      "command": "+whiteboard-update",
-      "implementation": "removed"
-    },
-    {
-      "service": "drive",
-      "command": "+create-folder",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+create-shortcut",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+delete",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+inspect",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+move",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+search",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+download",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+export",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+export-download",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+import",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+task_result",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+upload",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+pull",
-      "implementation": "native-node",
-      "notes": "partial-see-source-validation"
-    },
-    {
-      "service": "drive",
-      "command": "+push",
-      "implementation": "native-node",
-      "notes": "partial-see-source-validation"
-    },
-    {
-      "service": "drive",
-      "command": "+status",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+sync",
-      "implementation": "native-node",
-      "notes": "partial-see-source-validation"
-    },
-    {
-      "service": "drive",
-      "command": "+cover",
-      "implementation": "native-node",
-      "notes": "partial-see-source-validation"
-    },
-    {
-      "service": "drive",
-      "command": "+preview",
-      "implementation": "native-node",
-      "notes": "partial-see-source-validation"
-    },
-    {
-      "service": "drive",
-      "command": "+apply-permission",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+secure-label-list",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+secure-label-update",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+version-get",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "drive",
-      "command": "+version-history",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "markdown",
-      "command": "+create",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "markdown",
-      "command": "+diff",
-      "implementation": "native-node",
-      "notes": "implemented-unified-diff"
-    },
-    {
-      "service": "markdown",
-      "command": "+fetch",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "markdown",
-      "command": "+overwrite",
-      "implementation": "native-node",
-      "notes": "implemented"
-    },
-    {
-      "service": "markdown",
-      "command": "+patch",
-      "implementation": "native-node",
-      "notes": "implemented-re2-subset"
-    },
     {
       "service": "base",
       "command": "+base-copy",
@@ -243,17 +23,7 @@
     },
     {
       "service": "base",
-      "command": "+table-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+table-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+table-list",
+      "command": "+dashboard-list",
       "implementation": "native-node"
     },
     {
@@ -264,6 +34,11 @@
     {
       "service": "base",
       "command": "+field-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "base",
+      "command": "+form-get",
       "implementation": "native-node"
     },
     {
@@ -298,6 +73,21 @@
     },
     {
       "service": "base",
+      "command": "+table-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "base",
+      "command": "+table-get",
+      "implementation": "native-node"
+    },
+    {
+      "service": "base",
+      "command": "+table-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "base",
       "command": "+view-get",
       "implementation": "native-node"
     },
@@ -307,58 +97,182 @@
       "implementation": "native-node"
     },
     {
-      "service": "base",
-      "command": "+form-get",
-      "implementation": "native-node"
-    },
-    {
-      "service": "base",
-      "command": "+dashboard-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
+      "service": "docs",
       "command": "+create",
-      "implementation": "native-node"
+      "implementation": "native-node",
+      "notes": "native-xml-markdown-text-tables-or-docs-ai-or-mcp"
+    },
+    {
+      "service": "docs",
+      "command": "+fetch",
+      "implementation": "native-node",
+      "notes": "native-xml-markdown-raw-partial-or-docs-ai-or-mcp"
+    },
+    {
+      "service": "docs",
+      "command": "+media-download",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "docs",
+      "command": "+media-insert",
+      "implementation": "native-node",
+      "notes": "implemented-with-selection-clipboard-and-rollback"
+    },
+    {
+      "service": "docs",
+      "command": "+media-upload",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "docs",
+      "command": "+search",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "docs",
+      "command": "+update",
+      "implementation": "native-node",
+      "notes": "native-append-replace-delete-literal-edit-or-docs-ai-or-mcp"
+    },
+    {
+      "service": "drive",
+      "command": "+create-folder",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+create-shortcut",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+delete",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+download",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+export",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+import",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+inspect",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+move",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+pull",
+      "implementation": "native-node",
+      "notes": "partial-see-source-validation"
+    },
+    {
+      "service": "drive",
+      "command": "+push",
+      "implementation": "native-node",
+      "notes": "partial-see-source-validation"
+    },
+    {
+      "service": "drive",
+      "command": "+search",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+secure-label-list",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+status",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+sync",
+      "implementation": "native-node",
+      "notes": "partial-see-source-validation"
+    },
+    {
+      "service": "drive",
+      "command": "+task_result",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+upload",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "drive",
+      "command": "+version-get",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "markdown",
+      "command": "+create",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "markdown",
+      "command": "+diff",
+      "implementation": "native-node",
+      "notes": "implemented-unified-diff"
+    },
+    {
+      "service": "markdown",
+      "command": "+fetch",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "markdown",
+      "command": "+overwrite",
+      "implementation": "native-node",
+      "notes": "implemented"
+    },
+    {
+      "service": "markdown",
+      "command": "+patch",
+      "implementation": "native-node",
+      "notes": "implemented-re2-subset"
     },
     {
       "service": "sheets",
-      "command": "+info",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+workbook-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+workbook-export",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+copy-sheet",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+create-sheet",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+delete-sheet",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+sheet-set-tab-color",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+update-sheet",
+      "command": "+add-dimension",
       "implementation": "native-node"
     },
     {
@@ -373,92 +287,72 @@
     },
     {
       "service": "sheets",
-      "command": "+find",
+      "command": "+cells-batch-set-style",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+merge-cells",
+      "command": "+cells-get",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+read",
+      "command": "+cells-merge",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+replace",
+      "command": "+cells-replace",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+set-style",
+      "command": "+cells-search",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+unmerge-cells",
+      "command": "+cells-set",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+write",
+      "command": "+cells-set-image",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+write-image",
+      "command": "+cells-set-style",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+add-dimension",
+      "command": "+cells-unmerge",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+delete-dimension",
+      "command": "+cols-resize",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+dim-group",
+      "command": "+cond-format-create",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+dim-move",
+      "command": "+cond-format-list",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+dim-ungroup",
+      "command": "+copy-sheet",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+insert-dimension",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+move-dimension",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+update-dimension",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+cond-format-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+cond-format-update",
+      "command": "+create",
       "implementation": "native-node"
     },
     {
@@ -469,6 +363,21 @@
     {
       "service": "sheets",
       "command": "+create-filter-view-condition",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+create-float-image",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+create-sheet",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+delete-dimension",
       "implementation": "native-node"
     },
     {
@@ -488,6 +397,111 @@
     },
     {
       "service": "sheets",
+      "command": "+delete-float-image",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+delete-sheet",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-freeze",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-hide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dim-unhide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dropdown-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dropdown-get",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dropdown-set",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+dropdown-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+filter-view-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+find",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-list",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+float-image-update",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+get-dropdown",
       "implementation": "native-node"
     },
@@ -503,6 +517,21 @@
     },
     {
       "service": "sheets",
+      "command": "+get-float-image",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+info",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+insert-dimension",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+list-filter-view-conditions",
       "implementation": "native-node"
     },
@@ -513,7 +542,97 @@
     },
     {
       "service": "sheets",
+      "command": "+list-float-images",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+media-upload",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+merge-cells",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+move-dimension",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+read",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+replace",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+rows-resize",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
       "command": "+set-dropdown",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+set-style",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-copy",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-create",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-delete",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-hide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-info",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-move",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-rename",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+sheet-unhide",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+unmerge-cells",
+      "implementation": "native-node"
+    },
+    {
+      "service": "sheets",
+      "command": "+update-dimension",
       "implementation": "native-node"
     },
     {
@@ -533,114 +652,44 @@
     },
     {
       "service": "sheets",
-      "command": "+create-float-image",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+delete-float-image",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+get-float-image",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+list-float-images",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+media-upload",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
       "command": "+update-float-image",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+chart-create",
+      "command": "+update-sheet",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+chart-delete",
+      "command": "+workbook-create",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+chart-list",
+      "command": "+workbook-export",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+chart-update",
+      "command": "+workbook-info",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+pivot-create",
+      "command": "+write",
       "implementation": "native-node"
     },
     {
       "service": "sheets",
-      "command": "+pivot-delete",
+      "command": "+write-image",
       "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+pivot-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+pivot-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+sparkline-create",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+sparkline-delete",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+sparkline-list",
-      "implementation": "native-node"
-    },
-    {
-      "service": "sheets",
-      "command": "+sparkline-update",
-      "implementation": "native-node"
-    },
-    {
-      "service": "slides",
-      "command": "+create",
-      "implementation": "removed"
-    },
-    {
-      "service": "slides",
-      "command": "+replace-slide",
-      "implementation": "removed"
     },
     {
       "service": "whiteboard",
       "command": "+query",
       "implementation": "native-node",
       "notes": "image-raw-or-preserved-source-only"
-    },
-    {
-      "service": "whiteboard",
-      "command": "+update",
-      "implementation": "removed"
     }
   ],
   "contentLimitations": [
